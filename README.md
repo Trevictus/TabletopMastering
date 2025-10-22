@@ -17,7 +17,7 @@ Además, integra funcionalidades inteligentes como autocompletado de datos media
 > Todos los documentos se encuentran en la carpeta `/docs`.
 
 
-Equipo formado por alumno(s):  
+## 🤝 Equipo formado por alumno(s):  
 **Juan Felipe Arias Aguirrez** | Jeréz, 23 años, organizador y planificador.  
 **Manuel Arana** | Jeréz, 25 años, desarrollador resolutivo y estructural.   
 **Víctor Gómez Tejada** | Cádiz, 33 años, creativo y mediador en la dinámica grupal.
