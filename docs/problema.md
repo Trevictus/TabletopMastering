@@ -1,101 +1,203 @@
-# 🎲 Roll & Play
+# Fase 1: Detección del problema
 
-## 🧩 Descripción general del proyecto
+## Descripción del problema identificado
+La falta de una aplicación centralizada para gestionar juegos de mesa entre amigos genera múltiples dificultades y reduce la motivación de los jugadores.
 
-**Roll & Play** es una aplicación web diseñada para organizar, jugar y llevar registro de partidas de **juegos de mesa entre amigos**.  
-Su objetivo es **facilitar la gestión del grupo**, centralizando la información de los juegos, las partidas y los resultados, evitando la desorganización y mejorando la experiencia de los jugadores.
+### 👥 ¿Quién lo sufre?
+Principalmente adultos de entre 25 y 40 años, hombres y mujeres, que disfrutan de los juegos de mesa como una forma de sociabilizar y estimularse intelectualmente.  
+Suelen ser jugadores que valoran las interacciones presenciales y los retos mentales.
 
----
+### ⏰ ¿Con qué frecuencia ocurre?
+- **Jugadores casuales:** entre 1 y 2 partidas al mes, con juegos más ligeros como Monopoly o UNO.  
+- **Jugadores habituales o hobbyistas:** entre 1 y 8 partidas al mes, con títulos más complejos como Catan o Carcassonne.
 
-## 🚀 Funcionalidades principales
-
-### 🗂️ Catálogo de juegos
-
-El catálogo permite visualizar todos los juegos que posee el grupo, mostrando información relevante como:
-
-- **Nombre del juego**
-- **Descripción**
-- **Número de jugadores**
-- **Duración aproximada**
-- **Imagen ilustrativa**
-
-Los miembros del grupo pueden añadir nuevos juegos al catálogo de forma sencilla.
-
-#### 💡 Mejora propuesta: búsqueda inteligente
-
-Para ofrecer una mejor experiencia de usuario (**UX**), el proceso de añadir un nuevo juego será **dinámico e intuitivo**:
-
-1. El usuario solo deberá escribir las primeras palabras del título.  
-2. El sistema realizará una búsqueda automática en una **API de juegos de mesa** (por ejemplo, *BoardGameGeek API* o *Board Game Atlas API*).  
-3. Los datos del juego —nombre completo, descripción, imagen, número de jugadores, duración estimada, año de publicación, etc.— se **autocompletarán automáticamente**.
-
-Si el juego no se encuentra en la base de datos, el usuario podrá completar los campos manualmente.
-
-Esta mejora **aporta un valor añadido** al proyecto, evitando que el usuario tenga que introducir datos repetitivos y dotando a la aplicación de un comportamiento más *inteligente*.
+### ⚡ ¿Cuál es el impacto?
+- Falta de motivación y continuidad al no contar con rankings o estadísticas.  
+- Dificultad para organizar partidas y recordar resultados o ganadores.  
+- Imposibilidad de hacer seguimiento del progreso o logros del grupo.  
+- Pérdida de cohesión social, al depender de múltiples chats o apps genéricas no pensadas para juegos de mesa.  
+- Dificultad para crear grupos privados o perfiles personalizados según preferencias.
 
 ---
 
-### 📅 Calendario de partidas
+## Usuarios objetivo (User Personas)
 
-El calendario permite **planificar y organizar sesiones de juego** de manera cómoda y visual.  
-Cada partida incluirá:
+### 🎯 1. Jugador casual
+**Perfil:** disfruta jugando ocasionalmente con amigos o familia, sin ser experto ni competitivo.  
 
-- **Juego elegido**
-- **Fecha y hora**
-- **Participantes**
+**Necesidades:**
+- Organizar partidas sin depender de mensajes dispersos.  
+- Tener un calendario claro con fechas y participantes.  
+- Recordar qué juegos se han jugado y quién ganó.  
 
-Además, los usuarios podrán:
+**Frustraciones:**
+- Desorganización en los grupos de chat.  
+- Olvido de resultados o reglas.  
+- Dificultad para coordinar a todos.  
 
-- Confirmar su asistencia fácilmente.  
-- Visualizar **recordatorios o notificaciones** de partidas próximas.
-
-De esta forma, se evita la desorganización habitual al coordinar fechas por chat y se facilita la participación de todos los miembros del grupo.
-
----
-
-### 🧾 Registro de partidas
-
-Esta sección permite **guardar los resultados de cada partida**, incluyendo:
-
-- **Ganador(es)**
-- **Puntuaciones obtenidas**
-- **Duración de la partida**
-
-El sistema generará automáticamente:
-
-- **Estadísticas personalizadas y comparativas.**  
-- **Rankings entre los miembros del grupo.**  
-- **Historial de partidas** por juego, accesible en cualquier momento.
-
-De esta manera, los jugadores podrán consultar fácilmente su rendimiento a lo largo del tiempo y mantener un registro completo de sus actividades.
+**Objetivos / Motivaciones:**
+- Jugar más sin complicaciones.  
+- Pasarlo bien con amigos.  
+- Tener todo centralizado y visual.
 
 ---
 
-### 🏆 Ranking y logros
+### 🎲 2. Jugador habitual o aficionado
+**Perfil:** juega con frecuencia, sigue las novedades del sector y valora llevar registro de partidas.  
 
-El sistema de ranking y logros busca **fomentar la competitividad y la motivación** del grupo.  
-Se basa en un sistema de puntos obtenidos por:
+**Necesidades:**
+- Controlar resultados, estadísticas y rankings.  
+- Planificar partidas con antelación.  
+- Descubrir nuevos juegos fácilmente.  
 
-- **Participación en partidas**
-- **Victorias conseguidas**
+**Frustraciones:**
+- Tener que anotar manualmente los resultados.  
+- No disponer de una herramienta visual para el grupo.  
+- Falta de seguimiento del rendimiento.  
 
-Además, se otorgarán **insignias especiales** por logros destacados, como:
-
-- 🥇 *Ganador del mes*  
-- 🧠 *Partida perfecta*  
-- 🔥 *Jugador más constante*
-
-Este sistema aporta un componente **lúdico y motivador**, ayudando a mantener la implicación de los usuarios en el tiempo.
+**Objetivos / Motivaciones:**
+- Mejorar su nivel y comparar resultados.  
+- Competir sanamente.  
+- Mantener un historial de partidas y logros.
 
 ---
 
-## 💎 Valor diferencial
+### 🧠 3. Organizador del grupo
+**Perfil:** persona que coordina las partidas, tiene los juegos y gestiona al grupo.  
 
-A diferencia de otras aplicaciones de gestión, **Roll & Play** no se limita a ser una base de datos de partidas.  
-Su **valor principal** reside en ofrecer una experiencia de usuario **fluida, automatizada y visualmente atractiva**, gracias a:
+**Necesidades:**
+- Centralizar planificación (juego, fecha, asistentes).  
+- Evitar múltiples chats o documentos.  
+- Ahorrar tiempo en organización.  
 
-- 🔍 **Autocompletado inteligente** de datos mediante APIs.  
-- 🧭 **Interfaz intuitiva** y centrada en la usabilidad.  
-- 📊 **Integración de estadísticas y rankings** que fomentan la participación.
+**Frustraciones:**
+- Falta de compromiso de los demás.  
+- Caos al coordinar horarios.  
+- Repetir información constantemente.  
 
-El resultado es una plataforma **práctica, dinámica y social**, diseñada para que los grupos de jugadores disfruten de una **gestión moderna y sin complicaciones** de sus sesiones de juego.
+**Objetivos / Motivaciones:**
+- Mantener todo organizado sin esfuerzo.  
+- Visualizar confirmaciones fácilmente.  
+- Contar con un sistema automatizado.
+
+---
+
+### 🏆 4. Jugador competitivo
+**Perfil:** jugador que disfruta midiendo su rendimiento y progresando en el ranking.  
+
+**Necesidades:**
+- Rankings claros y actualizados.  
+- Estadísticas personales.  
+- Logros y reconocimientos visibles.  
+
+**Frustraciones:**
+- No poder comparar resultados.  
+- Falta de un sistema objetivo de puntuación.  
+- Ausencia de registros históricos.  
+
+**Objetivos / Motivaciones:**
+- Superarse a sí mismo y a los demás.  
+- Obtener logros y reconocimiento.  
+- Gamificar la experiencia de juego.
+
+
+## Evidencias de investigación
+Para comprender mejor las necesidades, frustraciones y motivaciones de los posibles usuarios, se realizaron breves entrevistas a algunos amigos que encajan dentro del público objetivo de la aplicación.  
+A continuación se resumen las respuestas obtenidas:
+
+### 👤 Adrián (34 años)
+- **Frecuencia de juego:** 1 o 2 veces por semana  
+- **Tipo de juegos preferidos:** juegos de estrategia  
+- **Con quién suele jugar:** con su pareja y/o amigos  
+- **¿Usa alguna app para organizar las partidas?** No  
+- **¿Lleva un registro de estadísticas?** No  
+- **Motivación para usar Tabletop Mastering:** Le resultaría muy útil poder ver estadísticas y hacer seguimiento de resultados  
+- **Impacto de no tener una app específica:**  
+  > “Un auténtico calvario. Cuando terminaba los papeles físicos del juego, se nos olvidaba hacer fotocopias para seguir las partidas y apuntar las estadísticas.”
+
+### 👤 Iván (28 años)
+No proporcionó respuestas a las preguntas realizadas.  
+*(Se asume que pertenece al público objetivo, pero no aportó datos concretos.)*
+
+### 👤 Lidia (37 años)
+No proporcionó respuestas a las preguntas realizadas.  
+*(Se considera dentro del perfil potencial, pero no participó activamente en la entrevista.)*
+
+---
+
+## Análisis de competencia
+Se han seleccionado tres soluciones relacionadas con la organización de juegos de mesa y registro de partidas: **Board Game Stats**, **Board Game Arena** y **BGG (BoardGameGeek)**.
+
+### Board Game Stats
+**💪 Fortalezas**
+- Registro detallado de partidas: fecha, jugadores, puntuaciones, duración, expansiones, etc.  
+- Estadísticas visuales: gráficos sobre frecuencia de juego, victorias, puntuaciones medias.  
+- Integración con BoardGameGeek (BGG): importar colección y sincronizar partidas.  
+- Funciones avanzadas: etiquetado, desafíos, sincronización en la nube y hojas de puntuación personalizadas.  
+
+**🧩 Oportunidades**
+- Mejorar el componente social: compartir partidas o logros.  
+- Integración con otras plataformas: Tabletopia, BGA, Discord.  
+- Gamificación: logros, niveles o recompensas.  
+- Uso educativo: enseñar probabilidad, estadística o gestión de datos.  
+
+**⚠️ Debilidades**
+- Interfaz algo técnica para nuevos usuarios.  
+- Limitaciones en la versión gratuita.  
+- Falta de personalización visual.
+
+---
+
+### Board Game Arena
+**💪 Fortalezas**
+- Amplia biblioteca de juegos: +500 títulos, incluyendo Carcassonne, 7 Wonders, Azul.  
+- Accesibilidad multiplataforma: navegador, PC, tablet, móvil.  
+- Automatización de reglas: guía el juego y evita errores.  
+- Comunidad activa: millones de usuarios, partidas 24/7.  
+- Modo en tiempo real y por turnos.
+
+**🧩 Oportunidades**
+- Expansión de licencias y juegos modernos.  
+- Integración educativa: enseñar estrategia, lógica o idiomas.  
+- Mejoras en UX: interfaces intuitivas, personalización de avatares y tableros.  
+- Eventos y torneos oficiales.
+
+**⚠️ Debilidades**
+- Limitaciones en juegos premium (requieren suscripción).  
+- Interfaz técnica en algunos juegos.  
+- Dependencia de licencias editoriales.
+
+---
+
+### BoardGameGeek (BGG)
+**💪 Fortalezas**
+- Amplia biblioteca de juegos: +500 títulos, incluyendo clásicos.  
+- Accesibilidad multiplataforma.  
+- Automatización de reglas para nuevos jugadores.  
+- Comunidad activa, partidas 24/7.  
+- Modo en tiempo real y por turnos.
+
+**🧩 Oportunidades**
+- Expansión de licencias y juegos modernos.  
+- Integración educativa.  
+- Mejoras en UX y personalización.  
+- Eventos y torneos oficiales.
+
+**⚠️ Debilidades**
+- Limitaciones en juegos premium.  
+- Interfaz técnica en algunos juegos.  
+- Dependencia de licencias editoriales.
+
+---
+
+## Propuesta de valor
+**Tabletop Mastering** ofrece una plataforma completa y social para gestionar partidas de juegos de mesa físicas entre amigos.  
+
+Se diferencia por combinar:
+- Calendario de partidas  
+- Autocompletado inteligente de juegos  
+- Estadísticas y rankings  
+- Interfaz atractiva e intuitiva  
+
+**Resultado:** organización fácil, seguimiento de logros y diversión garantizada, superando las limitaciones de otras soluciones existentes.
+
