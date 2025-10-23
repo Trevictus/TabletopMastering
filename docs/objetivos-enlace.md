@@ -40,6 +40,8 @@ Finalizar la primera versión funcional del sistema antes del **31 de enero de 2
 
 El **MVP de Tabletop Mastering** se centra en ofrecer las funciones esenciales para organizar y registrar partidas de juegos de mesa entre amigos, priorizando la simplicidad, la usabilidad y la centralización de la información.
 
+Su objetivo será validar la propuesta principal: **centralizar la organización y registro de partidas** de forma sencilla, atractiva y colaborativa, permitiendo comprobar la utilidad del sistema antes de añadir funciones avanzadas (logros, estadísticas detalladas, integración con APIs, etc.).
+
 ### Funcionalidades incluidas
 
 #### 1. Gestión de juegos
@@ -62,5 +64,52 @@ El **MVP de Tabletop Mastering** se centra en ofrecer las funciones esenciales p
 - Crear un grupo de jugadores e invitar a otros mediante enlace o código.  
 
 
-### Objetivo del MVP
-Validar la propuesta principal: **centralizar la organización y registro de partidas** de forma sencilla, atractiva y colaborativa, permitiendo comprobar la utilidad del sistema antes de añadir funciones avanzadas (logros, estadísticas detalladas, integración con APIs, etc.).
+---
+
+# Delimitación del Alcance
+## Qué SÍ se hará
+1. **Gestión de juegos**
+   - Añadir y consultar juegos con nombre, número de jugadores, duración e imagen.  
+   - **Justificación:** Es la base del proyecto; sin catálogo de juegos no se pueden planificar ni registrar partidas.  
+
+2. **Planificación de partidas**
+   - Crear partidas con juego, fecha y hora.  
+   - Invitar y confirmar asistencia de los jugadores.  
+   - **Justificación:** Facilita la organización del grupo y asegura que todos estén informados de las partidas.  
+
+3. **Registro de resultados**
+   - Guardar resultados (ganador, puntuaciones y duración).  
+   - Visualizar historial básico de partidas.  
+   - **Justificación:** Permite evaluar el progreso del grupo y alimentar el sistema de ranking.  
+
+4. **Ranking básico**
+   - Sistema de puntos por victorias y participación.  
+   - Mostrar clasificación general de jugadores.  
+   - **Justificación:** Aumenta la motivación y fomenta la competencia amistosa sin complicar el MVP.  
+
+5. **Gestión de grupo**
+   - Crear un grupo y permitir invitaciones mediante enlace o código.  
+   - **Justificación:** Es esencial para que la app funcione en un entorno cerrado y seguro de amigos o familiares.  
+
+
+## Qué NO se hará
+1. **Logros e insignias avanzadas**  
+   - **Justificación:** Aunque son motivadores, no son esenciales para validar la utilidad del MVP y se pueden añadir en versiones futuras.  
+
+2. **Estadísticas avanzadas por juego o jugador**  
+   - **Justificación:** Generar estadísticas detalladas requiere más desarrollo y análisis; se pospone hasta versiones posteriores.  
+
+3. **Integración con APIs externas (BoardGameGeek, Board Game Atlas)**  
+   - **Justificación:** Permitir autocompletado de juegos mejora la experiencia, pero no es crítico para la funcionalidad básica.  
+
+4. **Sala de discusión y chat interno**  
+   - **Justificación:** La comunicación puede gestionarse fuera de la app (WhatsApp, Discord) en el MVP; añadir chat interno es un plus para versiones futuras.  
+
+5. **Notificaciones avanzadas**  
+   - **Justificación:** Recordatorios y alertas automáticas mejoran la experiencia, pero no son imprescindibles para probar la utilidad principal del proyecto.  
+
+---
+
+
+
+
