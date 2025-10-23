@@ -109,7 +109,22 @@ Su objetivo será validar la propuesta principal: **centralizar la organización
    - **Justificación:** Recordatorios y alertas automáticas mejoran la experiencia, pero no son imprescindibles para probar la utilidad principal del proyecto.  
 
 ---
+# Criterios de Éxito
 
+Los criterios de éxito definen cómo se medirá que el MVP de **Tabletop Mastering** cumple su objetivo principal: centralizar la organización y registro de partidas de juegos de mesa de manera sencilla y efectiva.
 
+1. **Catálogo funcional**
+   - Los usuarios pueden añadir y consultar juegos sin errores ni pérdida de información.
 
+2. **Partidas registradas**
+   - Es posible crear partidas y registrar resultados (ganadores, puntuaciones y duración) correctamente.
+
+3. **Ranking visible**
+   - Los puntos de los jugadores y la clasificación general se actualizan automáticamente y reflejan el rendimiento de manera clara.
+
+4. **Gestión de grupo efectiva**
+   - Se pueden crear grupos y añadir miembros mediante enlace o código de invitación de forma sencilla y segura.
+
+5. **MVP usable**
+   - La aplicación es intuitiva, fácil de usar y permite validar la propuesta de valor principal sin necesidad de funciones avanzadas adicionales.
 
