@@ -95,12 +95,27 @@ A continuación se resumen las respuestas obtenidas:
   > “Un auténtico calvario. Cuando terminaba los papeles físicos del juego, se nos olvidaba hacer fotocopias para seguir las partidas y apuntar las estadísticas.”
 
 ### Iván (28 años)
-No proporcionó respuestas a las preguntas realizadas.  
-*(Se asume que pertenece al público objetivo, pero no aportó datos concretos.)*
+- **Frecuencia de juego:** 1 o 2 veces cada 2 semanas  
+- **Tipo de juegos preferidos:** Los denominados Party games, cooperativos y alguno de estrategia  
+- **Con quién suele jugar:** Con amigos  
+- **¿Usa alguna app para organizar las partidas?** No  
+- **¿Lleva un registro de estadísticas?** No  
+- **Motivación para usar Tabletop Mastering:** Quizás si fuera una persona más competitiva y jugara con el mismo grupo podría ser interesante ver la
+evolución de los jugadores a través del tiempo en sus dinámicas de juego  
+- **Impacto de no tener una app específica:**  
+  > “Un auténtico calvario. Cuando terminaba los papeles físicos del juego, se nos olvidaba hacer fotocopias para seguir las partidas y apuntar las estadísticas.”  
+
 
 ### Lidia (37 años)
-No proporcionó respuestas a las preguntas realizadas.  
-*(Se considera dentro del perfil potencial, pero no participó activamente en la entrevista.)*
+- **Frecuencia de juego:** 1 o 2 veces por semana  
+- **Tipo de juegos preferidos:** juegos de estrategia  
+- **Con quién suele jugar:** con su pareja y/o amigos  
+- **¿Usa alguna app para organizar las partidas?** No  
+- **¿Lleva un registro de estadísticas?** No  
+- **Motivación para usar Tabletop Mastering:** Le resultaría muy útil poder ver estadísticas y hacer seguimiento de resultados  
+- **Impacto de no tener una app específica:**  
+  > “Un auténtico calvario. Cuando terminaba los papeles físicos del juego, se nos olvidaba hacer fotocopias para seguir las partidas y apuntar las estadísticas.”
+
 
 
 
@@ -178,5 +193,6 @@ Se diferencia por combinar:
 - Interfaz atractiva e intuitiva  
 
 **Resultado:** organización fácil, seguimiento de logros y diversión garantizada, superando las limitaciones de otras soluciones existentes.
+
 
 
