@@ -103,18 +103,18 @@ A continuación se resumen las respuestas obtenidas:
 - **Motivación para usar Tabletop Mastering:** Quizás si fuera una persona más competitiva y jugara con el mismo grupo podría ser interesante ver la
 evolución de los jugadores a través del tiempo en sus dinámicas de juego  
 - **Impacto de no tener una app específica:**  
-  > “Un auténtico calvario. Cuando terminaba los papeles físicos del juego, se nos olvidaba hacer fotocopias para seguir las partidas y apuntar las estadísticas.”  
+  > “Cómo no juego demasiado no me afecta especialmente, aunque si es verdad que luego hay piques entre nosotros por querer recordar quién ganó.”  
 
 
 ### Lidia (37 años)
-- **Frecuencia de juego:** 1 o 2 veces por semana  
-- **Tipo de juegos preferidos:** juegos de estrategia  
+- **Frecuencia de juego:** entre 2 y 3 veces por mes   
+- **Tipo de juegos preferidos:** juegos que desarrollan la creatividad, la interpretación o la mímica  
 - **Con quién suele jugar:** con su pareja y/o amigos  
 - **¿Usa alguna app para organizar las partidas?** No  
-- **¿Lleva un registro de estadísticas?** No  
-- **Motivación para usar Tabletop Mastering:** Le resultaría muy útil poder ver estadísticas y hacer seguimiento de resultados  
+- **¿Lleva un registro de estadísticas?** antes sí, ahora no  
+- **Motivación para usar Tabletop Mastering:** que pudieses crear tu perfil rollo “ficha de personaje”, pudiendo poner imagen, descripción, cita, o que incluso la gente pudiese votar en cada perfil si es competitivo, si es cooperativo, etc.  
 - **Impacto de no tener una app específica:**  
-  > “Un auténtico calvario. Cuando terminaba los papeles físicos del juego, se nos olvidaba hacer fotocopias para seguir las partidas y apuntar las estadísticas.”
+  > “Me afecta en que puede que no recuerde si he quedado o no para jugar, y sobre todo el no tener estadísticas de cuánto he jugado, a qué suelo jugar, con cuál disfrutamos más todos, etc.”
 
 
 
@@ -193,6 +193,7 @@ Se diferencia por combinar:
 - Interfaz atractiva e intuitiva  
 
 **Resultado:** organización fácil, seguimiento de logros y diversión garantizada, superando las limitaciones de otras soluciones existentes.
+
 
 
 
