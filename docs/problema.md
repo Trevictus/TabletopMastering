@@ -4,8 +4,7 @@
 La falta de una aplicación centralizada para gestionar juegos de mesa entre amigos genera múltiples dificultades y reduce la motivación de los jugadores.
 
 ### ¿Quién lo sufre?
-Principalmente adultos de entre 25 y 40 años, hombres y mujeres, que disfrutan de los juegos de mesa como una forma de sociabilizar y estimularse intelectualmente.  
-Suelen ser jugadores que valoran las interacciones presenciales y los retos mentales.
+Principalmente adultos de entre 25 y 40 años, hombres y mujeres, que disfrutan de los juegos de mesa como una forma de sociabilizar y estimularse intelectualmente.
 
 ### ¿Con qué frecuencia ocurre?
 - **Jugadores casuales:** entre 1 y 2 partidas al mes, con juegos más ligeros como Monopoly o UNO.  
@@ -20,65 +19,25 @@ Suelen ser jugadores que valoran las interacciones presenciales y los retos ment
 
 ---
 
-## Usuarios objetivo (User Personas)
+## 🎯 Usuarios objetivo (User Personas)
 
-### 1. Jugador habitual o aficionado
-**Perfil:** juega con frecuencia, sigue las novedades del sector y valora llevar registro de partidas.  
-
-**Necesidades:**
-- Controlar resultados, estadísticas y rankings.  
-- Planificar partidas con antelación.  
-- Descubrir nuevos juegos fácilmente.  
-
-**Frustraciones:**
-- Tener que anotar manualmente los resultados.  
-- No disponer de una herramienta visual para el grupo.  
-- Falta de seguimiento del rendimiento.  
-
-**Objetivos / Motivaciones:**
-- Mejorar su nivel y comparar resultados.  
-- Competir sanamente.  
-- Mantener un historial de partidas y logros.
-
+### 1. Jugador habitual
+**Perfil:** participa frecuentemente en partidas y sigue las novedades del sector.  
+**Necesidades:** registrar resultados, planificar partidas y descubrir nuevos juegos.  
+**Frustraciones:** anotar manualmente, falta de herramientas visuales y sin seguimiento de rendimiento.  
+**Motivaciones:** mejorar su nivel, competir sanamente y mantener un historial de logros.
 
 ### 2. Organizador del grupo
-**Perfil:** persona que coordina las partidas, tiene los juegos y gestiona al grupo.  
-
-**Necesidades:**
-- Centralizar planificación (juego, fecha, asistentes).  
-- Evitar múltiples chats o documentos.  
-- Ahorrar tiempo en organización.  
-
-**Frustraciones:**
-- Falta de compromiso de los demás.  
-- Caos al coordinar horarios.  
-- Repetir información constantemente.  
-
-**Objetivos / Motivaciones:**
-- Mantener todo organizado sin esfuerzo.  
-- Visualizar confirmaciones fácilmente.  
-- Contar con un sistema automatizado.
-
+**Perfil:** coordina las partidas, posee la mayoría de los juegos y gestiona al grupo.  
+**Necesidades:** centralizar planificación (juego, fecha, asistentes) y reducir tiempo de gestión.  
+**Frustraciones:** falta de compromiso, caos en horarios y repetición de información.  
+**Motivaciones:** mantener orden y control de forma automatizada y visualizar confirmaciones fácilmente.
 
 ### 3. Jugador competitivo
-**Perfil:** jugador que disfruta midiendo su rendimiento y progresando en el ranking.  
-
-**Necesidades:**
-- Rankings claros y actualizados.  
-- Estadísticas personales.  
-- Logros y reconocimientos visibles.  
-
-**Frustraciones:**
-- No poder comparar resultados.  
-- Falta de un sistema objetivo de puntuación.  
-- Ausencia de registros históricos.  
-
-**Objetivos / Motivaciones:**
-- Superarse a sí mismo y a los demás.  
-- Obtener logros y reconocimiento.  
-- Gamificar la experiencia de juego.
-
-
+**Perfil:** busca medir su rendimiento y progresar en el ranking.  
+**Necesidades:** rankings actualizados, estadísticas personales y logros visibles.  
+**Frustraciones:** no poder comparar resultados ni contar con registros históricos.  
+**Motivaciones:** superarse, obtener reconocimiento y disfrutar de una experiencia gamificada.
 
 ## Evidencias de investigación
 Para comprender mejor las necesidades, frustraciones y motivaciones de los posibles usuarios, se realizaron breves entrevistas a algunos amigos que encajan dentro del público objetivo de la aplicación.  
@@ -105,7 +64,6 @@ evolución de los jugadores a través del tiempo en sus dinámicas de juego
 - **Impacto de no tener una app específica:**  
   > “Cómo no juego demasiado no me afecta especialmente, aunque si es verdad que luego hay piques entre nosotros por querer recordar quién ganó.”  
 
-
 ### Lidia (37 años)
 - **Frecuencia de juego:** entre 2 y 3 veces por mes   
 - **Tipo de juegos preferidos:** juegos que desarrollan la creatividad, la interpretación o la mímica  
@@ -118,81 +76,76 @@ evolución de los jugadores a través del tiempo en sus dinámicas de juego
 
 
 
-
+---
 ## Análisis de competencia
-Se han seleccionado tres soluciones relacionadas con la organización de juegos de mesa y registro de partidas: **Board Game Stats**, **Board Game Arena** y **BGG (BoardGameGeek)**.
 
-### 1). Board Game Stats
+Se han analizado tres soluciones destacadas en el ámbito de los juegos de mesa y registro de partidas: **Board Game Stats**, **Board Game Arena** y **BoardGameGeek (BGG)**.
+
+### 1. Board Game Stats
 **Fortalezas**
-- Registro detallado de partidas: fecha, jugadores, puntuaciones, duración, expansiones, etc.  
-- Estadísticas visuales: gráficos sobre frecuencia de juego, victorias, puntuaciones medias.  
-- Integración con BoardGameGeek (BGG): importar colección y sincronizar partidas.  
-- Funciones avanzadas: etiquetado, desafíos, sincronización en la nube y hojas de puntuación personalizadas.  
- 
-**Oportunidades**
-- Mejorar el componente social: compartir partidas o logros.  
-- Integración con otras plataformas: Tabletopia, BGA, Discord.  
-- Gamificación: logros, niveles o recompensas.  
-- Uso educativo: enseñar probabilidad, estadística o gestión de datos.  
-
-**Debilidades**
-- Interfaz algo técnica para nuevos usuarios.  
-- Limitaciones en la versión gratuita.  
-- Falta de personalización visual.  
-
-&nbsp;
-### 2). Board Game Arena
-**Fortalezas**
-- Amplia biblioteca de juegos: +500 títulos, incluyendo Carcassonne, 7 Wonders, Azul.  
-- Accesibilidad multiplataforma: navegador, PC, tablet, móvil.  
-- Automatización de reglas: guía el juego y evita errores.  
-- Comunidad activa: millones de usuarios, partidas 24/7.  
-- Modo en tiempo real y por turnos.
+- Registro completo de partidas (fecha, jugadores, puntuaciones, duración, expansiones).  
+- Estadísticas visuales e informes personalizados.  
+- Sincronización con BGG y almacenamiento en la nube.  
 
 **Oportunidades**
-- Expansión de licencias y juegos modernos.  
-- Integración educativa: enseñar estrategia, lógica o idiomas.  
-- Mejoras en UX: interfaces intuitivas, personalización de avatares y tableros.  
-- Eventos y torneos oficiales.
+- Potenciar la interacción social y la gamificación.  
+- Integración con plataformas como BGA, Discord o Tabletopia.  
+- Enfoque educativo (probabilidad, estadísticas, gestión de datos).  
 
 **Debilidades**
-- Limitaciones en juegos premium (requieren suscripción).  
-- Interfaz técnica en algunos juegos.  
+- Interfaz poco intuitiva para principiantes.  
+- Funciones limitadas en la versión gratuita.  
+- Escasa personalización visual.
+
+
+### 2. Board Game Arena
+**Fortalezas**
+- Más de 500 juegos disponibles, incluyendo títulos populares.  
+- Multiplataforma y accesible desde navegador o dispositivos móviles.  
+- Reglas automatizadas y comunidad muy activa.  
+
+**Oportunidades**
+- Ampliar catálogo y mejorar la experiencia de usuario.  
+- Integrar elementos educativos y personalización visual.  
+- Fomentar eventos y torneos oficiales.  
+
+**Debilidades**
+- Algunos juegos requieren suscripción premium.  
+- Interfaz técnica en ciertos títulos.  
 - Dependencia de licencias editoriales.
 
 
-&nbsp;
-### 3). BoardGameGeek (BGG)
+### 3. BoardGameGeek (BGG)
 **Fortalezas**
-- Amplia biblioteca de juegos: +500 títulos, incluyendo clásicos.  
-- Accesibilidad multiplataforma.  
-- Automatización de reglas para nuevos jugadores.  
-- Comunidad activa, partidas 24/7.  
-- Modo en tiempo real y por turnos.
+- Base de datos más completa del sector (reseñas, foros, rankings, colecciones).  
+- Integración con otras apps (como Board Game Stats).  
+- Comunidad global y muy activa.  
 
 **Oportunidades**
-- Expansión de licencias y juegos modernos.  
-- Integración educativa.  
-- Mejoras en UX y personalización.  
-- Eventos y torneos oficiales.
+- Mejorar la usabilidad y la interfaz móvil.  
+- Añadir herramientas sociales y estadísticas personales.  
+- Integrar funcionalidades para registro y seguimiento de partidas físicas.  
 
 **Debilidades**
-- Limitaciones en juegos premium.  
-- Interfaz técnica en algunos juegos.  
-- Dependencia de licencias editoriales.
+- Interfaz desactualizada y poco visual.  
+- Curva de aprendizaje alta.  
+- Funcionalidades dispersas entre múltiples secciones.
 
 ---
 
 ## Propuesta de valor
-**Tabletop Mastering** ofrece una plataforma completa y social para gestionar partidas de juegos de mesa físicas entre amigos.  
 
-Se diferencia por combinar:
-- Calendario de partidas  
-- Autocompletado inteligente de juegos  
-- Estadísticas y rankings  
-- Interfaz atractiva e intuitiva  
+**Tabletop Mastering** combina la gestión y registro de partidas físicas con una experiencia social, visual y accesible.
 
-**Resultado:** organización fácil, seguimiento de logros y diversión garantizada, superando las limitaciones de otras soluciones existentes.
+**Diferenciales clave:**
+- Calendario integrado para organizar partidas.  
+- Autocompletado inteligente de juegos mediante API.  
+- Estadísticas, rankings y logros motivadores.  
+- Interfaz moderna, intuitiva y centrada en la experiencia del grupo.
+
+**Resultado:** una gestión fluida y divertida de las sesiones de juego, que unifica lo mejor de cada plataforma sin sus limitaciones.
+
+
 
 
 
