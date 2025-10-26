@@ -13,7 +13,7 @@ Además, integra funcionalidades inteligentes como autocompletado de datos media
 | **Objetivos-enlace.md** | Contiene los requisitos funcionales y técnicos del proyecto. | [Ver documento](./docs/objetivos-enlace.md) |
 | **Problema.md** | Incluye la arquitectura del sistema y los diagramas principales. | [Ver documento](./docs/problema.md) |
 | **Recursos.md** | Expone el esquema y diagrama de la base de datos. | [Ver documento](./docs/recursos.md) |
-| **Viabilidad-tecnica.md** | Análisis de riesgos, mitigaciones y capacidades del equipo. | [Ver documento](./docs/viavilidad-tecnica.md) |
+| **Viabilidad-tecnica.md** | Análisis de riesgos, mitigaciones y capacidades del equipo. | [Ver documento](./docs/viabilidad-tecnica.md) |
 > Todos los documentos se encuentran en la carpeta `/docs`.
 
 
