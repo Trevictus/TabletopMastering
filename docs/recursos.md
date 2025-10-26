@@ -1,4 +1,4 @@
-## Distribución de roles  
+## 1. Distribución de roles  
 #### Product Owner  
 - Define y prioriza el Product Backlog.
 - Representa al cliente o stakeholders.
@@ -25,7 +25,7 @@
 
 ---
 
-## Stack tecnológico completo
+## 2. Stack tecnológico completo
 #### El frontend(cliente)
 Utilizamos React para construir la interfaz de usuario.
 
@@ -46,12 +46,12 @@ Con Docker empaquetamos y desplegamos la App con todas sus dependencias.
 
 ---
 
-## APIs a utilizar
+## 3. APIs a utilizar
 
 
 ---
 
-## Herramientas de desarrollo y gestion
+## 4. Herramientas de desarrollo y gestion
 #### Editores de código
 Usaremos VisualStudio Code, WebStorm e IntelliJIdea para la parte de programación y edición del código fuente.
 
@@ -74,3 +74,4 @@ Usamos Figma para el prototipado de las interfaces.
 Mediante GitHub Actions.
 
 #### Testing
+
