@@ -47,7 +47,14 @@ Con Docker empaquetamos y desplegamos la App con todas sus dependencias.
 ---
 
 ## 3. APIs a utilizar
+#### Board Game Atlas API
+API REST que permite hacer busqueda avanzada de juegos por categorías, nombre, precio, etc.
 
+#### BoardGameGeek XML API2
+Mediante peticiones XML permite acceder a información detallada de los juegos de mesa.
+
+#### Google Calendar API
+API REST que permite gestionar eventos mediante un CRUD. Permitiendo a usuarios añadir fechas a su calendario Google.
 
 ---
 
@@ -74,4 +81,5 @@ Usamos Figma para el prototipado de las interfaces.
 Mediante GitHub Actions.
 
 #### Testing
+
 
