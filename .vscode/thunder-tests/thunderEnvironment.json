@@ -1,0 +1,18 @@
+[
+  {
+    "client": "Thunder Client",
+    "environmentName": "Tabletop Dev",
+    "dateExported": "2025-11-07T12:21:00.000Z",
+    "version": "1.2",
+    "variables": [
+      {
+        "name": "baseUrl",
+        "value": "http://localhost:3000"
+      },
+      {
+        "name": "token",
+        "value": ""
+      }
+    ]
+  }
+]
