@@ -27,8 +27,18 @@ Tabletop Mastering es una aplicación web para gestionar grupos de juego, organi
 - ✅ Ver detalles y miembros del grupo
 - ✅ Roles: Admin y Miembro
 
+### � Gestión de Juegos
+- ✅ Integración completa con BoardGameGeek API
+- ✅ Búsqueda de juegos en BGG
+- ✅ Importación automática de datos desde BGG
+- ✅ Creación de juegos personalizados
+- ✅ CRUD completo (Crear, Leer, Actualizar, Eliminar)
+- ✅ Sistema de caché (30 días)
+- ✅ Sincronización con BGG
+- ✅ Estadísticas por grupo
+- ✅ Filtrado y paginación
+
 ### 🎯 Próximamente
-- ⏳ Catálogo de juegos
 - ⏳ Programación de partidas
 - ⏳ Sistema de confirmación de asistencia
 - ⏳ Registro de resultados y estadísticas
@@ -38,12 +48,12 @@ Tabletop Mastering es una aplicación web para gestionar grupos de juego, organi
 ## 🚀 Estado del Proyecto
 
 ```
-████████████████░░░░░░░░░░░░░░░░░░░░ 40% Completado
+████████████████████████░░░░░░░░░░░░ 60% Completado
 
 ✅ Autenticación:     100%
 ✅ Usuarios:          100%
 ✅ Grupos:            100%
-⏳ Juegos:              0%
+✅ Juegos:            100% ⭐ NUEVO
 ⏳ Partidas:            0%
 ```
 
@@ -56,6 +66,8 @@ Tabletop Mastering es una aplicación web para gestionar grupos de juego, organi
 - JWT (jsonwebtoken v9.0.2)
 - Bcrypt.js v2.4.3
 - Express Validator v7.2.0
+- Axios v1.x (integración BGG)
+- XML2JS v0.x (parser BGG)
 
 **Herramientas:**
 - Nodemon (desarrollo)

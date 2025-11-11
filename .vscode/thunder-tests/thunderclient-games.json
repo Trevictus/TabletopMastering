@@ -1,0 +1,273 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "Games API - BGG Integration",
+  "collectionId": "games-bgg-collection",
+  "dateExported": "2025-11-11T09:00:00.000Z",
+  "version": "1.0",
+  "folders": [
+    {
+      "id": "bgg-search",
+      "name": "🔍 BGG - Búsqueda",
+      "requests": []
+    },
+    {
+      "id": "games-crud",
+      "name": "🎮 Juegos - CRUD",
+      "requests": []
+    },
+    {
+      "id": "games-stats",
+      "name": "📊 Estadísticas",
+      "requests": []
+    }
+  ],
+  "requests": [
+    {
+      "id": "1",
+      "name": "Buscar juegos en BGG",
+      "url": "{{baseUrl}}/games/search-bgg?name=Catan&exact=false",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "folderId": "bgg-search",
+      "tests": []
+    },
+    {
+      "id": "2",
+      "name": "Obtener detalles de BGG por ID",
+      "url": "{{baseUrl}}/games/bgg/13",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "folderId": "bgg-search",
+      "tests": []
+    },
+    {
+      "id": "3",
+      "name": "Hot List de BGG",
+      "url": "{{baseUrl}}/games/bgg/hot?limit=10",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "folderId": "bgg-search",
+      "tests": []
+    },
+    {
+      "id": "4",
+      "name": "Añadir juego desde BGG",
+      "url": "{{baseUrl}}/games/add-from-bgg",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"bggId\": 13,\n  \"groupId\": \"{{groupId}}\",\n  \"customNotes\": \"Juego clásico de estrategia\"\n}"
+      },
+      "folderId": "games-crud",
+      "tests": []
+    },
+    {
+      "id": "5",
+      "name": "Crear juego personalizado",
+      "url": "{{baseUrl}}/games",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Mi Juego de Cartas\",\n  \"description\": \"Juego personalizado del grupo\",\n  \"groupId\": \"{{groupId}}\",\n  \"minPlayers\": 2,\n  \"maxPlayers\": 6,\n  \"playingTime\": 45,\n  \"categories\": [\"Cartas\", \"Estrategia\", \"Familiar\"],\n  \"mechanics\": [\"Gestión de mano\", \"Draft de cartas\"],\n  \"difficulty\": \"medio\",\n  \"yearPublished\": 2024,\n  \"customNotes\": \"Prototipo en desarrollo\"\n}"
+      },
+      "folderId": "games-crud",
+      "tests": []
+    },
+    {
+      "id": "6",
+      "name": "Listar todos los juegos del grupo",
+      "url": "{{baseUrl}}/games?groupId={{groupId}}&page=1&limit=20",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "folderId": "games-crud",
+      "tests": []
+    },
+    {
+      "id": "7",
+      "name": "Buscar juegos por texto",
+      "url": "{{baseUrl}}/games?groupId={{groupId}}&search=Catan",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "folderId": "games-crud",
+      "tests": []
+    },
+    {
+      "id": "8",
+      "name": "Filtrar solo juegos de BGG",
+      "url": "{{baseUrl}}/games?groupId={{groupId}}&source=bgg",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "folderId": "games-crud",
+      "tests": []
+    },
+    {
+      "id": "9",
+      "name": "Filtrar solo juegos personalizados",
+      "url": "{{baseUrl}}/games?groupId={{groupId}}&source=custom",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "folderId": "games-crud",
+      "tests": []
+    },
+    {
+      "id": "10",
+      "name": "Obtener detalles de un juego",
+      "url": "{{baseUrl}}/games/{{gameId}}",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "folderId": "games-crud",
+      "tests": []
+    },
+    {
+      "id": "11",
+      "name": "Actualizar juego personalizado",
+      "url": "{{baseUrl}}/games/{{gameId}}",
+      "method": "PUT",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"description\": \"Descripción actualizada\",\n  \"playingTime\": 60,\n  \"difficulty\": \"difícil\",\n  \"customNotes\": \"Notas actualizadas\"\n}"
+      },
+      "folderId": "games-crud",
+      "tests": []
+    },
+    {
+      "id": "12",
+      "name": "Actualizar juego de BGG (solo campos custom)",
+      "url": "{{baseUrl}}/games/{{gameId}}",
+      "method": "PUT",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"customNotes\": \"Añadidas expansiones\",\n  \"difficulty\": \"experto\"\n}"
+      },
+      "folderId": "games-crud",
+      "tests": []
+    },
+    {
+      "id": "13",
+      "name": "Sincronizar juego de BGG",
+      "url": "{{baseUrl}}/games/{{gameId}}/sync-bgg",
+      "method": "PUT",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "folderId": "games-crud",
+      "tests": []
+    },
+    {
+      "id": "14",
+      "name": "Eliminar juego (soft delete)",
+      "url": "{{baseUrl}}/games/{{gameId}}",
+      "method": "DELETE",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "folderId": "games-crud",
+      "tests": []
+    },
+    {
+      "id": "15",
+      "name": "Estadísticas del grupo",
+      "url": "{{baseUrl}}/games/stats/{{groupId}}",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "folderId": "games-stats",
+      "tests": []
+    }
+  ],
+  "settings": {
+    "options": {
+      "baseUrl": "http://localhost:3000/api"
+    }
+  }
+}
