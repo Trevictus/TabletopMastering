@@ -1,0 +1,74 @@
+.card {
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 4px 6px rgba(42, 31, 21, 0.1), 0 2px 4px rgba(42, 31, 21, 0.06);
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  border: 1px solid rgba(139, 125, 107, 0.2);
+}
+
+.card:hover {
+  box-shadow: 0 10px 15px rgba(42, 31, 21, 0.15), 0 4px 6px rgba(42, 31, 21, 0.1);
+  transform: translateY(-2px);
+}
+
+.header {
+  padding: var(--spacing-lg);
+  border-bottom: 2px solid var(--bg-tertiary);
+  background: linear-gradient(to bottom, var(--bg-primary), var(--bg-secondary));
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.subtitle {
+  margin: var(--spacing-xs) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.body {
+  padding: var(--spacing-lg);
+}
+
+.footer {
+  padding: var(--spacing-lg);
+  border-top: 2px solid var(--bg-tertiary);
+  background-color: var(--bg-secondary);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+/* Variantes */
+.elevated {
+  box-shadow: 0 10px 25px rgba(42, 31, 21, 0.2), 0 6px 12px rgba(42, 31, 21, 0.1);
+}
+
+.bordered {
+  border: 2px solid var(--primary-color);
+  box-shadow: none;
+}
+
+.flat {
+  box-shadow: none;
+  border: 1px solid var(--bg-tertiary);
+}
+
+/* Padding personalizado */
+.noPadding {
+  padding: 0;
+}
+
+.bodyNoPadding {
+  padding: 0;
+}

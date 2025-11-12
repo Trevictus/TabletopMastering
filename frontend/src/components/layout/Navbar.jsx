@@ -1,0 +1,105 @@
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { GiPerspectiveDiceSixFacesRandom } from 'react-icons/gi';
+import { MdPerson, MdExitToApp, MdDashboard } from 'react-icons/md';
+import { useAuth } from '../../context/AuthContext';
+import Button from '../common/Button';
+import styles from './Navbar.module.css';
+
+/**
+ * Componente Navbar - Barra de navegación principal
+ * Muestra diferentes opciones según el estado de autenticación
+ */
+const Navbar = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
+  
+  const isActive = (path) => {
+    return location.pathname === path ? styles.active : '';
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  return (
+    <nav className={styles.navbar}>
+      <div className={styles.container}>
+        <Link to={isAuthenticated ? "/dashboard" : "/"} className={styles.brand}>
+          <GiPerspectiveDiceSixFacesRandom className={styles.brandIcon} />
+          <span>Tabletop Mastering</span>
+        </Link>
+
+        {/* Usuario NO autenticado */}
+        {!isAuthenticated && (
+          <ul className={styles.nav}>
+            <li>
+              <Link to="/" className={`${styles.navLink} ${isActive('/')}`}>
+                Inicio
+              </Link>
+            </li>
+            <li>
+              <Link to="/login">
+                <Button variant="outline" size="small">
+                  Iniciar Sesión
+                </Button>
+              </Link>
+            </li>
+            <li>
+              <Link to="/register">
+                <Button variant="primary" size="small">
+                  Registrarse
+                </Button>
+              </Link>
+            </li>
+          </ul>
+        )}
+
+        {/* Usuario autenticado */}
+        {isAuthenticated && (
+          <ul className={styles.nav}>
+            <li>
+              <Link to="/dashboard" className={`${styles.navLink} ${isActive('/dashboard')}`}>
+                <MdDashboard className={styles.linkIcon} />
+                Dashboard
+              </Link>
+            </li>
+            <li>
+              <Link to="/profile" className={`${styles.navLink} ${isActive('/profile')}`}>
+                <MdPerson className={styles.linkIcon} />
+                Perfil
+              </Link>
+            </li>
+            
+            {/* User Info */}
+            <li className={styles.userInfo}>
+              <div className={styles.userAvatar}>
+                {user?.avatar ? (
+                  <img src={user.avatar} alt={user.name} />
+                ) : (
+                  <GiPerspectiveDiceSixFacesRandom />
+                )}
+              </div>
+              <span className={styles.userName}>{user?.name}</span>
+            </li>
+
+            <li>
+              <Button 
+                variant="outline" 
+                size="small"
+                onClick={handleLogout}
+                className={styles.logoutButton}
+              >
+                <MdExitToApp className={styles.linkIcon} />
+                Cerrar Sesión
+              </Button>
+            </li>
+          </ul>
+        )}
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;

@@ -10,6 +10,8 @@ import './styles/layout.css';
 import './App.css';
 
 function App() {
+  console.log('🎲 App component rendering...');
+  
   return (
     <AuthProvider>
       <Router>
@@ -17,8 +19,10 @@ function App() {
           <Navbar />
           <main className="main-content">
             <Routes>
+              {/* Rutas Públicas */}
               <Route path="/" element={<Home />} />
               
+              {/* Rutas Públicas (redirigen a dashboard si ya está autenticado) */}
               <Route 
                 path="/login" 
                 element={
@@ -36,6 +40,7 @@ function App() {
                 } 
               />
 
+              {/* Rutas Protegidas (requieren autenticación) */}
               <Route 
                 path="/dashboard" 
                 element={
@@ -53,6 +58,7 @@ function App() {
                 } 
               />
 
+              {/* Ruta 404 - No Encontrada */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
@@ -63,5 +69,3 @@ function App() {
 }
 
 export default App;
-
-

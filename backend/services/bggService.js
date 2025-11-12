@@ -9,6 +9,11 @@ const BGG_API_BASE = 'https://boardgamegeek.com/xmlapi2';
 class BGGService {
   constructor() {
     this.parser = new xml2js.Parser({ explicitArray: false });
+    this.axiosConfig = {
+      headers: {
+        'User-Agent': 'TabletopMastering/1.0 (juanfu224@github)',
+      },
+    };
   }
 
   /**
@@ -26,7 +31,10 @@ class BGGService {
         exact: exact ? 1 : 0,
       };
 
-      const response = await axios.get(url, { params });
+      const response = await axios.get(url, { 
+        params,
+        ...this.axiosConfig,
+      });
       const result = await this.parser.parseStringPromise(response.data);
 
       if (!result.items || !result.items.item) {
@@ -66,6 +74,7 @@ class BGGService {
       const response = await axios.get(url, { 
         params,
         timeout: 10000,
+        ...this.axiosConfig,
       });
 
       const result = await this.parser.parseStringPromise(response.data);
@@ -176,7 +185,10 @@ class BGGService {
         type: 'boardgame',
       };
 
-      const response = await axios.get(url, { params });
+      const response = await axios.get(url, { 
+        params,
+        ...this.axiosConfig,
+      });
       const result = await this.parser.parseStringPromise(response.data);
 
       if (!result.items || !result.items.item) {

@@ -149,7 +149,7 @@ register_response=$(curl -s -w "\n%{http_code}" -X POST "$BASE_URL/auth/register
     -d "{
         \"name\": \"Test User Games\",
         \"email\": \"$test_email\",
-        \"password\": \"123456\"
+        \"password\": \"12345678\"
     }")
 
 TOKEN=$(echo "$register_response" | sed '$d' | grep -o '"token":"[^"]*' | cut -d'"' -f4)
@@ -1011,7 +1011,7 @@ register2=$(curl -s -X POST "$BASE_URL/auth/register" \
     -d "{
         \"name\": \"Other User\",
         \"email\": \"$test_email2\",
-        \"password\": \"123456\"
+        \"password\": \"12345678\"
     }")
 TOKEN2=$(echo "$register2" | grep -o '"token":"[^"]*' | cut -d'"' -f4)
 

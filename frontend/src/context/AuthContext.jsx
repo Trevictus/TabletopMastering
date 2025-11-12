@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { createContext, useContext, useState, useEffect } from 'react';
 import authService from '../services/authService';
 
@@ -36,16 +37,24 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = async (credentials) => {
-    const data = await authService.login(credentials);
-    setUser(data.user);
+  const login = async (userData, token) => {
+    // Si se pasan directamente el usuario y token (para login automático después de registro)
+    if (userData && token) {
+      setUser(userData);
+      setIsAuthenticated(true);
+      return { user: userData, token };
+    }
+    
+    // Si se pasan credenciales (login normal)
+    const data = await authService.login(userData);
+    setUser(data.data.user);
     setIsAuthenticated(true);
     return data;
   };
 
   const register = async (userData) => {
     const data = await authService.register(userData);
-    setUser(data.user);
+    setUser(data.data.user);
     setIsAuthenticated(true);
     return data;
   };
@@ -73,6 +82,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired
 };
 
 export default AuthContext;

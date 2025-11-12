@@ -1,30 +1,34 @@
 :root {
-  /* Colores principales */
-  --primary-color: #6366f1;
-  --primary-dark: #4f46e5;
-  --primary-light: #818cf8;
+  /* Colores principales - Temática juegos de mesa */
+  --primary-color: #8b4513;        /* Marrón cálido (madera) */
+  --primary-dark: #5c2e0a;          /* Marrón oscuro */
+  --primary-light: #a0522d;         /* Sienna */
   
-  --secondary-color: #8b5cf6;
-  --secondary-dark: #7c3aed;
-  --secondary-light: #a78bfa;
+  --secondary-color: #2d5016;       /* Verde bosque */
+  --secondary-dark: #1a300d;        /* Verde oscuro */
+  --secondary-light: #3d6b1f;       /* Verde medio */
+  
+  --accent-color: #d4af37;          /* Dorado */
+  --accent-dark: #b8941f;           /* Dorado oscuro */
+  --accent-light: #e6c955;          /* Dorado claro */
   
   /* Colores de estado */
-  --success-color: #10b981;
-  --warning-color: #f59e0b;
-  --error-color: #ef4444;
-  --info-color: #3b82f6;
+  --success-color: #2d5016;         /* Verde bosque */
+  --warning-color: #d4af37;         /* Dorado */
+  --error-color: #8b2e2e;           /* Rojo teja */
+  --info-color: #5a6c7d;            /* Azul pizarra */
   
   /* Colores de fondo */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --bg-tertiary: #f3f4f6;
-  --bg-dark: #1f2937;
+  --bg-primary: #faf8f3;            /* Crema suave (papel pergamino) */
+  --bg-secondary: #f5f1e8;          /* Beige claro */
+  --bg-tertiary: #ede7db;           /* Beige */
+  --bg-dark: #2a1f15;               /* Marrón muy oscuro */
   
   /* Colores de texto */
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
-  --text-light: #ffffff;
+  --text-primary: #2a1f15;          /* Marrón muy oscuro */
+  --text-secondary: #5c4f42;        /* Marrón medio */
+  --text-tertiary: #8b7d6b;         /* Marrón claro */
+  --text-light: #faf8f3;            /* Crema */
   
   /* Bordes */
   --border-color: #e5e7eb;
@@ -45,6 +49,8 @@
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
   --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+  --spacing-4xl: 6rem;
   
   /* Tipografía */
   --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -53,10 +59,11 @@
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+  --font-size-3xl: 2.5rem;
+  --font-size-4xl: 3rem;
   
   /* Transiciones */
   --transition-fast: 150ms ease-in-out;
