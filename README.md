@@ -77,11 +77,9 @@
 git clone https://github.com/Trevictus/TabletopMastering.git
 cd TabletopMastering
 
-# 2. Configurar y ejecutar el backend
+# 2. ejecutar el backend
 cd backend
 npm install
-cp .env.example .env
-# Edita .env con tu configuración de MongoDB
 npm run dev
 
 # 3. (En otra terminal) Configurar y ejecutar el frontend
@@ -551,11 +549,9 @@ Este proyecto está bajo la Licencia MIT. Ver [LICENSE](LICENSE) para más detal
 
 ## 👨‍💻 Autor
 
-**Juan Francisco (Trevictus)**
-
-- 🐙 GitHub: [@Trevictus](https://github.com/Trevictus)
-- 📦 Proyecto: [TabletopMastering](https://github.com/Trevictus/TabletopMastering)
-- 📧 Contacto: [A través de GitHub Issues](https://github.com/Trevictus/TabletopMastering/issues)
+- GitHub: [@Trevictus](https://github.com/Trevictus)
+- GitHub: [@Juanfu224](https://github.com/Juanfu224)
+- GitHub: [@Aranaaa00](https://github.com/Aranaaa00)
 
 ### 🎓 Contexto del Proyecto
 
