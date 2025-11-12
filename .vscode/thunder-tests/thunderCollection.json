@@ -1,0 +1,154 @@
+[
+  {
+    "containerId": "",
+    "sortNum": 10000,
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/json"
+      }
+    ],
+    "colId": "auth_collection",
+    "name": "1. Registro de Usuario",
+    "url": "{{baseUrl}}/api/auth/register",
+    "method": "POST",
+    "modified": "2025-11-07T12:21:00.000Z",
+    "created": "2025-11-07T12:21:00.000Z",
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"name\": \"Juan Pérez\",\n  \"email\": \"juan@example.com\",\n  \"password\": \"123456\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "set-env-var",
+        "custom": "json.data.token",
+        "action": "setto",
+        "value": "{{token}}"
+      }
+    ]
+  },
+  {
+    "containerId": "",
+    "sortNum": 20000,
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/json"
+      }
+    ],
+    "colId": "auth_collection",
+    "name": "2. Login",
+    "url": "{{baseUrl}}/api/auth/login",
+    "method": "POST",
+    "modified": "2025-11-07T12:21:00.000Z",
+    "created": "2025-11-07T12:21:00.000Z",
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"email\": \"juan@example.com\",\n  \"password\": \"123456\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "set-env-var",
+        "custom": "json.data.token",
+        "action": "setto",
+        "value": "{{token}}"
+      }
+    ]
+  },
+  {
+    "containerId": "",
+    "sortNum": 30000,
+    "headers": [
+      {
+        "name": "Authorization",
+        "value": "Bearer {{token}}"
+      }
+    ],
+    "colId": "auth_collection",
+    "name": "3. Obtener Mi Perfil (Protegido)",
+    "url": "{{baseUrl}}/api/auth/me",
+    "method": "GET",
+    "modified": "2025-11-07T12:21:00.000Z",
+    "created": "2025-11-07T12:21:00.000Z"
+  },
+  {
+    "containerId": "",
+    "sortNum": 40000,
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/json"
+      },
+      {
+        "name": "Authorization",
+        "value": "Bearer {{token}}"
+      }
+    ],
+    "colId": "auth_collection",
+    "name": "4. Actualizar Perfil (Protegido)",
+    "url": "{{baseUrl}}/api/auth/profile",
+    "method": "PUT",
+    "modified": "2025-11-07T12:21:00.000Z",
+    "created": "2025-11-07T12:21:00.000Z",
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"name\": \"Juan Pérez García\",\n  \"description\": \"Amante de los juegos de estrategia\",\n  \"quote\": \"¡A jugar se ha dicho!\",\n  \"avatar\": \"https://i.pravatar.cc/150?img=12\"\n}",
+      "form": []
+    }
+  },
+  {
+    "containerId": "",
+    "sortNum": 50000,
+    "headers": [],
+    "colId": "auth_collection",
+    "name": "5. Sin Token (Error 401)",
+    "url": "{{baseUrl}}/api/auth/me",
+    "method": "GET",
+    "modified": "2025-11-07T12:21:00.000Z",
+    "created": "2025-11-07T12:21:00.000Z"
+  },
+  {
+    "containerId": "",
+    "sortNum": 60000,
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/json"
+      }
+    ],
+    "colId": "auth_collection",
+    "name": "6. Email Duplicado (Error 400)",
+    "url": "{{baseUrl}}/api/auth/register",
+    "method": "POST",
+    "modified": "2025-11-07T12:21:00.000Z",
+    "created": "2025-11-07T12:21:00.000Z",
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"name\": \"Otro Usuario\",\n  \"email\": \"juan@example.com\",\n  \"password\": \"123456\"\n}",
+      "form": []
+    }
+  },
+  {
+    "containerId": "",
+    "sortNum": 70000,
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/json"
+      }
+    ],
+    "colId": "auth_collection",
+    "name": "7. Credenciales Inválidas (Error 401)",
+    "url": "{{baseUrl}}/api/auth/login",
+    "method": "POST",
+    "modified": "2025-11-07T12:21:00.000Z",
+    "created": "2025-11-07T12:21:00.000Z",
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"email\": \"juan@example.com\",\n  \"password\": \"password_incorrecta\"\n}",
+      "form": []
+    }
+  }
+]
