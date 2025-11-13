@@ -7,6 +7,9 @@
 # Incluye validación de express-validator y casos edge
 # ========================================================================
 
+# Activar modo MOCK para BGG Service
+export USE_BGG_MOCK=true
+
 BASE_URL="http://localhost:3000/api"
 TOKEN=""
 GROUP_ID=""

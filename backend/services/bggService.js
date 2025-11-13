@@ -1,20 +1,29 @@
 const axios = require('axios');
 const xml2js = require('xml2js');
 
-const BGG_API_BASE = 'https://boardgamegeek.com/xmlapi2';
+// Detectar si estamos en modo test a través de variable de entorno
+const USE_MOCK = process.env.USE_BGG_MOCK === 'true' || process.env.NODE_ENV === 'test';
 
-/**
- * Servicio para interactuar con la API de BoardGameGeek
- */
-class BGGService {
-  constructor() {
-    this.parser = new xml2js.Parser({ explicitArray: false });
-    this.axiosConfig = {
-      headers: {
-        'User-Agent': 'TabletopMastering/1.0 (juanfu224@github)',
-      },
-    };
-  }
+// Si estamos en modo mock, usar el servicio mock en lugar del real
+if (USE_MOCK) {
+  console.log('🎭 [BGG Service] Usando MOCK de BGG para tests');
+  module.exports = require('./bggService.mock');
+} else {
+  // Código real del servicio BGG
+  const BGG_API_BASE = 'https://boardgamegeek.com/xmlapi2';
+
+  /**
+   * Servicio para interactuar con la API de BoardGameGeek
+   */
+  class BGGService {
+    constructor() {
+      this.parser = new xml2js.Parser({ explicitArray: false });
+      this.axiosConfig = {
+        headers: {
+          'User-Agent': 'TabletopMastering/1.0 (juanfu224@github)',
+        },
+      };
+    }
 
   /**
    * Buscar juegos en BGG por nombre
@@ -227,4 +236,5 @@ class BGGService {
   }
 }
 
-module.exports = new BGGService();
+  module.exports = new BGGService();
+}

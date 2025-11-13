@@ -125,16 +125,22 @@ exports.addFromBGG = async (req, res, next) => {
       group: groupId,
       addedBy: req.user._id,
       customNotes: customNotes || '',
+      isActive: true, // Asegurar que el juego esté activo
     });
 
-    // Populate para devolver información completa
-    await game.populate('addedBy', 'name email');
-    await game.populate('group', 'name');
+    // Verificar que el juego se guardó correctamente y popularlo
+    const savedGame = await Game.findById(game._id)
+      .populate('addedBy', 'name email')
+      .populate('group', 'name');
+
+    if (!savedGame) {
+      throw new Error('Error al guardar el juego en la base de datos');
+    }
 
     res.status(201).json({
       success: true,
       message: 'Juego añadido desde BGG exitosamente',
-      data: game,
+      data: savedGame,
     });
   } catch (error) {
     next(error);
@@ -221,15 +227,22 @@ exports.createGame = async (req, res, next) => {
       addedBy: req.user._id,
       source: 'custom',
       customNotes: customNotes || '',
+      isActive: true, // Asegurar que el juego esté activo
     });
 
-    await game.populate('addedBy', 'name email');
-    await game.populate('group', 'name');
+    // Verificar que el juego se guardó correctamente y popularlo
+    const savedGame = await Game.findById(game._id)
+      .populate('addedBy', 'name email')
+      .populate('group', 'name');
+
+    if (!savedGame) {
+      throw new Error('Error al guardar el juego en la base de datos');
+    }
 
     res.status(201).json({
       success: true,
       message: 'Juego personalizado creado exitosamente',
-      data: game,
+      data: savedGame,
     });
   } catch (error) {
     next(error);
@@ -322,7 +335,7 @@ exports.getGames = async (req, res, next) => {
  */
 exports.getGame = async (req, res, next) => {
   try {
-    const game = await Game.findById(req.params.id)
+    const game = await Game.findOne({ _id: req.params.id, isActive: true })
       .populate('addedBy', 'name email avatar')
       .populate('group', 'name description avatar');
 
@@ -364,7 +377,7 @@ exports.getGame = async (req, res, next) => {
  */
 exports.updateGame = async (req, res, next) => {
   try {
-    let game = await Game.findById(req.params.id);
+    let game = await Game.findOne({ _id: req.params.id, isActive: true });
 
     if (!game) {
       return res.status(404).json({
@@ -427,6 +440,11 @@ exports.updateGame = async (req, res, next) => {
       .populate('addedBy', 'name email')
       .populate('group', 'name');
 
+    // Verificar que la actualización fue exitosa
+    if (!game) {
+      throw new Error('Error al actualizar el juego en la base de datos');
+    }
+
     res.status(200).json({
       success: true,
       message: 'Juego actualizado exitosamente',
@@ -444,7 +462,7 @@ exports.updateGame = async (req, res, next) => {
  */
 exports.syncBGGGame = async (req, res, next) => {
   try {
-    const game = await Game.findById(req.params.id);
+    const game = await Game.findOne({ _id: req.params.id, isActive: true });
 
     if (!game) {
       return res.status(404).json({
@@ -456,7 +474,7 @@ exports.syncBGGGame = async (req, res, next) => {
     if (game.source !== 'bgg') {
       return res.status(400).json({
         success: false,
-        message: 'Solo se pueden sincronizar juegos de BGG',
+        message: 'Este endpoint solo funciona con juegos de BGG',
       });
     }
 
@@ -478,31 +496,33 @@ exports.syncBGGGame = async (req, res, next) => {
     // Obtener datos actualizados de BGG
     const bggData = await bggService.getGameDetails(game.bggId);
 
-    // Actualizar campos de BGG (preservando customNotes y otros campos personalizados)
-    const updatedGame = await Game.findByIdAndUpdate(
-      req.params.id,
-      {
-        name: bggData.name,
-        description: bggData.description,
-        image: bggData.image,
-        thumbnail: bggData.thumbnail,
-        yearPublished: bggData.yearPublished,
-        minPlayers: bggData.minPlayers,
-        maxPlayers: bggData.maxPlayers,
-        playingTime: bggData.playingTime,
-        minPlayTime: bggData.minPlayTime,
-        maxPlayTime: bggData.maxPlayTime,
-        categories: bggData.categories,
-        mechanics: bggData.mechanics,
-        designer: bggData.designer,
-        publisher: bggData.publisher,
-        rating: bggData.rating,
-        bggLastSync: new Date(),
-      },
-      { new: true, runValidators: true }
-    )
-      .populate('addedBy', 'name email')
-      .populate('group', 'name');
+    // Actualizar el juego directamente para evitar problemas de validación cruzada
+    game.name = bggData.name;
+    game.description = bggData.description;
+    game.image = bggData.image;
+    game.thumbnail = bggData.thumbnail;
+    game.yearPublished = bggData.yearPublished;
+    game.minPlayers = bggData.minPlayers;
+    game.maxPlayers = bggData.maxPlayers;
+    game.playingTime = bggData.playingTime;
+    game.minPlayTime = bggData.minPlayTime;
+    game.maxPlayTime = bggData.maxPlayTime;
+    game.categories = bggData.categories;
+    game.mechanics = bggData.mechanics;
+    game.designer = bggData.designer;
+    game.publisher = bggData.publisher;
+    game.rating = bggData.rating;
+    game.bggLastSync = new Date();
+
+    // Guardar y popular
+    const updatedGame = await game.save();
+    await updatedGame.populate('addedBy', 'name email');
+    await updatedGame.populate('group', 'name');
+
+    // Verificar que la sincronización fue exitosa
+    if (!updatedGame) {
+      throw new Error('Error al sincronizar el juego con BGG');
+    }
 
     res.status(200).json({
       success: true,
@@ -521,7 +541,7 @@ exports.syncBGGGame = async (req, res, next) => {
  */
 exports.deleteGame = async (req, res, next) => {
   try {
-    const game = await Game.findById(req.params.id);
+    const game = await Game.findOne({ _id: req.params.id, isActive: true });
 
     if (!game) {
       return res.status(404).json({
@@ -642,7 +662,8 @@ exports.getGroupGameStats = async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: {
-        total: totalGames,
+        totalGames: totalGames,
+        total: totalGames, // Mantener retrocompatibilidad
         bySource: {
           bgg: bggGames,
           custom: customGames,
