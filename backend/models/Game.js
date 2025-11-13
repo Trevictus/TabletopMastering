@@ -77,7 +77,6 @@ const gameSchema = new mongoose.Schema(
     },
     bggId: {
       type: Number,
-      sparse: true, // Permite múltiples documentos con valor null
     },
     yearPublished: {
       type: Number,
