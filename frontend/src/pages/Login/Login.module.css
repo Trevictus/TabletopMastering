@@ -154,12 +154,20 @@
     padding: var(--spacing-lg);
   }
 
+  .loginContainer {
+    padding: var(--spacing-lg);
+  }
+
   .loginCard {
-    padding: var(--spacing-2xl) var(--spacing-xl);
+    padding: var(--spacing-xl);
+  }
+
+  .header {
+    margin-bottom: var(--spacing-xl);
   }
 
   .icon {
-    font-size: 4rem;
+    font-size: 3rem;
   }
 
   .title {

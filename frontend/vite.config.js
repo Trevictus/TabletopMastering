@@ -8,7 +8,8 @@ export default defineConfig({
     allowedHosts: [
       'localhost',
       '127.0.0.1',
-      'unchapleted-sana-uncondemning.ngrok-free.dev'
+      'unchapleted-sana-uncondemning.ngrok-free.dev',
+        'collin-propanedioic-giuseppe.ngrok-free.dev'
     ]
   }
 })
