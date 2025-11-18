@@ -23,9 +23,9 @@ USE_BGG_MOCK=true npx nodemon server.js
 
 # Terminal 2: Ejecutar tests (una vez que el servidor esté corriendo)
 cd backend
-./test-games-comprehensive.sh    # 163 tests de juegos
-./test-groups-comprehensive.sh   # 16 tests de grupos
-./test-final.sh                  # Tests de caché
+./tests/test-games-comprehensive.sh    # 163 tests de juegos
+./tests/test-groups-comprehensive.sh   # 16 tests de grupos
+./tests/test-final.sh                  # Tests de caché
 ```
 
 ### Opción 2: Comando rápido con npm
@@ -44,7 +44,7 @@ npm test
 
 ### `test-games-comprehensive.sh`
 **Descripción:** Suite completa de tests de la API de juegos (163 tests)  
-**Uso:** `./test-games-comprehensive.sh`  
+**Uso:** `./tests/test-games-comprehensive.sh`  
 **Duración:** ~2-3 minutos  
 **Cubre:**
 - Búsqueda en BGG (6 tests)
@@ -62,7 +62,7 @@ npm test
 
 ### `test-groups-comprehensive.sh`
 **Descripción:** Tests de la API de grupos (16 tests)  
-**Uso:** `./test-groups-comprehensive.sh`  
+**Uso:** `./tests/test-groups-comprehensive.sh`  
 **Duración:** ~30 segundos  
 **Cubre:**
 - Registro de usuarios (2 tests)
@@ -218,7 +218,7 @@ curl http://localhost:3000/health
 
 ```bash
 cd backend
-node test-db-connection.js
+node tests/test-db-connection.js
 ```
 
 **Salida esperada:**

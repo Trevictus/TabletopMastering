@@ -14,11 +14,9 @@ Backend de la aplicación Tabletop Mastering para la gestión de partidas de jue
 - [Modelos de datos](#modelos-de-datos)
 
 📚 **Documentación adicional:**
-- **[QUICK_START.md](./QUICK_START.md)** - ⚡ **Guía de inicio rápido (EMPIEZA AQUÍ)**
-- **[DOC_INDEX.md](./DOC_INDEX.md)** - 📚 Índice completo de toda la documentación
-- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - 🚀 Guía de despliegue en producción
-- **[GAMES_API_DOCS.md](./GAMES_API_DOCS.md)** - 🎮 Documentación completa de la API de juegos
-- **[TESTING.md](./TESTING.md)** - 🧪 Guía completa de testing
+- **[docs/](./docs/)** - 📖 Documentación completa del backend
+  - **[GAMES_API_DOCS.md](./docs/GAMES_API_DOCS.md)** - 🎮 API de juegos
+  - **[TESTING.md](./docs/TESTING.md)** - 🧪 Guía de testing
 
 ## 🚀 Tecnologías
 
@@ -119,8 +117,6 @@ O usando el script npm:
 npm start
 ```
 
-📖 **Para despliegue en producción, consulta [DEPLOYMENT.md](./DEPLOYMENT.md)**
-
 El servidor estará disponible en: `http://localhost:3000`
 
 ### ✅ Verificar que el servidor funciona:
@@ -132,7 +128,7 @@ curl http://localhost:3000/health
 ### 🗄️ Probar conexión a MongoDB:
 
 ```bash
-node test-db-connection.js
+node tests/test-db-connection.js
 ```
 
 ### Linter y formateo:
@@ -147,31 +143,46 @@ npm run format      # Formatear código
 
 ```
 backend/
-├── config/
+├── config/              # Configuración
 │   └── database.js         # Configuración de MongoDB
-├── controllers/
-│   ├── authController.js   # Lógica de autenticación
-│   └── groupController.js  # Lógica de grupos
-├── middlewares/
-│   ├── auth.js             # Middleware de autenticación JWT
-│   ├── validator.js        # Validación de datos
+├── controllers/         # Lógica de negocio
+│   ├── authController.js   # Autenticación
+│   ├── gameController.js   # Gestión de juegos
+│   ├── groupController.js  # Gestión de grupos
+│   └── cacheController.js  # Caché de BGG
+├── middlewares/         # Middleware personalizado
+│   ├── auth.js             # Autenticación JWT
+│   ├── gameValidator.js    # Validación de juegos
+│   ├── groupAuth.js        # Autorización de grupos
+│   ├── validator.js        # Validación genérica
 │   └── errorHandler.js     # Manejo de errores
-├── models/
-│   ├── User.js             # Modelo de Usuario
-│   ├── Game.js             # Modelo de Juego
-│   ├── Match.js            # Modelo de Partida
-│   └── Group.js            # Modelo de Grupo
-├── routes/
-│   ├── authRoutes.js       # Rutas de autenticación
-│   ├── groupRoutes.js      # Rutas de grupos
-│   ├── gameRoutes.js       # Rutas de juegos (pendiente)
-│   └── matchRoutes.js      # Rutas de partidas (pendiente)
-├── utils/
-│   └── generateToken.js    # Utilidad para generar JWT
-├── .env                    # Variables de entorno
-├── .env.example            # Ejemplo de variables
-├── .gitignore              # Archivos ignorados por Git
-├── .eslintrc.json          # Configuración de ESLint
+├── models/              # Modelos de datos (Mongoose)
+│   ├── User.js             # Usuario
+│   ├── Game.js             # Juego
+│   ├── Match.js            # Partida
+│   ├── Group.js            # Grupo
+│   └── BGGCache.js         # Caché de BGG
+├── routes/              # Definición de rutas
+│   ├── authRoutes.js       # Autenticación
+│   ├── groupRoutes.js      # Grupos
+│   ├── gameRoutes.js       # Juegos
+│   └── matchRoutes.js      # Partidas (en desarrollo)
+├── services/            # Servicios externos
+│   ├── bggService.js       # Integración con BoardGameGeek
+│   └── bggService.mock.js  # Mock para testing
+├── utils/               # Utilidades
+│   ├── generateToken.js    # Generación de JWT
+│   └── groupHelpers.js     # Helpers de grupos
+├── tests/               # Tests automatizados
+│   ├── test-db-connection.js         # Test de conexión DB
+│   ├── test-games-comprehensive.sh   # 163 tests de juegos
+│   └── test-groups-comprehensive.sh  # 16 tests de grupos
+├── docs/                # Documentación del backend
+│   ├── README.md           # Índice de documentación
+│   ├── GAMES_API_DOCS.md   # Documentación completa de API de juegos
+│   └── TESTING.md          # Guía de testing
+├── .env.example         # Ejemplo de variables de entorno
+├── .eslintrc.json       # Configuración de ESLint
 ├── .prettierrc.json        # Configuración de Prettier
 ├── package.json            # Dependencias y scripts
 ├── server.js               # Punto de entrada

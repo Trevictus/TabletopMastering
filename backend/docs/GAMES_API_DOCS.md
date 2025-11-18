@@ -801,7 +801,7 @@ npm run dev:mock     # Inicia servidor con mock de BGG
 npm test            # Ejecuta la suite de tests
 
 # Opción 2: Comando directo
-USE_BGG_MOCK=true ./test-games-comprehensive.sh
+USE_BGG_MOCK=true ./tests/test-games-comprehensive.sh
 ```
 
 ### Cobertura de Tests

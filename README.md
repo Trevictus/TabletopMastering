@@ -179,26 +179,32 @@ Git + GitHub
 
 ## 📚 Documentación
 
-Documentación completa disponible en **[`/docs`](docs/README.md)**
+Documentación completa y organizada disponible en diferentes secciones:
 
-### 🎯 Lectura Recomendada
+### 📖 Documentación Principal
 
 | Documento | Descripción |
 |-----------|-------------|
-| **[Visión General](docs/introduccion/vision-general.md)** | ¿Qué es el proyecto? |
-| **[Instalación](docs/guias-inicio/instalacion.md)** | Setup completo paso a paso |
-| **[Inicio Rápido](docs/guias-inicio/inicio-rapido.md)** | Empieza en 5 minutos |
-| **[API Docs](docs/api/introduccion.md)** | Documentación de endpoints |
-| **[Estado](docs/introduccion/estado-del-proyecto.md)** | Progreso y roadmap |
+| **[Guía Completa](docs/README.md)** | 📚 Índice general de toda la documentación |
+| **[Visión General](docs/introduccion/vision-general.md)** | 🎯 ¿Qué es el proyecto? |
+| **[Instalación](docs/guias-inicio/instalacion.md)** | 🔧 Setup completo paso a paso |
+| **[Inicio Rápido](docs/guias-inicio/inicio-rapido.md)** | ⚡ Empieza en 5 minutos |
+| **[Estado del Proyecto](docs/introduccion/estado-del-proyecto.md)** | 📊 Progreso y roadmap |
+| **[Contribuir](CONTRIBUTING.md)** | 🤝 Guía para colaboradores |
 
-### 📖 Por Secciones
+### 🔧 Documentación Técnica
 
+#### Backend
+- **[Backend README](backend/README.md)** - Guía principal del backend
+- **[API de Juegos](backend/docs/GAMES_API_DOCS.md)** - Documentación completa de API
+- **[Testing](backend/docs/TESTING.md)** - Suite de 179 tests automatizados
+
+#### Estructura General
 - **[Introducción](docs/introduccion/)** - Contexto y objetivos del proyecto
 - **[Guías de Inicio](docs/guias-inicio/)** - Instalación y configuración
 - **[Arquitectura](docs/arquitectura/)** - Diseño técnico del sistema
-- **[API](docs/api/)** - Documentación completa de endpoints
+- **[API](docs/api/)** - Introducción a la API REST
 - **[Desarrollo](docs/desarrollo/)** - Guías para contribuir
-- **[Frontend](docs/frontend/)** - Documentación de la UI
 - **[Anexos](docs/anexos/)** - Recursos y referencias
 
 ---
@@ -245,7 +251,8 @@ PUT    /api/matches/:id         # Actualizar partida
 DELETE /api/matches/:id         # Eliminar partida
 ```
 
-**[Ver documentación completa de API →](backend/GAMES_API_DOCS.md)**
+**[Ver documentación completa de API →](backend/docs/GAMES_API_DOCS.md)**  
+**[Ver guía de testing →](backend/docs/TESTING.md)**
 
 ---
 

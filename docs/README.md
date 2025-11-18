@@ -107,28 +107,18 @@ Documentación completa de todos los endpoints.
   - Códigos de respuesta
   - Manejo de errores
 
-- **[Autenticación](./api/autenticacion.md)**
-  - Registro de usuarios
-  - Login
-  - Gestión de perfil
-  - Tokens JWT
-
-- **[Grupos](./api/grupos.md)**
-  - Crear grupos
-  - Códigos de invitación
-  - Gestión de miembros
-  - Permisos
-
-- **[Juegos](./api/juegos.md)**
+- **[Documentación de API de Juegos](../backend/docs/GAMES_API_DOCS.md)**
   - Integración con BoardGameGeek
-  - CRUD de juegos
+  - CRUD de juegos completo
   - Búsqueda y filtros
-  - Estadísticas
+  - Estadísticas y sincronización
+  - 163 tests automatizados
 
-- **[Partidas](./api/partidas.md)** ⏳ *En desarrollo*
-  - Programar partidas
-  - Registro de resultados
-  - Historial
+- **[Guía de Testing](../backend/docs/TESTING.md)**
+  - Suite completa de 179 tests
+  - Tests de API de juegos
+  - Tests de API de grupos
+  - Instrucciones de ejecución
 
 ---
 
@@ -230,9 +220,9 @@ Recursos adicionales y referencias.
 
 **🔌 Integrador de API**
 1. [API - Introducción](./api/introduccion.md)
-2. [API - Autenticación](./api/autenticacion.md)
-3. [API - Grupos](./api/grupos.md)
-4. [API - Juegos](./api/juegos.md)
+2. [Instalación Backend](../backend/README.md)
+3. [API de Juegos - Documentación Completa](../backend/docs/GAMES_API_DOCS.md)
+4. [Guía de Testing](../backend/docs/TESTING.md)
 5. [Pruebas](./desarrollo/pruebas.md)
 
 **🎨 Frontend Developer**

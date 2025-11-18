@@ -7,7 +7,10 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "dev:mock": "USE_BGG_MOCK=true nodemon server.js",
-    "test": "USE_BGG_MOCK=true ./test-games-comprehensive.sh",
+    "test": "USE_BGG_MOCK=true ./tests/test-games-comprehensive.sh",
+    "test:db": "node tests/test-db-connection.js",
+    "test:games": "USE_BGG_MOCK=true ./tests/test-games-comprehensive.sh",
+    "test:groups": "./tests/test-groups-comprehensive.sh",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{js,json,md}\""
