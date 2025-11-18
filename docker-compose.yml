@@ -12,7 +12,8 @@ services:
     volumes:
       - mongodb_data:/data/db
     networks:
-      - tabletop-network
+      tabletop-network:
+        ipv4_address: 172.25.0.2
 
   backend:
     build:
@@ -35,7 +36,8 @@ services:
       - ./backend:/app
       - /app/node_modules
     networks:
-      - tabletop-network
+      tabletop-network:
+        ipv4_address: 172.25.0.3
 
   frontend:
     build:
@@ -53,7 +55,8 @@ services:
       - ./frontend:/app
       - /app/node_modules
     networks:
-      - tabletop-network
+      tabletop-network:
+        ipv4_address: 172.25.0.4
 
 volumes:
   mongodb_data:
@@ -61,3 +64,7 @@ volumes:
 networks:
   tabletop-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+          gateway: 172.25.0.1
