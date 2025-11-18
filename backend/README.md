@@ -13,6 +13,13 @@ Backend de la aplicación Tabletop Mastering para la gestión de partidas de jue
 - [API Endpoints](#api-endpoints)
 - [Modelos de datos](#modelos-de-datos)
 
+📚 **Documentación adicional:**
+- **[QUICK_START.md](./QUICK_START.md)** - ⚡ **Guía de inicio rápido (EMPIEZA AQUÍ)**
+- **[DOC_INDEX.md](./DOC_INDEX.md)** - 📚 Índice completo de toda la documentación
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - 🚀 Guía de despliegue en producción
+- **[GAMES_API_DOCS.md](./GAMES_API_DOCS.md)** - 🎮 Documentación completa de la API de juegos
+- **[TESTING.md](./TESTING.md)** - 🧪 Guía completa de testing
+
 ## 🚀 Tecnologías
 
 - **Node.js** v24.11.0
@@ -79,29 +86,62 @@ CLIENT_URL=http://localhost:5173
 ### Modo desarrollo (con nodemon):
 
 ```bash
+npx nodemon server.js
+```
+
+O usando el script npm:
+
+```bash
 npm run dev
+```
+
+### Modo desarrollo con mock de BGG (para testing):
+
+```bash
+USE_BGG_MOCK=true npx nodemon server.js
+```
+
+O usando el script npm:
+
+```bash
+npm run dev:mock
 ```
 
 ### Modo producción:
 
 ```bash
+node server.js
+```
+
+O usando el script npm:
+
+```bash
 npm start
 ```
 
-### Linter:
+📖 **Para despliegue en producción, consulta [DEPLOYMENT.md](./DEPLOYMENT.md)**
+
+El servidor estará disponible en: `http://localhost:3000`
+
+### ✅ Verificar que el servidor funciona:
+
+```bash
+curl http://localhost:3000/health
+```
+
+### 🗄️ Probar conexión a MongoDB:
+
+```bash
+node test-db-connection.js
+```
+
+### Linter y formateo:
 
 ```bash
 npm run lint        # Revisar errores
 npm run lint:fix    # Corregir errores automáticamente
+npm run format      # Formatear código
 ```
-
-### Formatear código:
-
-```bash
-npm run format
-```
-
-El servidor estará disponible en: `http://localhost:3000`
 
 ## 📁 Estructura del proyecto
 
@@ -158,15 +198,23 @@ backend/
 | GET | `/:id` | Obtener un grupo | ✅ |
 | POST | `/join` | Unirse a un grupo | ✅ |
 
-### Juegos (`/api/games`) - ⏳ Pendiente
+### Juegos (`/api/games`)
+
+Para más detalles sobre los endpoints de juegos, consulta [GAMES_API_DOCS.md](./GAMES_API_DOCS.md)
 
 | Método | Ruta | Descripción | Auth |
 |--------|------|-------------|------|
-| POST | `/` | Añadir juego | ✅ |
+| GET | `/search-bgg?name=query` | Buscar juegos en BGG | ✅ |
+| GET | `/bgg/hot?limit=10` | Hot list de BGG | ✅ |
+| GET | `/bgg/:bggId` | Detalles de juego BGG | ✅ |
+| POST | `/add-from-bgg` | Añadir juego de BGG a grupo | ✅ |
+| POST | `/` | Crear juego personalizado | ✅ |
 | GET | `/` | Listar juegos | ✅ |
+| GET | `/stats/:groupId` | Estadísticas de juegos del grupo | ✅ |
 | GET | `/:id` | Obtener juego | ✅ |
 | PUT | `/:id` | Actualizar juego | ✅ |
-| DELETE | `/:id` | Eliminar juego | ✅ |
+| PUT | `/:id/sync-bgg` | Sincronizar juego con BGG | ✅ |
+| DELETE | `/:id` | Eliminar juego (soft delete) | ✅ |
 
 ### Partidas (`/api/matches`) - ⏳ Pendiente
 
@@ -251,20 +299,14 @@ Authorization: Bearer <tu_token_jwt>
 }
 ```
 
-## 🧪 Testing
-
-```bash
-npm test
-```
-
-*(Por implementar)*
-
 ## 📝 Notas
 
-- Los controladores de Games y Matches están pendientes de implementación
-- Las rutas están preparadas pero sin controladores
-- Recuerda cambiar el `JWT_SECRET` en producción
-- La base de datos se crea automáticamente al conectar
+- ✅ La API de juegos está completamente implementada con integración a BoardGameGeek
+- ✅ Sistema de caché MongoDB para mejorar rendimiento (consultas <100ms)
+- ✅ Sistema de soft delete implementado
+- ✅ Validación exhaustiva con express-validator
+- ⏳ Los controladores de Matches están pendientes de implementación
+- 🔒 Recuerda cambiar el `JWT_SECRET` en producción
 
 ## 👥 Equipo
 

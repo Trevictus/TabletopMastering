@@ -1,5 +1,6 @@
 const axios = require('axios');
 const xml2js = require('xml2js');
+const BGGCache = require('../models/BGGCache');
 
 // Detectar si estamos en modo test a través de variable de entorno
 const USE_MOCK = process.env.USE_BGG_MOCK === 'true' || process.env.NODE_ENV === 'test';
@@ -68,11 +69,26 @@ if (USE_MOCK) {
 
   /**
    * Obtener detalles completos de un juego por su ID de BGG
+   * Implementa caché de MongoDB para reducir llamadas a la API
    * @param {number} bggId - ID del juego en BGG
+   * @param {boolean} forceRefresh - Forzar actualización ignorando caché
    * @returns {Promise<Object>} - Información completa del juego
    */
-  async getGameDetails(bggId) {
+  async getGameDetails(bggId, forceRefresh = false) {
     try {
+      // Intentar obtener de caché si no se fuerza actualización
+      if (!forceRefresh) {
+        const cachedData = await BGGCache.getValidCache(bggId);
+        if (cachedData) {
+          console.log(`✅ [BGG Cache] Cache HIT para bggId: ${bggId}`);
+          return cachedData;
+        }
+        console.log(`❌ [BGG Cache] Cache MISS para bggId: ${bggId}`);
+      } else {
+        console.log(`🔄 [BGG Cache] Forzando actualización para bggId: ${bggId}`);
+      }
+
+      // Si no hay caché o se fuerza actualización, consultar BGG
       const url = `${BGG_API_BASE}/thing`;
       const params = {
         id: bggId,
@@ -117,7 +133,7 @@ if (USE_MOCK) {
       // Extraer estadísticas
       const stats = item.statistics?.ratings || {};
 
-      return {
+      const gameData = {
         bggId: parseInt(item.$.id),
         name: primaryName,
         description: this.cleanDescription(item.description || ''),
@@ -141,6 +157,12 @@ if (USE_MOCK) {
         source: 'bgg',
         bggLastSync: new Date(),
       };
+
+      // Guardar en caché (30 días por defecto)
+      await BGGCache.saveToCache(bggId, gameData);
+      console.log(`💾 [BGG Cache] Datos guardados en caché para bggId: ${bggId}`);
+
+      return gameData;
     } catch (error) {
       console.error('Error obteniendo detalles de BGG:', error.message);
       if (error.message.includes('no encontrado')) {
@@ -233,6 +255,34 @@ if (USE_MOCK) {
     } catch (error) {
       return false;
     }
+  }
+
+  /**
+   * Invalidar caché de un juego específico
+   * Útil cuando se necesita forzar actualización
+   * @param {number} bggId - ID del juego a invalidar
+   * @returns {Promise<void>}
+   */
+  async invalidateCache(bggId) {
+    await BGGCache.invalidateCache(bggId);
+    console.log(`🗑️ [BGG Cache] Caché invalidada para bggId: ${bggId}`);
+  }
+
+  /**
+   * Obtener estadísticas del caché
+   * @returns {Promise<Object>} - Estadísticas del caché
+   */
+  async getCacheStats() {
+    return await BGGCache.getCacheStats();
+  }
+
+  /**
+   * Limpiar toda la caché
+   * @returns {Promise<void>}
+   */
+  async clearCache() {
+    await BGGCache.clearAllCache();
+    console.log('🧹 [BGG Cache] Toda la caché ha sido limpiada');
   }
 }
 
