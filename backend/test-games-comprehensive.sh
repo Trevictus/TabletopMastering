@@ -77,16 +77,23 @@ make_request() {
         auth_header="Authorization: Bearer invalid_token"
     fi
     
+    local response=""
+    
     if [ -z "$data" ]; then
-        curl -s -w "\n%{http_code}" -X $method "$BASE_URL$endpoint" \
+        # Request sin data (GET, PUT, DELETE sin body)
+        response=$(curl -s -w "\n%{http_code}" --max-time 30 -X "$method" "$BASE_URL$endpoint" \
             -H "$auth_header" \
-            -H "Content-Type: application/json"
+            -H "Content-Type: application/json")
     else
-        curl -s -w "\n%{http_code}" -X $method "$BASE_URL$endpoint" \
+        # POST/PUT/DELETE con data
+        response=$(curl -s -w "\n%{http_code}" --max-time 30 -X "$method" "$BASE_URL$endpoint" \
             -H "$auth_header" \
             -H "Content-Type: application/json" \
-            -d "$data"
+            -d "$data")
     fi
+    
+    # Devolver respuesta con código HTTP al final
+    echo "$response"
 }
 
 # Función para validar código de estado
@@ -108,20 +115,24 @@ assert_status() {
     fi
 }
 
-# Función para validar que contiene texto
+# Función para verificar contenido
 assert_contains() {
-    local response=$1
-    local text=$2
-    local message=$3
+    local response="$1"
+    local expected="$2"
+    local description="$3"
     
     local body=$(echo "$response" | sed '$d')
+    ((TOTAL_TESTS++))
     
-    if echo "$body" | grep -q "$text"; then
-        print_success "$message"
+    if echo "$body" | grep -q "$expected"; then
+        print_success "✓ $description"
+        ((PASSED_TESTS++))
         return 0
     else
-        print_fail "$message - Text '$text' not found"
-        echo -e "${RED}  Response: ${body:0:200}${NC}"
+        print_error "✗ $description"
+        print_info "   Buscando: $expected"
+        print_info "   Response: ${body:0:300}"
+        ((FAILED_TESTS++))
         return 1
     fi
 }
@@ -133,8 +144,8 @@ assert_contains() {
 print_header "SETUP - VERIFICACIÓN DEL SERVIDOR"
 
 # Verificar servidor
-health=$(curl -s http://localhost:3000/health 2>/dev/null)
-if [ $? -eq 0 ]; then
+health=$(wget -q -O- --timeout=5 http://localhost:3000/health 2>/dev/null)
+if [ $? -eq 0 ] && [ ! -z "$health" ]; then
     print_info "Servidor funcionando en http://localhost:3000"
 else
     print_error "Servidor no disponible. Ejecuta: npm run dev"
@@ -147,7 +158,7 @@ print_header "SETUP - AUTENTICACIÓN"
 timestamp=$(date +%s)
 test_email="test_games_${timestamp}@example.com"
 
-register_response=$(curl -s -w "\n%{http_code}" -X POST "$BASE_URL/auth/register" \
+register_response=$(curl -s -w "\n%{http_code}" --max-time 30 -X POST "$BASE_URL/auth/register" \
     -H "Content-Type: application/json" \
     -d "{
         \"name\": \"Test User Games\",
@@ -171,10 +182,12 @@ group_response=$(make_request POST "/groups" "{
     \"description\": \"Grupo para tests exhaustivos\"
 }")
 
-GROUP_ID=$(echo "$group_response" | sed '$d' | grep -o '"_id":"[^"]*' | head -1 | cut -d'"' -f4)
+# Extraer el ID del grupo (es el segundo _id que aparece, después del admin)
+GROUP_ID=$(echo "$group_response" | sed '$d' | grep -o '"_id":"[^"]*' | sed -n '2p' | cut -d'"' -f4)
 
 if [ -z "$GROUP_ID" ]; then
     print_error "No se pudo crear grupo de prueba"
+    print_info "Respuesta completa: $group_response"
     exit 1
 fi
 
@@ -991,14 +1004,14 @@ print_header "TEST SUITE 12: AUTENTICACIÓN Y AUTORIZACIÓN"
 
 # Test 12.1: Error - Sin token (todas las rutas requieren auth)
 print_test "Error: Búsqueda sin autenticación"
-response=$(curl -s -w "\n%{http_code}" -X GET "$BASE_URL/games/search-bgg?name=Test" \
+response=$(curl -s -w "\n%{http_code}" --max-time 30 -X GET "$BASE_URL/games/search-bgg?name=Test" \
     -H "Content-Type: application/json")
 assert_status "$response" 401 "Error 401 - sin autenticación"
 echo ""
 
 # Test 12.2: Error - Token inválido
 print_test "Error: Token inválido"
-response=$(curl -s -w "\n%{http_code}" -X GET "$BASE_URL/games?groupId=$GROUP_ID" \
+response=$(curl -s -w "\n%{http_code}" --max-time 30 -X GET "$BASE_URL/games?groupId=$GROUP_ID" \
     -H "Authorization: Bearer invalid_token_12345" \
     -H "Content-Type: application/json")
 assert_status "$response" 401 "Error 401 - token inválido"
@@ -1009,7 +1022,7 @@ print_test "Error: Acceder a juegos de grupo al que no perteneces"
 # Crear segundo usuario
 timestamp2=$(date +%s)
 test_email2="test_other_${timestamp2}@example.com"
-register2=$(curl -s -X POST "$BASE_URL/auth/register" \
+register2=$(curl -s --max-time 30 -X POST "$BASE_URL/auth/register" \
     -H "Content-Type: application/json" \
     -d "{
         \"name\": \"Other User\",
@@ -1020,7 +1033,7 @@ TOKEN2=$(echo "$register2" | grep -o '"token":"[^"]*' | cut -d'"' -f4)
 
 # Intentar acceder con segundo usuario
 if [ ! -z "$TOKEN2" ]; then
-    response=$(curl -s -w "\n%{http_code}" -X GET "$BASE_URL/games?groupId=$GROUP_ID" \
+    response=$(curl -s -w "\n%{http_code}" --max-time 30 -X GET "$BASE_URL/games?groupId=$GROUP_ID" \
         -H "Authorization: Bearer $TOKEN2" \
         -H "Content-Type: application/json")
     assert_status "$response" 403 "Error 403 - sin permiso"

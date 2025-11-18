@@ -207,6 +207,34 @@ class MockBGGService {
   }
 
   /**
+   * Obtener estadísticas de la caché (mock)
+   * @returns {Promise<Object>}
+   */
+  async getCacheStats() {
+    const BGGCache = require('../models/BGGCache');
+    return await BGGCache.getCacheStats();
+  }
+
+  /**
+   * Invalidar caché de un juego (mock)
+   * @param {number} bggId
+   * @returns {Promise<void>}
+   */
+  async invalidateCache(bggId) {
+    const BGGCache = require('../models/BGGCache');
+    return await BGGCache.invalidateCache(bggId);
+  }
+
+  /**
+   * Limpiar toda la caché (mock)
+   * @returns {Promise<void>}
+   */
+  async clearCache() {
+    const BGGCache = require('../models/BGGCache');
+    return await BGGCache.clearCache();
+  }
+
+  /**
    * Simular delay de red
    * @param {number} ms - Milisegundos a esperar
    * @returns {Promise}
