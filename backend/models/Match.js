@@ -57,16 +57,33 @@ const matchSchema = new mongoose.Schema(
     winner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      validate: {
+        validator: function(val) {
+          // Si hay ganador, debe ser uno de los jugadores
+          if (!val) return true; // Si no hay ganador, ok
+          return this.players.some(p => p.user.toString() === val.toString());
+        },
+        message: 'El ganador debe ser uno de los jugadores'
+      }
     },
     duration: {
       value: {
         type: Number,
+        min: [1, 'La duración debe ser al menos 1'],
+        max: [1440, 'La duración máxima es 24 horas'],
       },
       unit: {
         type: String,
         enum: ['minutos', 'horas'],
         default: 'minutos',
       },
+      validate: {
+        validator: function() {
+          // Si hay valor, debe haber unidad
+          return !this.duration.value || this.duration.unit;
+        },
+        message: 'Si hay duración, debe especificar la unidad'
+      }
     },
     notes: {
       type: String,
