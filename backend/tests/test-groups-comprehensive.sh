@@ -3,7 +3,7 @@
 # Script de pruebas completas para la API de Grupos
 # Tabletop Mastering - Backend Tests
 
-BASE_URL="http://localhost:3000/api"
+BASE_URL="http://localhost:5000/api"
 TIMESTAMP=$(date +%s)
 TOKEN=""
 TOKEN2=""

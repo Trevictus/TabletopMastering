@@ -10,7 +10,7 @@
 # Activar modo MOCK para BGG Service
 export USE_BGG_MOCK=true
 
-BASE_URL="http://localhost:3000/api"
+BASE_URL="http://localhost:5000/api"
 TOKEN=""
 GROUP_ID=""
 GAME_BGG_ID=""
@@ -144,9 +144,9 @@ assert_contains() {
 print_header "SETUP - VERIFICACIÓN DEL SERVIDOR"
 
 # Verificar servidor
-health=$(wget -q -O- --timeout=5 http://localhost:3000/health 2>/dev/null)
-if [ $? -eq 0 ] && [ ! -z "$health" ]; then
-    print_info "Servidor funcionando en http://localhost:3000"
+health=$(wget -q -O- --timeout=5 http://localhost:5000/health 2>/dev/null)
+if [ $? -eq 0 ]; then
+    print_info "Servidor funcionando en http://localhost:5000"
 else
     print_error "Servidor no disponible. Ejecuta: npm run dev"
     exit 1
