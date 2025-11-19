@@ -77,13 +77,6 @@ const matchSchema = new mongoose.Schema(
         enum: ['minutos', 'horas'],
         default: 'minutos',
       },
-      validate: {
-        validator: function() {
-          // Si hay valor, debe haber unidad
-          return !this.duration.value || this.duration.unit;
-        },
-        message: 'Si hay duración, debe especificar la unidad'
-      }
     },
     notes: {
       type: String,

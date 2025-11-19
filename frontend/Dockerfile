@@ -1,14 +1,18 @@
-FROM node:24-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
+# Copiar archivos de dependencias
 COPY package*.json ./
 
-RUN npm install
+# Instalar dependencias
+RUN npm ci
 
+# Copiar código fuente
 COPY . .
 
+# Exponer puerto
 EXPOSE 5173
 
-# Ejecutar Vite en modo desarrollo con acceso desde cualquier interfaz
+# Ejecutar Vite en modo desarrollo con host 0.0.0.0
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
