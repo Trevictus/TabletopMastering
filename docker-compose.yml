@@ -86,7 +86,9 @@ services:
 
 volumes:
   mongodb_data:
+    name: tabletop-mongodb-data
 
 networks:
   tabletop-network:
+    name: tabletop-network
     driver: bridge
