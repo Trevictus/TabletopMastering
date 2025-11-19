@@ -1,0 +1,79 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  REGISTRY: registry.digitalocean.com
+  IMAGE_NAME_BACKEND: ${{ secrets.DIGITALOCEAN_REGISTRY_NAME }}/tabletop-backend
+  IMAGE_NAME_FRONTEND: ${{ secrets.DIGITALOCEAN_REGISTRY_NAME }}/tabletop-frontend
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Log in to DigitalOcean Container Registry
+        run: doctl registry login --expiry-seconds 600
+
+      - name: Build and push backend image
+        run: |
+          docker build \
+            -f backend/Dockerfile.prod \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }} \
+            ./backend
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:${{ github.sha }}
+
+      - name: Build and push frontend image
+        run: |
+          docker build \
+            -f frontend/Dockerfile.prod \
+            --build-arg VITE_API_URL=${{ secrets.VITE_API_URL }} \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }} \
+            ./frontend
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:${{ github.sha }}
+
+  deploy:
+    name: Deploy to App Platform
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Deploy to App Platform
+        run: |
+          doctl apps update ${{ secrets.DIGITALOCEAN_APP_ID }} --spec .do/app.yaml
+
+      - name: Wait for deployment
+        run: |
+          echo "Esperando a que el deployment se complete..."
+          sleep 30
+          doctl apps get ${{ secrets.DIGITALOCEAN_APP_ID }}
+
+      - name: Deployment status
+        run: |
+          echo "✅ Deployment completado!"
+          echo "🔗 URL: https://$(doctl apps get ${{ secrets.DIGITALOCEAN_APP_ID }} --format DefaultIngress --no-header)"

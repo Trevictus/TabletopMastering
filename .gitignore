@@ -1,3 +1,15 @@
+# Environment files
+.env
+.env.local
+.env.production
+.env.*.local
+
+# SSL certificates
+ssl/
+*.pem
+*.key
+*.crt
+
 # Logs
 logs
 *.log
