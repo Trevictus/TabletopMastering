@@ -11,8 +11,8 @@ import './App.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <div className="page-container">
           <Navbar />
           <main className="main-content">
@@ -57,8 +57,8 @@ function App() {
             </Routes>
           </main>
         </div>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

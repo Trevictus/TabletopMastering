@@ -74,14 +74,10 @@ const Register = () => {
     if (password.length < 8) {
       return 'La contraseña debe tener al menos 8 caracteres';
     }
-    if (!/[A-Z]/.test(password)) {
-      return 'La contraseña debe contener al menos una mayúscula';
-    }
-    if (!/[a-z]/.test(password)) {
-      return 'La contraseña debe contener al menos una minúscula';
-    }
-    if (!/[0-9]/.test(password)) {
-      return 'La contraseña debe contener al menos un número';
+    // Recomendaciones adicionales (no obligatorias)
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+      // Solo advertir pero no bloquear
+      return '';
     }
     return '';
   };
