@@ -2,6 +2,8 @@ const Match = require('../models/Match');
 const Group = require('../models/Group');
 const Game = require('../models/Game');
 const User = require('../models/User');
+const pointsCalculator = require('../services/pointsCalculator');
+const rankingService = require('../services/rankingService');
 
 /**
  * @desc    Crear una partida
@@ -387,11 +389,30 @@ exports.finishMatch = async (req, res, next) => {
           if (result.position !== undefined) {
             match.players[playerIndex].position = result.position;
           }
-          if (result.pointsEarned !== undefined) {
-            match.players[playerIndex].pointsEarned = result.pointsEarned;
-          }
         }
       }
+    }
+
+    // Validar posiciones si existen
+    const positionsToValidate = match.players.filter(p => p.position !== undefined && p.position !== null);
+    if (positionsToValidate.length > 0) {
+      if (!pointsCalculator.validatePositions(match.players)) {
+        return res.status(400).json({
+          success: false,
+          message: 'No puede haber posiciones duplicadas',
+        });
+      }
+
+      // Calcular puntos automáticamente basado en posiciones
+      const pointsData = pointsCalculator.calculatePointsForAllPlayers(match.players);
+      pointsData.forEach(data => {
+        const playerIndex = match.players.findIndex(
+          p => p.user.toString() === data.userId.toString()
+        );
+        if (playerIndex !== -1) {
+          match.players[playerIndex].pointsEarned = data.points;
+        }
+      });
     }
 
     // Actualizar duración y estado
@@ -403,6 +424,9 @@ exports.finishMatch = async (req, res, next) => {
     match.actualDate = new Date();
 
     await match.save();
+
+    // Actualizar ranking automáticamente
+    const rankingReport = await rankingService.updateMatchStatistics(match);
 
     await match.populate([
       { path: 'game', select: 'name image' },
@@ -416,6 +440,7 @@ exports.finishMatch = async (req, res, next) => {
       success: true,
       message: 'Partida finalizada y resultados registrados',
       data: match,
+      ranking: rankingReport,
     });
   } catch (error) {
     next(error);
@@ -525,6 +550,65 @@ exports.deleteMatch = async (req, res, next) => {
       success: true,
       message: 'Partida eliminada exitosamente',
       data: {},
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Obtener ranking global de usuarios
+ * @route   GET /api/matches/ranking/global
+ * @access  Private
+ */
+exports.getGlobalRanking = async (req, res, next) => {
+  try {
+    const ranking = await rankingService.getGlobalRanking();
+
+    res.status(200).json({
+      success: true,
+      data: ranking,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Obtener ranking de un grupo
+ * @route   GET /api/matches/ranking/group/:groupId
+ * @access  Private
+ */
+exports.getGroupRanking = async (req, res, next) => {
+  try {
+    const { groupId } = req.params;
+
+    // Verificar que el grupo existe
+    const group = await Group.findById(groupId);
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        message: 'Grupo no encontrado',
+      });
+    }
+
+    // Verificar que el usuario es miembro del grupo
+    const isMember = group.members.some(
+      member => member.user.toString() === req.user._id.toString()
+    );
+
+    if (!isMember) {
+      return res.status(403).json({
+        success: false,
+        message: 'No eres miembro de este grupo',
+      });
+    }
+
+    const ranking = await rankingService.getGroupRanking(groupId);
+
+    res.status(200).json({
+      success: true,
+      data: ranking,
     });
   } catch (error) {
     next(error);

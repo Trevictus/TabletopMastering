@@ -8,9 +8,15 @@ const {
   finishMatch,
   confirmAttendance,
   deleteMatch,
+  getGlobalRanking,
+  getGroupRanking,
 } = require('../controllers/matchController');
 
 const router = express.Router();
+
+// Rutas de ranking
+router.get('/ranking/global', protect, getGlobalRanking);
+router.get('/ranking/group/:groupId', protect, getGroupRanking);
 
 // Rutas protegidas
 router.post('/', protect, createMatch);
