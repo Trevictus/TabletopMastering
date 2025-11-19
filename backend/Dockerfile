@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:lts-alpine
 
 WORKDIR /app
 
@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instalar dependencias
-RUN npm ci --only=production && \
+RUN npm install --production && \
     npm install -g nodemon
 
 # Copiar código fuente
