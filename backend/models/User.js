@@ -68,6 +68,11 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+// Índices para mejorar rendimiento de rankings
+userSchema.index({ 'stats.totalPoints': -1 });
+userSchema.index({ groups: 1, 'stats.totalPoints': -1 });
+userSchema.index({ isActive: 1, 'stats.totalPoints': -1 });
+
 // Middleware para hashear la contraseña antes de guardar
 userSchema.pre('save', async function (next) {
   // Solo hashear si la contraseña ha sido modificada
