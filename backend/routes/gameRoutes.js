@@ -1,6 +1,7 @@
 const express = require('express');
 const { protect } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validator');
+const upload = require('../middlewares/upload');
 const {
   createGameValidation,
   addFromBGGValidation,
@@ -24,6 +25,7 @@ const {
   deleteGame,
   getHotGames,
   getGroupGameStats,
+  uploadGameImage,
 } = require('../controllers/gameController');
 const {
   getCacheStats,
@@ -51,7 +53,27 @@ router.get('/', protect, getGamesValidation, validate, getGames);
 // Rutas específicas con paths completos ANTES de las rutas con parámetros dinámicos
 router.get('/stats/:groupId', protect, groupStatsValidation, validate, getGroupGameStats);
 
+// Middleware para manejar errores de multer
+const handleMulterError = (err, req, res, next) => {
+  if (err) {
+    if (err.message.includes('Tipo de archivo no válido')) {
+      return res.status(400).json({
+        success: false,
+        message: err.message,
+      });
+    }
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        message: 'La imagen no puede superar los 5MB',
+      });
+    }
+  }
+  next(err);
+};
+
 // Rutas con parámetros dinámicos - las más específicas primero
+router.post('/:id/upload-image', protect, idParamValidation, validate, upload.single('image'), handleMulterError, uploadGameImage);
 router.put('/:id/sync-bgg', protect, idParamValidation, validate, syncBGGGame);
 router.get('/:id', protect, idParamValidation, validate, getGame);
 router.put('/:id', protect, updateGameValidation, validate, updateGame);

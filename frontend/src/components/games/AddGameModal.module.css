@@ -49,6 +49,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   padding: 1rem;
   background-color: var(--bg-secondary, #f5f1e8);
   border-radius: var(--border-radius);
@@ -63,6 +64,15 @@
   transform: translateX(4px);
 }
 
+.resultThumbnail {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background-color: var(--bg-tertiary, #e5e7eb);
+}
+
 .resultInfo {
   flex: 1;
 }
@@ -74,14 +84,135 @@
   color: var(--text-primary);
 }
 
+.resultName {
+  display: inline;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.resultYear {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-left: 0.5rem;
+}
+
 .year {
   color: var(--text-secondary);
   font-size: 0.875rem;
   margin-left: 0.5rem;
 }
 
+/* Estado de carga */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+/* Mensaje de no resultados */
+.noResults {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: var(--bg-secondary, #f5f1e8);
+  border-radius: var(--border-radius);
+  margin-top: 1.5rem;
+}
+
+.noResults p {
+  margin: 0 0 1rem 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+/* Banner de error */
+.errorBanner {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--error-color);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--error-color);
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.errorBanner p {
+  margin: 0 0 1rem 0;
+}
+
+.errorBanner button {
+  margin-top: 0.5rem;
+}
+
 .backButton {
   margin-bottom: 1rem;
+}
+
+/* Banner informativo para BGG no disponible */
+.infoBanner {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  border-radius: var(--border-radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.1);
+}
+
+.infoIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.infoText {
+  flex: 1;
+}
+
+.infoText strong {
+  display: block;
+  color: #92400e;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.infoText p {
+  margin: 0;
+  color: #78350f;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* Mensaje sobre BGG no disponible */
+.bggNotice {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: var(--border-radius);
+  padding: 1rem 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.bggNotice p {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.bggNotice ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.5rem;
+}
+
+.bggNotice li {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.6;
 }
 
 .preview {

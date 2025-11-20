@@ -16,9 +16,18 @@ exports.searchBGG = async (req, res, next) => {
       success: true,
       count: results.length,
       data: results,
+      warning: results.length === 0 && query ? 'No se encontraron resultados. BGG API puede estar experimentando problemas.' : null,
     });
   } catch (error) {
-    next(error);
+    // Si BGG no está disponible, devolver error amigable
+    console.error('[Controller] Error en búsqueda BGG:', error.message);
+    
+    res.status(503).json({
+      success: false,
+      message: 'La API de BoardGameGeek no está disponible temporalmente. Por favor, intenta crear un juego personalizado o intenta de nuevo más tarde.',
+      error: 'BGG_UNAVAILABLE',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
   }
 };
 
@@ -316,6 +325,64 @@ exports.getGroupGameStats = async (req, res, next) => {
       data: stats,
     });
   } catch (error) {
+    if (error.status) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message,
+      });
+    }
+    next(error);
+  }
+};
+
+/**
+ * @desc    Subir imagen para un juego
+ * @route   POST /api/games/:id/upload-image
+ * @access  Private
+ */
+exports.uploadGameImage = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No se ha proporcionado ninguna imagen',
+      });
+    }
+
+    // Construir URL de la imagen
+    const protocol = req.protocol;
+    const host = req.get('host');
+    const imageUrl = `${protocol}://${host}/uploads/games/${req.file.filename}`;
+
+    // Actualizar el juego con la nueva imagen
+    const updatedGame = await gameService.updateGame(
+      id,
+      { image: imageUrl },
+      req.user._id
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Imagen subida exitosamente',
+      data: {
+        game: updatedGame,
+        imageUrl: imageUrl,
+        filename: req.file.filename,
+      },
+    });
+  } catch (error) {
+    // Si hay error, eliminar el archivo subido
+    if (req.file) {
+      const fs = require('fs');
+      const path = require('path');
+      const filePath = path.join(__dirname, '../uploads/games', req.file.filename);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
     if (error.status) {
       return res.status(error.status).json({
         success: false,

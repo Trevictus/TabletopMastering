@@ -1,0 +1,119 @@
+.imageUploader {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.imagePreview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border: 2px dashed var(--border-color, #ddd);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: var(--bg-secondary, #f8f9fa);
+}
+
+.imagePreview:hover {
+  border-color: var(--primary-color, #007bff);
+  background-color: var(--bg-hover, #e9ecef);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary, #6c757d);
+  padding: 20px;
+  text-align: center;
+}
+
+.uploadIcon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 12px;
+  color: var(--text-muted, #adb5bd);
+}
+
+.placeholder p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.uploadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.uploadingOverlay p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.fileInput {
+  display: none;
+}
+
+.info {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.infoText {
+  font-size: 12px;
+  color: var(--text-secondary, #6c757d);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .imageUploader {
+    max-width: 100%;
+  }
+  
+  .uploadIcon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .placeholder p {
+    font-size: 13px;
+  }
+}
