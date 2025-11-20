@@ -116,8 +116,63 @@ const isGroupAdminOrModerator = async (req, res, next) => {
   }
 };
 
+/**
+ * Middleware para verificar que el usuario sea admin o miembro del grupo
+ * Centraliza la lógica duplicada: if (!isAdmin && !isMember)
+ */
+const checkGroupAccess = async (req, res, next) => {
+  try {
+    const groupId = req.params.id || req.body.groupId || req.query.groupId;
+
+    if (!groupId) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de grupo no proporcionado',
+      });
+    }
+
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        message: 'Grupo no encontrado',
+      });
+    }
+
+    if (!group.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: 'Grupo no encontrado',
+      });
+    }
+
+    const isAdmin = group.admin.toString() === req.user._id.toString();
+    const isMember = group.members.some(
+      member => member.user.toString() === req.user._id.toString()
+    );
+
+    if (!isAdmin && !isMember) {
+      return res.status(403).json({
+        success: false,
+        message: 'No eres miembro de este grupo',
+      });
+    }
+
+    // Adjuntar grupo y permisos al request
+    req.group = group;
+    req.isGroupAdmin = isAdmin;
+    req.isGroupMember = isMember;
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   isGroupMember,
   isGroupAdmin,
   isGroupAdminOrModerator,
+  checkGroupAccess,
 };
