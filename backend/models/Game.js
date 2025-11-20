@@ -113,13 +113,11 @@ const gameSchema = new mongoose.Schema(
         default: 0,
       },
     },
-    // Campo group opcional (solo para juegos custom o añadidos a grupos)
+    // Campo group opcional (solo para juegos en grupos)
     group: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Group',
-      required: function() {
-        return this.source === 'custom';
-      },
+      default: null,
     },
     addedBy: {
       type: mongoose.Schema.Types.ObjectId,

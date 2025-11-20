@@ -58,7 +58,7 @@ exports.getBGGDetails = async (req, res, next) => {
 };
 
 /**
- * @desc    Añadir un juego de BGG a un grupo
+ * @desc    Añadir un juego de BGG
  * @route   POST /api/games/add-from-bgg
  * @access  Private
  */
@@ -74,46 +74,58 @@ exports.addFromBGG = async (req, res, next) => {
       });
     }
 
-    if (!groupId) {
-      return res.status(400).json({
-        success: false,
-        message: 'El ID del grupo es obligatorio',
+    // Verificar que el grupo existe y el usuario es miembro o admin (si se proporciona)
+    if (groupId) {
+      const group = await Group.findById(groupId);
+      if (!group) {
+        return res.status(404).json({
+          success: false,
+          message: 'Grupo no encontrado',
+        });
+      }
+
+      const isAdmin = group.admin.toString() === req.user._id.toString();
+      const isMember = group.members.some(
+        member => member.user.toString() === req.user._id.toString()
+      );
+
+      if (!isAdmin && !isMember) {
+        return res.status(403).json({
+          success: false,
+          message: 'No eres miembro de este grupo',
+        });
+      }
+
+      // Verificar si el juego ya existe en el grupo
+      const existingGame = await Game.findOne({ 
+        bggId: bggId, 
+        group: groupId,
+        isActive: true 
       });
-    }
 
-    // Verificar que el grupo existe y el usuario es miembro
-    const group = await Group.findById(groupId);
-    if (!group) {
-      return res.status(404).json({
-        success: false,
-        message: 'Grupo no encontrado',
+      if (existingGame) {
+        return res.status(400).json({
+          success: false,
+          message: 'Este juego ya está en la colección del grupo',
+          data: existingGame,
+        });
+      }
+    } else {
+      // Si no hay grupo, verificar si el usuario ya tiene este juego de forma personal
+      const existingGame = await Game.findOne({ 
+        bggId: bggId, 
+        addedBy: req.user._id,
+        group: { $exists: false },
+        isActive: true 
       });
-    }
 
-    const isMember = group.members.some(
-      member => member.user.toString() === req.user._id.toString()
-    );
-
-    if (!isMember) {
-      return res.status(403).json({
-        success: false,
-        message: 'No eres miembro de este grupo',
-      });
-    }
-
-    // Verificar si el juego ya existe en el grupo
-    const existingGame = await Game.findOne({ 
-      bggId: bggId, 
-      group: groupId,
-      isActive: true 
-    });
-
-    if (existingGame) {
-      return res.status(400).json({
-        success: false,
-        message: 'Este juego ya está en la colección del grupo',
-        data: existingGame,
-      });
+      if (existingGame) {
+        return res.status(400).json({
+          success: false,
+          message: 'Ya tienes este juego en tu colección personal',
+          data: existingGame,
+        });
+      }
     }
 
     // Obtener detalles del juego desde BGG
@@ -122,7 +134,7 @@ exports.addFromBGG = async (req, res, next) => {
     // Crear el juego en la base de datos
     const game = await Game.create({
       ...bggData,
-      group: groupId,
+      group: groupId || null,
       addedBy: req.user._id,
       customNotes: customNotes || '',
       isActive: true, // Asegurar que el juego esté activo
@@ -177,13 +189,6 @@ exports.createGame = async (req, res, next) => {
       });
     }
 
-    if (!groupId) {
-      return res.status(400).json({
-        success: false,
-        message: 'El ID del grupo es obligatorio',
-      });
-    }
-
     if (!minPlayers || !maxPlayers) {
       return res.status(400).json({
         success: false,
@@ -191,24 +196,42 @@ exports.createGame = async (req, res, next) => {
       });
     }
 
-    // Verificar que el grupo existe y el usuario es miembro
-    const group = await Group.findById(groupId);
-    if (!group) {
-      return res.status(404).json({
-        success: false,
-        message: 'Grupo no encontrado',
-      });
-    }
+    // Verificar que el grupo existe y el usuario es miembro o admin (si se proporciona)
+    if (groupId) {
+      const group = await Group.findById(groupId);
+      if (!group) {
+        return res.status(404).json({
+          success: false,
+          message: 'Grupo no encontrado',
+        });
+      }
 
-    const isMember = group.members.some(
-      member => member.user.toString() === req.user._id.toString()
-    );
+      const isAdmin = group.admin.toString() === req.user._id.toString();
+      const isMember = group.members.some(
+        member => member.user.toString() === req.user._id.toString()
+      );
 
-    if (!isMember) {
-      return res.status(403).json({
-        success: false,
-        message: 'No eres miembro de este grupo',
+      if (!isAdmin && !isMember) {
+        return res.status(403).json({
+          success: false,
+          message: 'No eres miembro de este grupo',
+        });
+      }
+
+      // Verificar si el juego ya existe en el grupo con el mismo nombre
+      const existingGame = await Game.findOne({ 
+        name: name, 
+        group: groupId,
+        isActive: true 
       });
+
+      if (existingGame) {
+        return res.status(400).json({
+          success: false,
+          message: 'Este juego ya está en la colección del grupo',
+          data: existingGame,
+        });
+      }
     }
 
     // Crear juego personalizado
@@ -223,7 +246,7 @@ exports.createGame = async (req, res, next) => {
       mechanics: mechanics || [],
       difficulty: difficulty || '',
       yearPublished,
-      group: groupId,
+      group: groupId || null,
       addedBy: req.user._id,
       source: 'custom',
       customNotes: customNotes || '',
@@ -250,7 +273,7 @@ exports.createGame = async (req, res, next) => {
 };
 
 /**
- * @desc    Listar juegos (global o por grupo)
+ * @desc    Listar juegos (personales o por grupo sin duplicados)
  * @route   GET /api/games
  * @access  Private
  */
@@ -258,11 +281,12 @@ exports.getGames = async (req, res, next) => {
   try {
     const { groupId, source, search, page = 1, limit = 20 } = req.query;
 
-    // Construir filtro
-    const filter = { isActive: true };
+    let filter = { isActive: true };
+    let deduplicationField = null;
 
-    // Filtrar por grupo si se proporciona
+    // Obtener juegos según contexto
     if (groupId) {
+      // Verificar acceso al grupo
       const group = await Group.findById(groupId);
       if (!group) {
         return res.status(404).json({
@@ -271,31 +295,33 @@ exports.getGames = async (req, res, next) => {
         });
       }
 
-      // Verificar que el usuario es miembro
+      const isAdmin = group.admin.toString() === req.user._id.toString();
       const isMember = group.members.some(
         member => member.user.toString() === req.user._id.toString()
       );
 
-      if (!isMember) {
+      if (!isAdmin && !isMember) {
         return res.status(403).json({
           success: false,
           message: 'No eres miembro de este grupo',
         });
       }
 
+      // Juegos del grupo (sin duplicados por nombre/bggId)
       filter.group = groupId;
+      deduplicationField = 'bggId'; // Deduplicar por bggId si existe
     } else {
-      // Si no se especifica grupo, solo mostrar juegos globales de BGG
-      filter.source = 'bgg';
-      filter.group = { $exists: false };
+      // Juegos personales (sin grupo)
+      filter.addedBy = req.user._id;
+      filter.group = null;
     }
 
-    // Filtrar por fuente
+    // Aplicar filtro de fuente si se proporciona
     if (source && ['bgg', 'custom'].includes(source)) {
       filter.source = source;
     }
 
-    // Búsqueda por texto
+    // Aplicar búsqueda si se proporciona
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },
@@ -304,29 +330,50 @@ exports.getGames = async (req, res, next) => {
       ];
     }
 
-    // Paginación
+    // Obtener juegos
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    const total = await Game.countDocuments(filter);
-
-    const games = await Game.find(filter)
+    const allGames = await Game.find(filter)
       .populate('addedBy', 'name email')
       .populate('group', 'name')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(limit));
+      .sort({ createdAt: -1 });
+
+    // Deduplicar si es necesario (en grupo)
+    const games = deduplicationField 
+      ? deduplicateGames(allGames, deduplicationField)
+      : allGames;
+
+    // Aplicar paginación post-deduplicación
+    const paginatedGames = games.slice(skip, skip + parseInt(limit));
+    const total = games.length;
 
     res.status(200).json({
       success: true,
-      count: games.length,
+      count: paginatedGames.length,
       total,
       pages: Math.ceil(total / parseInt(limit)),
       currentPage: parseInt(page),
-      data: games,
+      data: paginatedGames,
     });
   } catch (error) {
     next(error);
   }
 };
+
+/**
+ * @helper  Eliminar duplicados manteniendo el primer registro único
+ */
+function deduplicateGames(games, field) {
+  const seen = new Set();
+  return games.filter(game => {
+    // Para juegos de BGG, usar bggId
+    const identifier = game[field] || `custom_${game._id}`;
+    if (seen.has(identifier)) {
+      return false;
+    }
+    seen.add(identifier);
+    return true;
+  });
+}
 
 /**
  * @desc    Obtener un juego por ID
@@ -349,11 +396,12 @@ exports.getGame = async (req, res, next) => {
     // Verificar acceso si tiene grupo
     if (game.group) {
       const group = await Group.findById(game.group._id);
+      const isAdmin = group.admin.toString() === req.user._id.toString();
       const isMember = group.members.some(
         member => member.user.toString() === req.user._id.toString()
       );
 
-      if (!isMember) {
+      if (!isAdmin && !isMember) {
         return res.status(403).json({
           success: false,
           message: 'No tienes acceso a este juego',
@@ -481,11 +529,12 @@ exports.syncBGGGame = async (req, res, next) => {
     // Verificar permisos
     if (game.group) {
       const group = await Group.findById(game.group);
+      const isAdmin = group.admin.toString() === req.user._id.toString();
       const isMember = group.members.some(
         m => m.user.toString() === req.user._id.toString()
       );
 
-      if (!isMember) {
+      if (!isAdmin && !isMember) {
         return res.status(403).json({
           success: false,
           message: 'No tienes permisos para sincronizar este juego',
@@ -625,11 +674,12 @@ exports.getGroupGameStats = async (req, res, next) => {
       });
     }
 
+    const isAdmin = group.admin.toString() === req.user._id.toString();
     const isMember = group.members.some(
       m => m.user.toString() === req.user._id.toString()
     );
 
-    if (!isMember) {
+    if (!isAdmin && !isMember) {
       return res.status(403).json({
         success: false,
         message: 'No eres miembro de este grupo',

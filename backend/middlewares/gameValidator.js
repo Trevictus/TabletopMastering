@@ -15,7 +15,7 @@ exports.createGameValidation = [
     .isLength({ max: 2000 }).withMessage('La descripción no puede exceder 2000 caracteres'),
   
   body('groupId')
-    .notEmpty().withMessage('El ID del grupo es obligatorio')
+    .optional()
     .isMongoId().withMessage('ID de grupo inválido'),
   
   body('minPlayers')
@@ -68,7 +68,7 @@ exports.addFromBGGValidation = [
     .isInt({ min: 1 }).withMessage('ID de BGG inválido'),
   
   body('groupId')
-    .notEmpty().withMessage('El ID del grupo es obligatorio')
+    .optional()
     .isMongoId().withMessage('ID de grupo inválido'),
   
   body('customNotes')
