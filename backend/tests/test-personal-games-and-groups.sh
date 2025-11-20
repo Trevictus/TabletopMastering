@@ -4,6 +4,13 @@
 # TEST: Juegos Personales y de Grupo sin Duplicados
 ################################################################################
 
+# Verificar que Docker está corriendo
+if ! curl -s http://localhost/api/auth/me > /dev/null 2>&1; then
+    echo "❌ Error: Docker no está corriendo"
+    echo "Ejecuta: docker compose up -d"
+    exit 1
+fi
+
 API_URL="http://localhost/api"
 TESTS=0
 PASSED=0

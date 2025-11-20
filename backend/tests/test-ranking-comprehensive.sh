@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Verificar que Docker está corriendo
+if ! curl -s http://localhost/api/auth/me > /dev/null 2>&1; then
+    echo "❌ Error: Docker no está corriendo"
+    echo "Ejecuta: docker compose up -d"
+    exit 1
+fi
+
 # Script completo para probar la lógica de ranking
 # Colores para output
 RED='\033[0;31m'

@@ -7,10 +7,17 @@
 # Incluye validación de express-validator y casos edge
 # ========================================================================
 
+# Verificar que Docker está corriendo
+if ! curl -s http://localhost/api/auth/me > /dev/null 2>&1; then
+    echo "❌ Error: Docker no está corriendo"
+    echo "Ejecuta: docker compose up -d"
+    exit 1
+fi
+
 # Activar modo MOCK para BGG Service
 export USE_BGG_MOCK=true
 
-BASE_URL="http://localhost:5000/api"
+BASE_URL="http://localhost/api"
 TOKEN=""
 GROUP_ID=""
 GAME_BGG_ID=""
@@ -144,12 +151,12 @@ assert_contains() {
 print_header "SETUP - VERIFICACIÓN DEL SERVIDOR"
 
 # Verificar servidor
-health=$(wget -q -O- --timeout=5 http://localhost:5000/health 2>/dev/null)
-if [ $? -eq 0 ]; then
-    print_info "Servidor funcionando en http://localhost:5000"
-else
-    print_error "Servidor no disponible. Ejecuta: npm run dev"
+health=$(curl -s -m 5 http://localhost/api/auth/me 2>/dev/null)
+if [ $? -ne 0 ]; then
+    print_error "Servidor no disponible en http://localhost/api"
     exit 1
+else
+    print_info "✓ Servidor funcionando en http://localhost/api"
 fi
 
 print_header "SETUP - AUTENTICACIÓN"
