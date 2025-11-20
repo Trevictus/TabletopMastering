@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { GroupProvider } from './context/GroupContext';
+import { ToastProvider } from './context/ToastContext';
+import { ToastContainer } from './components/common/Toast';
 import ProtectedRoute from './components/routes/ProtectedRoute';
 import PublicRoute from './components/routes/PublicRoute';
 import Navbar from './components/layout/Navbar';
@@ -15,11 +17,12 @@ function App() {
     <Router>
       <AuthProvider>
         <GroupProvider>
-          <div className="page-container">
-          <Navbar />
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<Home />} />
+          <ToastProvider>
+            <div className="page-container">
+              <Navbar />
+              <main className="main-content">
+                <Routes>
+                  <Route path="/" element={<Home />} />
               
               <Route 
                 path="/login" 
@@ -64,9 +67,11 @@ function App() {
               />
 
               <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-        </div>
+                </Routes>
+              </main>
+            </div>
+            <ToastContainer />
+          </ToastProvider>
         </GroupProvider>
       </AuthProvider>
     </Router>

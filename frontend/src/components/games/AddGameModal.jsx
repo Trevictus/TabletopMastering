@@ -9,6 +9,7 @@ import {
   MdArrowBack
 } from 'react-icons/md';
 import { GiDiceFire } from 'react-icons/gi';
+import { useToast } from '../../context/ToastContext';
 import Modal from '../common/Modal';
 import Input from '../common/Input';
 import Button from '../common/Button';
@@ -20,6 +21,7 @@ import styles from './AddGameModal.module.css';
  * Modal para añadir juegos desde BGG o crear uno personalizado
  */
 const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
+  const toast = useToast();
   const [mode, setMode] = useState('search'); // 'search', 'preview', 'custom'
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -67,7 +69,10 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
   // Buscar juegos en BGG
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return;
+    if (!searchQuery.trim()) {
+      toast.warning('Escribe el nombre de un juego para buscar');
+      return;
+    }
 
     setLoading(true);
     setError('');
@@ -77,10 +82,16 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
       const response = await gameService.searchBGG(searchQuery);
       setSearchResults(response.data || []);
       if (response.data?.length === 0) {
-        setError('No se encontraron juegos con ese nombre');
+        toast.info('No se encontraron juegos con ese nombre', {
+          title: 'Sin resultados'
+        });
+      } else {
+        toast.success(`Se encontraron ${response.data.length} juegos`);
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al buscar juegos');
+      const errorMsg = err.response?.data?.message || 'Error al buscar juegos';
+      setError(errorMsg);
+      toast.error(errorMsg, { title: 'Error de búsqueda' });
     } finally {
       setLoading(false);
     }
@@ -115,10 +126,17 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
         groupId || null,
         ''
       );
+      
+      toast.success(`${gamePreview.name} añadido correctamente`, {
+        title: 'Juego añadido'
+      });
+      
       onGameAdded(response.data);
       handleClose();
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al añadir juego');
+      const errorMsg = err.response?.data?.message || 'Error al añadir juego';
+      setError(errorMsg);
+      toast.error(errorMsg, { title: 'Error al añadir' });
     } finally {
       setLoading(false);
     }
@@ -127,6 +145,11 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
   // Crear juego personalizado
   const handleCreateCustom = async (e) => {
     e.preventDefault();
+
+    if (!customGame.name.trim()) {
+      toast.warning('El nombre del juego es obligatorio');
+      return;
+    }
 
     setLoading(true);
     setError('');
@@ -144,10 +167,17 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
       };
 
       const response = await gameService.createCustomGame(gameData);
+      
+      toast.success(`${customGame.name} creado correctamente`, {
+        title: 'Juego creado'
+      });
+      
       onGameAdded(response.data);
       handleClose();
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al crear juego');
+      const errorMsg = err.response?.data?.message || 'Error al crear juego';
+      setError(errorMsg);
+      toast.error(errorMsg, { title: 'Error al crear' });
     } finally {
       setLoading(false);
     }

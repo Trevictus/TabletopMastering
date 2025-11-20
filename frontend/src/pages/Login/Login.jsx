@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { GiPerspectiveDiceSixFacesRandom } from 'react-icons/gi';
 import { MdEmail, MdLock } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import styles from './Login.module.css';
@@ -11,6 +12,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const toast = useToast();
 
   const from = location.state?.from || '/dashboard';
   const [formData, setFormData] = useState({
@@ -128,14 +130,23 @@ const Login = () => {
     try {
       const { email, password } = formData;
       await login({ email, password });
-      navigate(from, { 
-        replace: true,
-        state: { 
-          message: '¡Bienvenido de nuevo!' 
-        } 
+      
+      toast.success('¡Bienvenido de nuevo!', {
+        action: {
+          label: 'Ir al dashboard',
+          onClick: () => navigate(from, { replace: true })
+        }
       });
+      
+      navigate(from, { replace: true });
     } catch (error) {
       console.error('Error en el login:', error);
+      
+      // Mostrar toast de error
+      toast.error(
+        error.response?.data?.message || 'Email o contraseña incorrectos',
+        { title: 'Error de autenticación' }
+      );
       
       // Manejar errores del servidor
       if (error.response?.data?.message) {

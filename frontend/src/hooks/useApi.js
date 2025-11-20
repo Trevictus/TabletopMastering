@@ -1,12 +1,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { formatError, logError } from '../services/apiErrorHandler';
+import { useToast } from '../context/ToastContext';
 
 /**
  * Hook personalizado para manejar peticiones a la API
  * 
  * Proporciona:
  * - Estado de loading/error/data
- * - Manejo automático de errores
+ * - Manejo automático de errores con toasts
  * - Cancelación automática al desmontar
  * - Retry manual
  * - Cache opcional
@@ -18,7 +19,7 @@ import { formatError, logError } from '../services/apiErrorHandler';
  * @example
  * const { data, loading, error, execute, retry } = useApi(
  *   () => gameService.getGames({ page: 1 }),
- *   { immediate: true }
+ *   { immediate: true, showErrorToast: true }
  * );
  */
 const useApi = (apiFunction, options = {}) => {
@@ -29,6 +30,9 @@ const useApi = (apiFunction, options = {}) => {
     initialData = null,
     cache = false,
     logErrors = true,
+    showErrorToast = true,
+    showSuccessToast = false,
+    successMessage = 'Operación exitosa',
   } = options;
 
   const [data, setData] = useState(initialData);
@@ -39,6 +43,7 @@ const useApi = (apiFunction, options = {}) => {
   const abortControllerRef = useRef(null);
   const cacheRef = useRef(null);
   const isMountedRef = useRef(true);
+  const toast = useToast();
 
   // Cleanup al desmontar
   useEffect(() => {
@@ -93,6 +98,15 @@ const useApi = (apiFunction, options = {}) => {
             cacheRef.current = responseData;
           }
 
+          // Mostrar toast de éxito si está habilitado
+          if (showSuccessToast) {
+            toast.success(
+              typeof successMessage === 'function' 
+                ? successMessage(responseData) 
+                : successMessage
+            );
+          }
+
           // Callback de éxito
           if (onSuccess) {
             onSuccess(responseData);
@@ -116,6 +130,15 @@ const useApi = (apiFunction, options = {}) => {
             logError(err, apiFunction.name || 'useApi');
           }
 
+          // Mostrar toast de error si está habilitado
+          if (showErrorToast) {
+            toast.error(formattedError.userMessage, {
+              title: formattedError.type === 'VALIDATION' 
+                ? 'Error de validación' 
+                : 'Error',
+            });
+          }
+
           // Callback de error
           if (onError) {
             onError(formattedError);
@@ -125,7 +148,7 @@ const useApi = (apiFunction, options = {}) => {
         }
       }
     },
-    [apiFunction, cache, onSuccess, onError, logErrors]
+    [apiFunction, cache, onSuccess, onError, logErrors, showErrorToast, showSuccessToast, successMessage, toast]
   );
 
   /**
