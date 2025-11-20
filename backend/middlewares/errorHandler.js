@@ -31,14 +31,15 @@ const errorHandler = (err, req, res, next) => {
     });
   }
 
-  // Error de JWT
+  // Error de JWT - Token inválido
   if (err.name === 'JsonWebTokenError') {
     return res.status(401).json({
       success: false,
-      message: 'Token inválido',
+      message: 'Token inválido o malformado',
     });
   }
 
+  // Error de JWT - Token expirado
   if (err.name === 'TokenExpiredError') {
     return res.status(401).json({
       success: false,
@@ -46,11 +47,47 @@ const errorHandler = (err, req, res, next) => {
     });
   }
 
+  // Error de CORS
+  if (err.message === 'CORS no permitido') {
+    return res.status(403).json({
+      success: false,
+      message: 'Acceso denegado - Origen no permitido',
+    });
+  }
+
+  // Error de autenticación
+  if (err.statusCode === 401) {
+    return res.status(401).json({
+      success: false,
+      message: err.message || 'No autorizado',
+    });
+  }
+
+  // Error de autorización
+  if (err.statusCode === 403) {
+    return res.status(403).json({
+      success: false,
+      message: err.message || 'Acceso denegado',
+    });
+  }
+
+  // Error de base de datos (conexión)
+  if (err.name === 'MongoNetworkError' || err.name === 'MongoTimeoutError') {
+    return res.status(503).json({
+      success: false,
+      message: 'Base de datos no disponible',
+    });
+  }
+
   // Error genérico
-  res.status(err.statusCode || 500).json({
+  const statusCode = err.statusCode || err.status || 500;
+  res.status(statusCode).json({
     success: false,
-    message: err.message || 'Error del servidor',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    message: err.message || 'Error interno del servidor',
+    ...(process.env.NODE_ENV === 'development' && { 
+      error: err.name,
+      stack: err.stack 
+    }),
   });
 };
 
@@ -60,7 +97,7 @@ const errorHandler = (err, req, res, next) => {
 const notFound = (req, res, next) => {
   res.status(404).json({
     success: false,
-    message: `Ruta no encontrada - ${req.originalUrl}`,
+    message: `Ruta no encontrada: ${req.method} ${req.originalUrl}`,
   });
 };
 

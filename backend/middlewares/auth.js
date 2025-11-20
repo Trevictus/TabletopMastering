@@ -36,9 +36,25 @@ const protect = async (req, res, next) => {
       next();
     } catch (error) {
       console.error('Error en la autenticación:', error);
+      
+      // Diferenciar entre token expirado e inválido
+      if (error.name === 'TokenExpiredError') {
+        return res.status(401).json({
+          success: false,
+          message: 'Token expirado',
+        });
+      }
+      
+      if (error.name === 'JsonWebTokenError') {
+        return res.status(401).json({
+          success: false,
+          message: 'Token inválido o malformado',
+        });
+      }
+      
       return res.status(401).json({
         success: false,
-        message: 'Token inválido o expirado',
+        message: 'Error en la autenticación',
       });
     }
   }
