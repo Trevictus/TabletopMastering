@@ -1,9 +1,14 @@
 import PropTypes from 'prop-types';
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import authService from '../services/authService';
 
 const AuthContext = createContext(null);
 
+/**
+ * Hook personalizado para acceder al contexto de autenticación
+ * @returns {Object} Contexto de autenticación con user, loading, isAuthenticated y métodos
+ * @throws {Error} Si se usa fuera del AuthProvider
+ */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -12,23 +17,51 @@ export const useAuth = () => {
   return context;
 };
 
+/**
+ * Proveedor del contexto de autenticación global
+ * Maneja el estado del usuario autenticado en toda la aplicación
+ */
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [error, setError] = useState(null);
 
+  // Estado derivado - más predecible
+  const isAuthenticated = useMemo(() => !!user, [user]);
+
+  /**
+   * Valida el token actual con el backend al cargar la aplicación
+   * Esto asegura que el token es válido y obtiene datos actualizados del usuario
+   */
   useEffect(() => {
-    // Verificar si hay un usuario en el localStorage al cargar
     const checkAuth = async () => {
       try {
-        if (authService.isAuthenticated()) {
-          const currentUser = authService.getCurrentUser();
-          setUser(currentUser);
-          setIsAuthenticated(true);
+        setLoading(true);
+        setError(null);
+
+        // Verificar si existe token en localStorage
+        if (!authService.isAuthenticated()) {
+          setLoading(false);
+          return;
         }
-      } catch (error) {
-        console.error('Error al verificar autenticación:', error);
+
+        // Validar token con el backend y obtener datos actualizados
+        const { user: currentUser } = await authService.getProfile();
+
+        if (currentUser) {
+          setUser(currentUser);
+          // Sincronizar localStorage con datos del backend
+          authService.syncUserData(currentUser);
+        } else {
+          // Token inválido o expirado
+          authService.logout();
+        }
+      } catch (err) {
+        console.error('Error al verificar autenticación:', err);
+        // Si falla la validación, limpiar datos locales
         authService.logout();
+        setUser(null);
+        setError(err.message || 'Error al verificar autenticación');
       } finally {
         setLoading(false);
       }
@@ -37,49 +70,122 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = async (userData, token) => {
-    // Si se pasan directamente el usuario y token (para login automático después de registro)
-    if (userData && token) {
-      setUser(userData);
-      setIsAuthenticated(true);
-      return { user: userData, token };
+  /**
+   * Inicia sesión con credenciales
+   * @param {Object} credentials - Email y contraseña
+   * @returns {Promise<Object>} Datos del usuario y token
+   */
+  const login = useCallback(async (credentials) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const data = await authService.login(credentials);
+
+      if (data.data?.user) {
+        setUser(data.data.user);
+        return data;
+      } else {
+        throw new Error('Respuesta de login inválida');
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || err.message || 'Error al iniciar sesión';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
     }
-    
-    // Si se pasan credenciales (login normal)
-    const data = await authService.login(userData);
-    setUser(data.data.user);
-    setIsAuthenticated(true);
-    return data;
-  };
+  }, []);
 
-  const register = async (userData) => {
-    const data = await authService.register(userData);
-    setUser(data.data.user);
-    setIsAuthenticated(true);
-    return data;
-  };
+  /**
+   * Registra un nuevo usuario
+   * @param {Object} userData - Datos del nuevo usuario
+   * @returns {Promise<Object>} Datos del usuario y token
+   */
+  const register = useCallback(async (userData) => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  const logout = () => {
+      const data = await authService.register(userData);
+
+      if (data.data?.user) {
+        setUser(data.data.user);
+        return data;
+      } else {
+        throw new Error('Respuesta de registro inválida');
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || err.message || 'Error al registrarse';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  /**
+   * Cierra la sesión del usuario
+   * Limpia el estado global y localStorage
+   */
+  const logout = useCallback(() => {
     authService.logout();
     setUser(null);
-    setIsAuthenticated(false);
-  };
+    setError(null);
+  }, []);
 
-  const updateProfile = async (profileData) => {
-    const data = await authService.updateProfile(profileData);
-    setUser(data.user);
-    return data;
-  };
+  /**
+   * Actualiza el perfil del usuario
+   * @param {Object} profileData - Datos actualizados del perfil
+   * @returns {Promise<Object>} Usuario actualizado
+   */
+  const updateProfile = useCallback(async (profileData) => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  const value = {
-    user,
-    loading,
-    isAuthenticated,
-    login,
-    register,
-    logout,
-    updateProfile,
-  };
+      const data = await authService.updateProfile(profileData);
+
+      if (data.user) {
+        setUser(data.user);
+        return data;
+      } else {
+        throw new Error('Respuesta de actualización inválida');
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || err.message || 'Error al actualizar perfil';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  /**
+   * Limpia mensajes de error
+   */
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
+  // Memoizar el valor del contexto para evitar re-renders innecesarios
+  const value = useMemo(
+    () => ({
+      // Estado
+      user,
+      loading,
+      error,
+      isAuthenticated,
+
+      // Métodos
+      login,
+      register,
+      logout,
+      updateProfile,
+      clearError,
+    }),
+    [user, loading, error, isAuthenticated, login, register, logout, updateProfile, clearError]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
