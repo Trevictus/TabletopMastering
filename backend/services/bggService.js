@@ -21,8 +21,10 @@ if (USE_MOCK) {
       this.parser = new xml2js.Parser({ explicitArray: false });
       this.axiosConfig = {
         headers: {
-          'User-Agent': 'TabletopMastering/1.0 (juanfu224@github)',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'application/xml, text/xml, */*',
         },
+        timeout: 10000,
       };
     }
 
@@ -41,13 +43,17 @@ if (USE_MOCK) {
         exact: exact ? 1 : 0,
       };
 
+      console.log('🔍 [BGG] Buscando:', query);
+      
       const response = await axios.get(url, { 
         params,
         ...this.axiosConfig,
       });
+      
       const result = await this.parser.parseStringPromise(response.data);
 
       if (!result.items || !result.items.item) {
+        console.log('📭 [BGG] Sin resultados para:', query);
         return [];
       }
 
@@ -56,13 +62,19 @@ if (USE_MOCK) {
         ? result.items.item 
         : [result.items.item];
 
+      console.log(`✅ [BGG] Encontrados ${items.length} resultados`);
+
       return items.map(item => ({
         bggId: parseInt(item.$.id),
         name: item.name.$.value,
         yearPublished: item.yearpublished ? parseInt(item.yearpublished.$.value) : null,
       }));
     } catch (error) {
-      console.error('Error buscando en BGG:', error.message);
+      console.error('❌ [BGG] Error buscando:', error.message);
+      if (error.response) {
+        console.error('Status:', error.response.status);
+        console.error('Data:', error.response.data);
+      }
       throw new Error('Error al buscar juegos en BoardGameGeek');
     }
   }

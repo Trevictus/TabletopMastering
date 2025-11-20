@@ -1,0 +1,150 @@
+import PropTypes from 'prop-types';
+import { 
+  MdPeople, 
+  MdTimer, 
+  MdStar, 
+  MdDelete,
+  MdSync 
+} from 'react-icons/md';
+import { GiDiceFire } from 'react-icons/gi';
+import Card from '../common/Card';
+import Button from '../common/Button';
+import styles from './GameCard.module.css';
+
+/**
+ * Componente GameCard - Tarjeta de juego
+ * Muestra información de un juego de forma visual y compacta
+ */
+const GameCard = ({ 
+  game, 
+  onDelete, 
+  onSync,
+  canDelete = false 
+}) => {
+  const {
+    name,
+    image,
+    thumbnail,
+    minPlayers,
+    maxPlayers,
+    playingTime,
+    rating,
+    source,
+    categories,
+    yearPublished
+  } = game;
+
+  const imageUrl = thumbnail || image || 'https://via.placeholder.com/300x200?text=Sin+Imagen';
+  const players = minPlayers === maxPlayers 
+    ? `${minPlayers}` 
+    : `${minPlayers}-${maxPlayers}`;
+
+  return (
+    <Card variant="elevated" noPadding className={styles.gameCard}>
+      <div className={styles.imageContainer}>
+        <img 
+          src={imageUrl} 
+          alt={name}
+          className={styles.gameImage}
+          loading="lazy"
+        />
+        {source === 'bgg' && (
+          <span className={styles.badge} title="Desde BoardGameGeek">
+            <GiDiceFire />
+          </span>
+        )}
+        {rating?.average && (
+          <div className={styles.rating}>
+            <MdStar />
+            <span>{rating.average.toFixed(1)}</span>
+          </div>
+        )}
+      </div>
+
+      <div className={styles.content}>
+        <h3 className={styles.title} title={name}>
+          {name}
+        </h3>
+
+        {yearPublished && (
+          <p className={styles.year}>({yearPublished})</p>
+        )}
+
+        <div className={styles.stats}>
+          <div className={styles.stat}>
+            <MdPeople />
+            <span>{players} jugadores</span>
+          </div>
+          {playingTime > 0 && (
+            <div className={styles.stat}>
+              <MdTimer />
+              <span>{playingTime} min</span>
+            </div>
+          )}
+        </div>
+
+        {categories && categories.length > 0 && (
+          <div className={styles.categories}>
+            {categories.slice(0, 2).map((category, index) => (
+              <span key={index} className={styles.category}>
+                {category}
+              </span>
+            ))}
+            {categories.length > 2 && (
+              <span className={styles.category}>+{categories.length - 2}</span>
+            )}
+          </div>
+        )}
+
+        {(canDelete || (source === 'bgg' && onSync)) && (
+          <div className={styles.actions}>
+            {source === 'bgg' && onSync && (
+              <Button
+                variant="outline"
+                size="small"
+                onClick={() => onSync(game)}
+                className={styles.actionButton}
+                title="Sincronizar con BGG"
+              >
+                <MdSync />
+              </Button>
+            )}
+            {canDelete && (
+              <Button
+                variant="outline"
+                size="small"
+                onClick={() => onDelete(game)}
+                className={styles.deleteButton}
+              >
+                <MdDelete />
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+};
+
+GameCard.propTypes = {
+  game: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    image: PropTypes.string,
+    thumbnail: PropTypes.string,
+    minPlayers: PropTypes.number,
+    maxPlayers: PropTypes.number,
+    playingTime: PropTypes.number,
+    rating: PropTypes.shape({
+      average: PropTypes.number
+    }),
+    source: PropTypes.oneOf(['bgg', 'custom']),
+    categories: PropTypes.arrayOf(PropTypes.string),
+    yearPublished: PropTypes.number
+  }).isRequired,
+  onDelete: PropTypes.func,
+  onSync: PropTypes.func,
+  canDelete: PropTypes.bool
+};
+
+export default GameCard;

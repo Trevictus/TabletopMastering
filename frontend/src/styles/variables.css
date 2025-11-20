@@ -23,6 +23,8 @@
   --bg-secondary: #f5f1e8;          /* Beige claro */
   --bg-tertiary: #ede7db;           /* Beige */
   --bg-dark: #2a1f15;               /* Marrón muy oscuro */
+  --card-bg: #ffffff;               /* Fondo de tarjetas/modales */
+  --hover-bg: #f9f9f9;              /* Fondo hover */
   
   /* Colores de texto */
   --text-primary: #2a1f15;          /* Marrón muy oscuro */
@@ -67,6 +69,7 @@
   
   /* Transiciones */
   --transition-fast: 150ms ease-in-out;
+  --transition-base: 300ms ease-in-out;
   --transition-normal: 300ms ease-in-out;
   --transition-slow: 500ms ease-in-out;
   

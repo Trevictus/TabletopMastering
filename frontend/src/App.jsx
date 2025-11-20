@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { GroupProvider } from './context/GroupContext';
 import ProtectedRoute from './components/routes/ProtectedRoute';
 import PublicRoute from './components/routes/PublicRoute';
 import Navbar from './components/layout/Navbar';
-import { Home, Login, Register, Dashboard, Profile, NotFound } from './pages';
+import { Home, Login, Register, Dashboard, Profile, Games, NotFound } from './pages';
 import './styles/variables.css';
 import './styles/components.css';
 import './styles/layout.css';
@@ -13,7 +14,8 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="page-container">
+        <GroupProvider>
+          <div className="page-container">
           <Navbar />
           <main className="main-content">
             <Routes>
@@ -52,11 +54,20 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+              <Route 
+                path="/games" 
+                element={
+                  <ProtectedRoute>
+                    <Games />
+                  </ProtectedRoute>
+                } 
+              />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
         </div>
+        </GroupProvider>
       </AuthProvider>
     </Router>
   );

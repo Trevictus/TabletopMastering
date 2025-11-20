@@ -8,9 +8,9 @@ const bggGameService = require('../services/bggGameService');
  */
 exports.searchBGG = async (req, res, next) => {
   try {
-    const { name, exact } = req.query;
+    const { query, exact } = req.query;
 
-    const results = await bggGameService.searchBGGGames(name, exact === 'true');
+    const results = await bggGameService.searchBGGGames(query, exact === 'true');
 
     res.status(200).json({
       success: true,

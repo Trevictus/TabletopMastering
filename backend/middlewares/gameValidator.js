@@ -15,8 +15,12 @@ exports.createGameValidation = [
     .isLength({ max: 2000 }).withMessage('La descripción no puede exceder 2000 caracteres'),
   
   body('groupId')
-    .optional()
-    .isMongoId().withMessage('ID de grupo inválido'),
+    .optional({ values: 'null' })
+    .custom((value) => {
+      if (value === null || value === undefined || value === '') return true;
+      return /^[0-9a-fA-F]{24}$/.test(value);
+    })
+    .withMessage('ID de grupo inválido'),
   
   body('minPlayers')
     .notEmpty().withMessage('El número mínimo de jugadores es obligatorio')
@@ -68,8 +72,12 @@ exports.addFromBGGValidation = [
     .isInt({ min: 1 }).withMessage('ID de BGG inválido'),
   
   body('groupId')
-    .optional()
-    .isMongoId().withMessage('ID de grupo inválido'),
+    .optional({ values: 'null' })
+    .custom((value) => {
+      if (value === null || value === undefined || value === '') return true;
+      return /^[0-9a-fA-F]{24}$/.test(value);
+    })
+    .withMessage('ID de grupo inválido'),
   
   body('customNotes')
     .optional()
@@ -120,8 +128,8 @@ exports.updateGameValidation = [
  * Validaciones para búsqueda en BGG
  */
 exports.searchBGGValidation = [
-  query('name')
-    .notEmpty().withMessage('El parámetro "name" es obligatorio')
+  query('query')
+    .notEmpty().withMessage('El parámetro "query" es obligatorio')
     .trim()
     .isLength({ min: 2 }).withMessage('El término de búsqueda debe tener al menos 2 caracteres'),
   
