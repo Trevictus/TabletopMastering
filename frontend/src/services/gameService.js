@@ -72,6 +72,19 @@ const gameService = {
     const response = await api.get(`/games/stats/${groupId}`);
     return response.data;
   },
+
+  // Subir imagen para un juego
+  uploadGameImage: async (gameId, imageFile) => {
+    const formData = new FormData();
+    formData.append('image', imageFile);
+
+    const response = await api.post(`/games/${gameId}/upload-image`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
 };
 
 export default gameService;

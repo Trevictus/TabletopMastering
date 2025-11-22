@@ -1,5 +1,7 @@
 const axios = require('axios');
 const xml2js = require('xml2js');
+const { wrapper } = require('axios-cookiejar-support');
+const { CookieJar } = require('tough-cookie');
 const BGGCache = require('../models/BGGCache');
 
 // Detectar si estamos en modo test a través de variable de entorno
@@ -13,20 +15,70 @@ if (USE_MOCK) {
   // Código real del servicio BGG
   const BGG_API_BASE = 'https://boardgamegeek.com/xmlapi2';
 
+  // Crear instancia de axios con soporte de cookies
+  const jar = new CookieJar();
+  const client = wrapper(axios.create({ jar }));
+
   /**
    * Servicio para interactuar con la API de BoardGameGeek
    */
   class BGGService {
     constructor() {
       this.parser = new xml2js.Parser({ explicitArray: false });
+      this.client = client;
+      this.lastRequestTime = 0;
+      this.minRequestInterval = 1000; // Mínimo 1 segundo entre peticiones
+      this.sessionInitialized = false;
       this.axiosConfig = {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'User-Agent': 'TabletopMastering/1.0 (+https://github.com/Trevictus/TabletopMastering)',
           'Accept': 'application/xml, text/xml, */*',
+          'Accept-Encoding': 'gzip, deflate',
+          'Accept-Language': 'en-US,en;q=0.9',
         },
-        timeout: 10000,
+        timeout: 20000,
+        maxRedirects: 5,
+        validateStatus: function (status) {
+          return status >= 200 && status < 500;
+        },
+        withCredentials: true,
       };
     }
+
+  /**
+   * Inicializar sesión con BGG para obtener cookies
+   */
+  async initializeSession() {
+    if (this.sessionInitialized) return;
+    
+    try {
+      console.log('🔐 [BGG] Inicializando sesión...');
+      await this.client.get('https://boardgamegeek.com', {
+        headers: this.axiosConfig.headers,
+        timeout: 10000,
+        validateStatus: () => true,
+      });
+      this.sessionInitialized = true;
+      console.log('✅ [BGG] Sesión inicializada');
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      console.warn('⚠️  [BGG] No se pudo inicializar sesión, continuando sin ella...');
+    }
+  }
+
+  /**
+   * Espera el tiempo necesario para respetar rate limiting
+   */
+  async waitForRateLimit() {
+    const now = Date.now();
+    const timeSinceLastRequest = now - this.lastRequestTime;
+    if (timeSinceLastRequest < this.minRequestInterval) {
+      const waitTime = this.minRequestInterval - timeSinceLastRequest;
+      console.log(`⏱️  [BGG] Esperando ${waitTime}ms para respetar rate limit`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+    this.lastRequestTime = Date.now();
+  }
 
   /**
    * Buscar juegos en BGG por nombre
@@ -36,6 +88,9 @@ if (USE_MOCK) {
    */
   async searchGames(query, exact = false) {
     try {
+      await this.initializeSession();
+      await this.waitForRateLimit();
+      
       const url = `${BGG_API_BASE}/search`;
       const params = {
         query: query,
@@ -44,11 +99,29 @@ if (USE_MOCK) {
       };
 
       console.log('🔍 [BGG] Buscando:', query);
+      console.log('🌐 [BGG] URL:', `${url}?query=${query}&type=boardgame&exact=${exact ? 1 : 0}`);
       
-      const response = await axios.get(url, { 
+      const response = await this.client.get(url, { 
         params,
         ...this.axiosConfig,
       });
+      
+      // Check for rate limiting or errors
+      if (response.status === 429) {
+        console.warn('⚠️  [BGG] Rate limit alcanzado, esperando 2 segundos...');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        throw new Error('API de BGG temporalmente no disponible (rate limit). Intenta de nuevo en un momento.');
+      }
+      
+      if (response.status === 401 || response.status === 403) {
+        console.error('🚫 [BGG] Acceso denegado. Status:', response.status);
+        throw new Error('No se pudo acceder a la API de BoardGameGeek. Verifica la conectividad.');
+      }
+      
+      if (response.status !== 200) {
+        console.error('❌ [BGG] Status inesperado:', response.status);
+        throw new Error(`Error en API de BGG (Status: ${response.status})`);
+      }
       
       const result = await this.parser.parseStringPromise(response.data);
 
@@ -107,10 +180,12 @@ if (USE_MOCK) {
         stats: 1,
       };
 
+      await this.waitForRateLimit();
+
       // BGG puede tardar, damos más tiempo
-      const response = await axios.get(url, { 
+      const response = await this.client.get(url, { 
         params,
-        timeout: 10000,
+        timeout: 20000,
         ...this.axiosConfig,
       });
 
@@ -228,7 +303,9 @@ if (USE_MOCK) {
         type: 'boardgame',
       };
 
-      const response = await axios.get(url, { 
+      await this.waitForRateLimit();
+
+      const response = await this.client.get(url, { 
         params,
         ...this.axiosConfig,
       });

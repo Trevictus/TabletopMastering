@@ -34,9 +34,11 @@ services:
       CLIENT_URL: ${CLIENT_URL:-http://localhost}
       JWT_SECRET: ${JWT_SECRET:-tu-super-secret-key-change-in-production}
       JWT_EXPIRE: ${JWT_EXPIRE:-7d}
+      USE_BGG_MOCK: ${USE_BGG_MOCK:-true}
     volumes:
       - ./backend:/app
       - /app/node_modules
+      - game_uploads:/app/uploads/games
     networks:
       - frontend-network
       - backend-network
@@ -88,6 +90,8 @@ services:
 volumes:
   mongodb_data:
     name: tabletop-mongodb-data
+  game_uploads:
+    name: tabletop-game-uploads
 
 networks:
   # Red frontal: nginx, frontend y backend (para API requests)

@@ -81,17 +81,33 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
     try {
       const response = await gameService.searchBGG(searchQuery);
       setSearchResults(response.data || []);
+      
       if (response.data?.length === 0) {
-        toast.info('No se encontraron juegos con ese nombre', {
+        toast.info('No se encontraron juegos con ese nombre. ¿Quieres crearlo como juego personalizado?', {
           title: 'Sin resultados'
         });
       } else {
-        toast.success(`Se encontraron ${response.data.length} juegos`);
+        toast.success(`Se encontraron ${response.data.length} juego${response.data.length !== 1 ? 's' : ''}`);
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Error al buscar juegos';
+      const errorMsg = err.response?.data?.message || 'Error al buscar juegos en BoardGameGeek';
+      const isBGGUnavailable = err.response?.data?.error === 'BGG_UNAVAILABLE' || err.response?.status === 503;
+      
       setError(errorMsg);
-      toast.error(errorMsg, { title: 'Error de búsqueda' });
+      
+      if (isBGGUnavailable) {
+        // BGG no disponible - mostrar mensaje amigable
+        toast.warning(
+          'BoardGameGeek no está disponible temporalmente. Puedes crear juegos manualmente.',
+          { 
+            title: 'Servicio Temporalmente No Disponible',
+            duration: 5000,
+          }
+        );
+      } else {
+        // Otro tipo de error
+        toast.error(errorMsg, { title: 'Error de búsqueda' });
+      }
     } finally {
       setLoading(false);
     }
@@ -215,19 +231,16 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
               icon={<MdSearch />}
             />
             <Button type="submit" disabled={loading || !searchQuery.trim()}>
-              Buscar
+              {loading ? 'Buscando...' : 'Buscar'}
             </Button>
           </form>
 
-          {error && <div className={styles.error}>{error}</div>}
-
-          {loading && <Loading message="Buscando juegos..." />}
-
+          {/* Mostrar resultados de búsqueda */}
           {searchResults.length > 0 && (
             <div className={styles.searchResults}>
-              <h3 className={styles.resultsTitle}>
-                Resultados ({searchResults.length})
-              </h3>
+              <h4 className={styles.resultsTitle}>
+                {searchResults.length} resultado{searchResults.length !== 1 ? 's' : ''} encontrado{searchResults.length !== 1 ? 's' : ''}
+              </h4>
               <div className={styles.resultsList}>
                 {searchResults.map((game) => (
                   <div
@@ -235,10 +248,17 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
                     className={styles.resultItem}
                     onClick={() => handlePreview(game)}
                   >
+                    {game.thumbnail && (
+                      <img
+                        src={game.thumbnail}
+                        alt={game.name}
+                        className={styles.resultThumbnail}
+                      />
+                    )}
                     <div className={styles.resultInfo}>
-                      <h4>{game.name}</h4>
+                      <h5 className={styles.resultName}>{game.name}</h5>
                       {game.yearPublished && (
-                        <span className={styles.year}>({game.yearPublished})</span>
+                        <span className={styles.resultYear}>({game.yearPublished})</span>
                       )}
                     </div>
                     <Button variant="outline" size="small">
@@ -247,6 +267,48 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Mensaje cuando no hay resultados después de buscar */}
+          {!loading && searchQuery && searchResults.length === 0 && (
+            <div className={styles.noResults}>
+              <p>No se encontraron juegos para "{searchQuery}"</p>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setCustomGame({ ...customGame, name: searchQuery });
+                  setMode('custom');
+                }}
+              >
+                Crear "{searchQuery}" como juego personalizado
+              </Button>
+            </div>
+          )}
+
+          {/* Error display */}
+          {error && (
+            <div className={styles.errorBanner}>
+              <p>{error}</p>
+              {searchQuery && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setCustomGame({ ...customGame, name: searchQuery });
+                    setMode('custom');
+                  }}
+                >
+                  Crear como juego personalizado
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Loading state */}
+          {loading && (
+            <div className={styles.loadingState}>
+              <Loading size="medium" />
+              <p>Buscando en BoardGameGeek...</p>
             </div>
           )}
         </>
