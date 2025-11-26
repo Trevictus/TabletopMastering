@@ -1,67 +1,112 @@
 .gamesPage {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: var(--spacing-lg);
 }
 
 .header {
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-lg);
 }
 
 .headerContent {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-lg);
 }
 
 .headerTitle {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-lg);
 }
 
 .headerIcon {
-  font-size: 3rem;
+  font-size: var(--font-size-3xl);
   color: var(--primary-color);
 }
 
 .headerTitle h1 {
   margin: 0;
-  font-size: 2rem;
+  font-size: var(--font-size-2xl);
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .subtitle {
-  margin: 0.25rem 0 0 0;
+  margin: var(--spacing-xs) 0 0 0;
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: var(--font-size-sm);
 }
 
 .groupSelector {
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-lg);
+  padding: 0 !important;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
 }
 
 .groupSelectorHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border-color);
+  display: none;
 }
 
-.groupSelectorHeader h3 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 1.1rem;
+.groupList {
+  display: flex;
+  gap: var(--spacing-xs);
+  overflow-x: auto;
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(139, 92, 246, 0.03) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  align-items: center;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+}
+
+.groupList button {
+  flex-shrink: 0;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  font-size: var(--font-size-xs) !important;
+  white-space: nowrap;
+  border-radius: var(--border-radius-md) !important;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-color) !important;
+  background: white !important;
+  color: var(--text-secondary) !important;
+  font-weight: 500;
+  min-width: max-content;
+}
+
+.groupList button:hover:not(:disabled) {
+  background: var(--bg-secondary) !important;
+  border-color: var(--primary-color) !important;
+  color: var(--primary-color) !important;
+}
+
+.groupList button[class*="primary"] {
+  background: var(--primary-color) !important;
+  color: white !important;
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+}
+
+.infoCard {
+  padding: var(--spacing-lg);
+  text-align: center;
+  background: var(--bg-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.infoText {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--text-secondary);
 }
 
 .actionsBar {
   display: flex;
   justify-content: center;
   margin-bottom: var(--spacing-lg);
+  gap: var(--spacing-md);
 }
 
 .actionsBar .addButton {
@@ -77,24 +122,6 @@
   justify-content: center;
 }
 
-.groupList {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.75rem;
-}
-
-.infoCard {
-  padding: var(--spacing-lg);
-  text-align: center;
-  background: var(--bg-secondary);
-  margin-bottom: var(--spacing-lg);
-}
-
-.infoText {
-  margin: 0 0 var(--spacing-md) 0;
-  color: var(--text-secondary);
-}
-
 @media (max-width: 768px) {
   .groupList {
     grid-template-columns: 1fr;
@@ -108,12 +135,12 @@
 }
 
 .filtersCard {
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-lg);
 }
 
 .searchBar {
   display: flex;
-  gap: 1rem;
+  gap: var(--spacing-lg);
   align-items: flex-start;
 }
 
@@ -126,20 +153,20 @@
 }
 
 .filters {
-  margin-top: 1rem;
-  padding-top: 1rem;
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-lg);
   flex-wrap: wrap;
 }
 
 .filterGroup {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-md);
   flex: 1;
 }
 
@@ -151,7 +178,7 @@
 
 .filterButtons {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
   flex-wrap: wrap;
 }
 
@@ -162,16 +189,16 @@
 .gamesGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
 }
 
 .pageInfo {
@@ -188,38 +215,38 @@
   font-size: 4rem;
   color: var(--text-secondary);
   opacity: 0.5;
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-lg);
 }
 
 .emptyTitle {
-  font-size: 1.5rem;
+  font-size: var(--font-size-xl);
   font-weight: 600;
   color: var(--text-primary);
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 var(--spacing-sm) 0;
 }
 
 .emptyDescription {
   color: var(--text-secondary);
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 var(--spacing-lg) 0;
   max-width: 500px;
   margin-left: auto;
   margin-right: auto;
 }
 
 .emptyButton {
-  margin-top: 1rem;
+  margin-top: var(--spacing-lg);
 }
 
 .error {
   background-color: rgba(239, 68, 68, 0.1);
   color: var(--error-color);
-  padding: 1rem 1.25rem;
+  padding: var(--spacing-lg) var(--spacing-xl);
   border-radius: var(--border-radius);
   border: 1px solid var(--error-color);
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--spacing-lg);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-md);
 }
 
 @media (max-width: 1200px) {
@@ -230,7 +257,7 @@
 
 @media (max-width: 768px) {
   .gamesPage {
-    padding: 1rem;
+    padding: var(--spacing-md);
   }
 
   .headerContent {
@@ -244,11 +271,15 @@
   }
 
   .headerIcon {
-    font-size: 2rem;
+    font-size: var(--font-size-2xl);
   }
 
   .headerTitle h1 {
-    font-size: 1.5rem;
+    font-size: var(--font-size-xl);
+  }
+
+  .actionsBar {
+    flex-direction: column;
   }
 
   .addButton {
@@ -285,6 +316,10 @@
     width: 100%;
   }
 
+  .groupList {
+    flex-wrap: wrap;
+  }
+
   .gamesGrid {
     grid-template-columns: 1fr;
   }
@@ -308,6 +343,16 @@
   }
 
   .emptyTitle {
-    font-size: 1.25rem;
+    font-size: var(--font-size-lg);
+  }
+
+  .groupList {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-xs);
+  }
+
+  .groupList button {
+    padding: var(--spacing-xs) var(--spacing-sm) !important;
+    font-size: var(--font-size-xs) !important;
   }
 }

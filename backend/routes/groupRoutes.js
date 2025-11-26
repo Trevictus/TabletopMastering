@@ -11,6 +11,8 @@ const {
   removeMember,
   leaveGroup,
   deleteGroup,
+  inviteUserToGroup,
+  getGroupRanking,
 } = require('../controllers/groupController');
 const { protect } = require('../middlewares/auth');
 const { isGroupMember, isGroupAdmin } = require('../middlewares/groupAuth');
@@ -82,6 +84,8 @@ router.post('/join', protect, joinGroupValidation, validate, joinGroup);
 
 // Rutas con parámetros específicos (antes de rutas genéricas con :id)
 router.put('/:id/invite-code', protect, idValidation, validate, isGroupAdmin, regenerateInviteCode);
+router.post('/:id/invite', protect, idValidation, validate, isGroupAdmin, inviteUserToGroup);
+router.get('/:id/ranking', protect, idValidation, validate, isGroupMember, getGroupRanking);
 router.delete('/:id/members/:userId', protect, memberValidation, validate, isGroupAdmin, removeMember);
 
 // Rutas que requieren ser miembro del grupo

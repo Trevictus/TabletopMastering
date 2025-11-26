@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { GiPerspectiveDiceSixFacesRandom, GiCardPlay } from 'react-icons/gi';
+import { GiPerspectiveDiceSixFacesRandom, GiCardPlay, GiTrophy, GiTeamIdea } from 'react-icons/gi';
 import { MdPerson, MdExitToApp, MdDashboard } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../common/Button';
@@ -62,7 +62,13 @@ const Navbar = () => {
             <li>
               <Link to="/dashboard" className={`${styles.navLink} ${isActive('/dashboard')}`}>
                 <MdDashboard className={styles.linkIcon} />
-                Dashboard
+                Inicio
+              </Link>
+            </li>
+            <li>
+              <Link to="/groups" className={`${styles.navLink} ${isActive('/groups')}`}>
+                <GiTeamIdea className={styles.linkIcon} />
+                Grupos
               </Link>
             </li>
             <li>
@@ -72,24 +78,25 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <Link to="/profile" className={`${styles.navLink} ${isActive('/profile')}`}>
-                <MdPerson className={styles.linkIcon} />
-                Perfil
+              <Link to="/rankings" className={`${styles.navLink} ${isActive('/rankings')}`}>
+                <GiTrophy className={styles.linkIcon} />
+                Rankings
+              </Link>
+            </li>
+            <li>
+              <Link to="/profile" className={`${styles.navLink} ${styles.profileLink} ${isActive('/profile')}`}>
+                <div className={styles.userAvatar}>
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt={user.name} />
+                  ) : (
+                    <MdPerson className={styles.avatarIcon} />
+                  )}
+                </div>
+                <span>{user?.name}</span>
               </Link>
             </li>
             
-            {/* User Info */}
-            <li className={styles.userInfo}>
-              <div className={styles.userAvatar}>
-                {user?.avatar ? (
-                  <img src={user.avatar} alt={user.name} />
-                ) : (
-                  <GiPerspectiveDiceSixFacesRandom />
-                )}
-              </div>
-              <span className={styles.userName}>{user?.name}</span>
-            </li>
-
+            {/* Logout Button */}
             <li>
               <Button 
                 variant="outline" 
@@ -98,7 +105,6 @@ const Navbar = () => {
                 className={styles.logoutButton}
               >
                 <MdExitToApp className={styles.linkIcon} />
-                Cerrar Sesión
               </Button>
             </li>
           </ul>

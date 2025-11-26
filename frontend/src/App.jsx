@@ -6,7 +6,7 @@ import { ToastContainer } from './components/common/Toast';
 import ProtectedRoute from './components/routes/ProtectedRoute';
 import PublicRoute from './components/routes/PublicRoute';
 import Navbar from './components/layout/Navbar';
-import { Home, Login, Register, Dashboard, Profile, Games, NotFound } from './pages';
+import { Home, Login, Register, Dashboard, Profile, Games, Rankings, Groups, CreateGroup, NotFound } from './pages';
 import './styles/variables.css';
 import './styles/components.css';
 import './styles/layout.css';
@@ -62,6 +62,30 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Games />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/rankings" 
+                element={
+                  <ProtectedRoute>
+                    <Rankings />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/groups" 
+                element={
+                  <ProtectedRoute>
+                    <Groups />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/groups/new" 
+                element={
+                  <ProtectedRoute>
+                    <CreateGroup />
                   </ProtectedRoute>
                 } 
               />

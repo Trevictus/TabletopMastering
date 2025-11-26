@@ -1,7 +1,7 @@
 .navbar {
   background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   box-shadow: 0 4px 6px rgba(42, 31, 21, 0.1), 0 2px 4px rgba(42, 31, 21, 0.06);
-  padding: var(--spacing-lg) 0;
+  padding: var(--spacing-md) 0;
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
@@ -23,7 +23,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-lg);
   font-weight: 700;
   color: var(--primary-color);
   text-decoration: none;
@@ -36,7 +36,7 @@
 }
 
 .brandIcon {
-  font-size: var(--font-size-3xl);
+  font-size: var(--font-size-2xl);
   animation: rotate 20s linear infinite;
 }
 
@@ -56,7 +56,7 @@
 .nav {
   display: flex;
   list-style: none;
-  gap: var(--spacing-2xl);
+  gap: var(--spacing-lg);
   align-items: center;
   margin: 0;
 }
@@ -64,31 +64,15 @@
 .navLink {
   color: var(--text-primary);
   font-weight: 600;
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-md);
   text-decoration: none;
   transition: all var(--transition-fast);
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--border-radius-sm);
   position: relative;
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-}
-
-.linkIcon {
-  font-size: var(--font-size-xl);
-}
-
-.navLink::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background-color: var(--accent-color);
-  transition: all var(--transition-fast);
-  transform: translateX(-50%);
 }
 
 .navLink:hover {
@@ -104,8 +88,14 @@
   background-color: rgba(139, 69, 19, 0.1);
 }
 
-.navLink.active::after {
-  width: 100%;
+.profileLink {
+  padding: var(--spacing-xs) var(--spacing-sm) !important;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.05) 0%, rgba(212, 175, 55, 0.05) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.linkIcon {
+  font-size: var(--font-size-xl);
 }
 
 /* User Info */
@@ -113,15 +103,15 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-xs) var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
   background: linear-gradient(135deg, rgba(139, 69, 19, 0.1) 0%, rgba(212, 175, 55, 0.1) 100%);
   border-radius: var(--border-radius);
   border: 1px solid rgba(212, 175, 55, 0.3);
 }
 
 .userAvatar {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   overflow: hidden;
   display: flex;
@@ -142,6 +132,11 @@
   color: var(--accent-color);
 }
 
+.avatarIcon {
+  font-size: 1.2rem;
+  color: var(--accent-color);
+}
+
 .userName {
   font-size: var(--font-size-md);
   font-weight: 600;
@@ -152,6 +147,8 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-xs) !important;
+  min-width: auto;
 }
 
 /* Responsive */

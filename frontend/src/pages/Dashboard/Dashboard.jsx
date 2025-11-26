@@ -128,9 +128,9 @@ const Dashboard = () => {
             <p className={styles.actionDescription}>
               Organiza un nuevo grupo de jugadores
             </p>
-            <Link to="/groups/new">
+            <Link to="/groups">
               <Button variant="primary" fullWidth>
-                Nuevo Grupo
+                Mis Grupos
               </Button>
             </Link>
           </Card>

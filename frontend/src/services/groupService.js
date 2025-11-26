@@ -42,6 +42,12 @@ const groupService = {
     const response = await api.delete(`/groups/${groupId}`);
     return response.data;
   },
+
+  // Invitar usuario a un grupo por email
+  inviteUserToGroup: async (groupId, email) => {
+    const response = await api.post(`/groups/${groupId}/invite`, { email });
+    return response.data;
+  },
 };
 
 export default groupService;

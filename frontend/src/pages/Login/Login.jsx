@@ -133,7 +133,7 @@ const Login = () => {
       
       toast.success('¡Bienvenido de nuevo!', {
         action: {
-          label: 'Ir al dashboard',
+          label: 'Ir al Inicio',
           onClick: () => navigate(from, { replace: true })
         }
       });
