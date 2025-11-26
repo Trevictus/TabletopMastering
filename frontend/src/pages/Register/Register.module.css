@@ -11,7 +11,7 @@
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   padding: 2rem;
-  padding-top: 90px;
+  padding-top: 120px;
   z-index: 910;
   overflow-y: auto;
 }

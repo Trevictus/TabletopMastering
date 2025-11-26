@@ -57,11 +57,16 @@ export const AuthProvider = ({ children }) => {
           authService.logout();
         }
       } catch (err) {
-        console.error('Error al verificar autenticación:', err);
+        // Solo mostrar error si no es una petición cancelada
+        if (err.name !== 'CanceledError') {
+          console.error('Error al verificar autenticación:', err);
+        }
         // Si falla la validación, limpiar datos locales
         authService.logout();
         setUser(null);
-        setError(err.message || 'Error al verificar autenticación');
+        if (err.name !== 'CanceledError') {
+          setError(err.message || 'Error al verificar autenticación');
+        }
       } finally {
         setLoading(false);
       }

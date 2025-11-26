@@ -48,8 +48,11 @@ export const GroupProvider = ({ children }) => {
       // No seleccionar automáticamente el primer grupo
       // El usuario debe elegir explícitamente
     } catch (err) {
-      console.error('Error al cargar grupos:', err);
-      setError(err.response?.data?.message || 'Error al cargar grupos');
+      // Solo mostrar error si no es una petición cancelada
+      if (err.name !== 'CanceledError') {
+        console.error('Error al cargar grupos:', err);
+        setError(err.response?.data?.message || 'Error al cargar grupos');
+      }
     } finally {
       setLoading(false);
     }

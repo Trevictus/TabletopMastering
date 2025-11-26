@@ -42,13 +42,19 @@ const Dashboard = () => {
     // Cargar estadísticas reales del usuario
     const loadUserStats = async () => {
       try {
-        // Contar juegos del usuario
+        // Contar juegos personales del usuario (sin grupo)
         let gamesCount = 0;
         try {
-          const gamesResponse = await gameService.getGames({ limit: 1 });
+          const gamesResponse = await gameService.getGames({ 
+            groupId: undefined, // Solo juegos personales
+            limit: 1 
+          });
           gamesCount = gamesResponse.total || 0;
         } catch (error) {
-          console.error('Error loading games:', error);
+          // Solo mostrar error si no es una petición cancelada
+          if (error.name !== 'CanceledError') {
+            console.error('Error loading games:', error);
+          }
         }
         
         // Usar datos del contexto de usuario si están disponibles

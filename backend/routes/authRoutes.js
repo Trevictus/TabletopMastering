@@ -45,7 +45,18 @@ const updateProfileValidation = [
     .trim()
     .isLength({ min: 2, max: 50 })
     .withMessage('El nombre debe tener entre 2 y 50 caracteres'),
-  body('avatar').optional().isURL().withMessage('El avatar debe ser una URL válida'),
+  body('avatar')
+    .optional()
+    .custom((value) => {
+      // Permitir URLs o base64
+      if (!value) return true;
+      const isUrl = value.startsWith('http://') || value.startsWith('https://');
+      const isBase64 = value.startsWith('data:image/');
+      if (!isUrl && !isBase64) {
+        throw new Error('El avatar debe ser una URL o imagen base64');
+      }
+      return true;
+    }),
   body('description')
     .optional()
     .isLength({ max: 500 })

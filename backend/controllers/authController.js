@@ -145,7 +145,9 @@ const updateProfile = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: 'Perfil actualizado exitosamente',
-      data: user,
+      data: {
+        user: user,
+      },
     });
   } catch (error) {
     next(error);

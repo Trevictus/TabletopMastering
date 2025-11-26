@@ -86,7 +86,7 @@ const Navbar = () => {
             </li>
             <li>
               <Link to="/profile" className={`${styles.navLink} ${isActive('/profile')}`}>
-                {user?.avatar ? (
+                {user?.avatar && user.avatar.startsWith('data:image') ? (
                   <img src={user.avatar} alt={user.name} className={styles.userAvatar} />
                 ) : (
                   <FaUserCircle className={styles.linkIcon} />

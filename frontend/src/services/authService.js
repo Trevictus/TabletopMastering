@@ -64,8 +64,10 @@ const authService = {
    */
   updateProfile: async (profileData) => {
     const response = await api.put('/auth/profile', profileData);
-    if (response.data.user) {
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.user));
+    // Backend devuelve { success, message, data: { user } }
+    if (response.data.data?.user) {
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
+      return response.data.data; // Devolver { user }
     }
     return response.data;
   },

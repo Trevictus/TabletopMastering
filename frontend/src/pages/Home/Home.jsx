@@ -23,10 +23,20 @@ const Home = () => {
   const [welcomeMessage, setWelcomeMessage] = useState('');
 
   useEffect(() => {
-    // Redirigir a dashboard si está autenticado
+    // Si está autenticado y entra directamente a /, redirigir a dashboard
     if (!loading && isAuthenticated) {
-      navigate('/dashboard', { replace: true });
-      return;
+      const currentPath = location.pathname;
+      // Solo redirigir si está en /, /login o /register
+      if (currentPath === '/' || currentPath === '/login' || currentPath === '/register') {
+        navigate('/dashboard', { replace: true });
+        return;
+      }
+      
+      // Si viene de una ruta protegida, también redirigir
+      const from = location.state?.from;
+      if (from && from !== '/' && from !== '/login' && from !== '/register') {
+        navigate('/dashboard', { replace: true });
+      }
     }
 
     // Mostrar mensaje de bienvenida si viene del registro o login
@@ -64,12 +74,12 @@ const Home = () => {
         </p>
         <div className={styles.ctaButtons}>
           <Link to="/login">
-            <Button variant="primary" size="large">
+            <Button variant="primary" size="small">
               Iniciar Sesión
             </Button>
           </Link>
           <Link to="/register">
-            <Button variant="outline" size="large">
+            <Button variant="outline" size="small">
               Crear Cuenta
             </Button>
           </Link>
@@ -80,10 +90,10 @@ const Home = () => {
       <section className={styles.features}>
         <Card variant="elevated" className={styles.featureCard}>
           <GiCardPlay className={styles.featureIcon} />
-          <h3 className={styles.featureTitle}>Gestiona tus Juegos</h3>
+          <h3 className={styles.featureTitle}>Descubre Juegos</h3>
           <p className={styles.featureDescription}>
-            Accede a un catálogo completo de juegos integrado con BoardGameGeek.
-            Encuentra nuevos juegos y mantén tu colección organizada.
+            Explora miles de juegos de mesa, añade tus favoritos a tu colección
+            y descubre nuevas experiencias para tus partidas.
           </p>
         </Card>
 

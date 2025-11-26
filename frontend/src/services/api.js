@@ -177,11 +177,8 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // 1. Petición cancelada (duplicada)
+    // 1. Petición cancelada (duplicada) - Silenciar completamente
     if (axios.isCancel(error)) {
-      if (import.meta.env.DEV) {
-        console.warn('⚠️ [API] Petición cancelada (duplicada)');
-      }
       return Promise.reject(error);
     }
 
@@ -255,8 +252,8 @@ api.interceptors.response.use(
       }
     }
 
-    // 8. Logging detallado en desarrollo
-    if (import.meta.env.DEV) {
+    // 8. Logging detallado en desarrollo (solo si NO es cancelación)
+    if (import.meta.env.DEV && !axios.isCancel(error)) {
       console.error('❌ [API Error]', {
         url: originalRequest?.url,
         method: originalRequest?.method,

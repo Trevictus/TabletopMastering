@@ -11,17 +11,14 @@ import styles from './Rankings.module.css';
 
 /**
  * Página de Rankings
- * Muestra tabla de ranking del grupo con avatares, nombres, puntos, posición y filtros
+ * Muestra ranking general de TODOS los grupos combinados
  */
 const Rankings = () => {
   const { user } = useAuth();
-  const { selectedGroup, groups, loadGroups, selectGroup } = useGroup();
+  const { groups, loadGroups } = useGroup();
   const [ranking, setRanking] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
-
-  // Filtros
   const [sortBy, setSortBy] = useState('points'); // 'points' o 'wins'
 
   // Cargar grupos al montar
@@ -29,9 +26,9 @@ const Rankings = () => {
     loadGroups();
   }, [loadGroups]);
 
-  // Cargar ranking (memoizado)
-  const loadRanking = useCallback(async () => {
-    if (!selectedGroup) {
+  // Cargar ranking general (memoizado)
+  const loadGeneralRanking = useCallback(async () => {
+    if (!groups || groups.length === 0) {
       setRanking([]);
       return;
     }
@@ -40,76 +37,94 @@ const Rankings = () => {
     setError('');
 
     try {
-      const response = await rankingService.getGroupRanking(selectedGroup._id, {
-        sortBy: sortBy,
+      // Cargar rankings de todos los grupos
+      const allRankingsPromises = groups.map(group => 
+        rankingService.getGroupRanking(group._id, { sortBy })
+          .catch(err => {
+            console.error(`Error loading ranking for group ${group._id}:`, err);
+            return { data: [] };
+          })
+      );
+
+      const allRankingsResponses = await Promise.all(allRankingsPromises);
+      
+      // Combinar todos los rankings
+      const playerMap = new Map();
+      
+      allRankingsResponses.forEach(response => {
+        const rankingData = Array.isArray(response.data) ? response.data : response.data?.ranking || [];
+        
+        rankingData.forEach(playerData => {
+          const userId = playerData.user._id;
+          
+          if (playerMap.has(userId)) {
+            // Sumar estadísticas si el jugador ya existe
+            const existing = playerMap.get(userId);
+            existing.totalPoints = (existing.totalPoints || 0) + (playerData.totalPoints || 0);
+            existing.totalWins = (existing.totalWins || 0) + (playerData.totalWins || 0);
+            existing.totalMatches = (existing.totalMatches || 0) + (playerData.totalMatches || 0);
+          } else {
+            // Agregar nuevo jugador
+            playerMap.set(userId, {
+              user: playerData.user,
+              totalPoints: playerData.totalPoints || 0,
+              totalWins: playerData.totalWins || 0,
+              totalMatches: playerData.totalMatches || 0
+            });
+          }
+        });
       });
-      const rankingData = Array.isArray(response.data) ? response.data : response.data?.ranking || [];
-      setRanking(rankingData);
+
+      // Convertir a array y ordenar
+      let rankingArray = Array.from(playerMap.values());
+      
+      if (sortBy === 'points') {
+        rankingArray.sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0));
+      } else {
+        rankingArray.sort((a, b) => (b.totalWins || 0) - (a.totalWins || 0));
+      }
+
+      setRanking(rankingArray);
     } catch (err) {
-      console.error('Error cargando ranking:', err);
-      setError('');
+      console.error('Error cargando ranking general:', err);
+      setError('Error al cargar el ranking general');
       setRanking([]);
     } finally {
       setLoading(false);
     }
-  }, [selectedGroup, sortBy]);
+  }, [groups, sortBy]);
 
-  // Cargar ranking cuando cambia grupo o filtro
+  // Cargar ranking cuando cambian los grupos o el filtro
   useEffect(() => {
-    loadRanking();
-  }, [selectedGroup, sortBy, loadRanking]);
+    loadGeneralRanking();
+  }, [groups, sortBy, loadGeneralRanking]);
 
   // Handlers
   const handleRefresh = () => {
-    loadRanking();
-  };
-
-  const clearFilters = () => {
-    setSortBy('points');
+    loadGeneralRanking();
   };
 
   return (
     <div className={styles.rankingsPage}>
-      {/* Header con Nav de Grupos */}
+      {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.headerTitle}>
             <GiTrophy className={styles.headerIcon} />
             <div>
-              <h1>Rankings</h1>
+              <h1>Ranking General</h1>
               <p className={styles.subtitle}>
-                {selectedGroup ? (
-                  <>{ranking.length} {ranking.length === 1 ? 'jugador' : 'jugadores'}</>
-                ) : (
-                  <>Selecciona un grupo</>
-                )}
+                {ranking.length} {ranking.length === 1 ? 'jugador' : 'jugadores'} en total
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Nav de Grupos - Horizontal sin scroll */}
-      {groups.length > 0 && (
-        <div className={styles.groupNav}>
-          <div className={styles.groupNavContent}>
-            {groups.map(group => (
-              <button
-                key={group._id}
-                className={`${styles.groupNavButton} ${selectedGroup?._id === group._id ? styles.active : ''}`}
-                onClick={() => selectGroup(group)}
-              >
-                🎲 {group.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Loading inicial */}
-      {!selectedGroup && loading && (
+      {loading && groups.length === 0 && (
         <Card variant="elevated" className={styles.loadingCard}>
-          <Loading message="Cargando grupos..." />
+          <Loading message="Cargando ranking..." />
         </Card>
       )}
 
@@ -117,7 +132,7 @@ const Rankings = () => {
       {!loading && groups.length === 0 && (
         <Card variant="elevated" className={styles.infoCard}>
           <p className={styles.infoText}>
-            💡 <strong>Tip:</strong> Únete a un grupo para ver los rankings.
+            💡 <strong>Tip:</strong> Únete a un grupo para aparecer en el ranking.
           </p>
           <Button
             variant="outline"
@@ -129,8 +144,8 @@ const Rankings = () => {
         </Card>
       )}
 
-      {/* Mostrar contenido solo si hay grupo seleccionado */}
-      {selectedGroup && (
+      {/* Mostrar contenido si hay grupos */}
+      {groups.length > 0 && (
         <>
           {/* Botones de control rápido */}
           <div className={styles.controlBar}>
@@ -240,7 +255,7 @@ const Rankings = () => {
               <GiTrophy className={styles.emptyIcon} />
               <h2 className={styles.emptyTitle}>No hay datos de ranking</h2>
               <p className={styles.emptyDescription}>
-                Aún no hay partidas registradas en este grupo. Comienza a registrar partidas para ver el ranking.
+                Aún no hay partidas registradas en tus grupos. Comienza a registrar partidas para ver el ranking.
               </p>
             </Card>
           )}

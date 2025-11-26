@@ -188,12 +188,18 @@
 
 .searchBar {
   display: flex;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-sm);
   align-items: flex-start;
 }
 
 .searchInput {
   flex: 1;
+}
+
+.searchInput input {
+  font-size: 0.9rem !important;
+  padding: 0.6rem 0.85rem !important;
+  height: auto !important;
 }
 
 .filterButton {
