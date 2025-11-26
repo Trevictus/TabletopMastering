@@ -110,18 +110,35 @@ JWT_EXPIRE=7d
 FRONTEND_URL=http://localhost:5173
 ```
 
-### Demo Interactiva
+### 🐳 Inicio Rápido con Docker (Recomendado)
 
 ```bash
-# Ejecuta el script de demostración desde la raíz del proyecto
-chmod +x demo.sh
-./demo.sh
+# Iniciar todos los servicios con Docker Compose
+docker compose up -d
+
+# Acceder a la aplicación
+# Frontend: http://localhost
+# Backend API: http://localhost/api
+# MongoDB: localhost:27017
 ```
 
-Este script te guiará por todas las funcionalidades del sistema.
+### 🌐 Exposición Pública con ngrok
 
-📖 **[Guía de instalación completa →](docs/guias-inicio/instalacion.md)**  
-📖 **[Inicio rápido detallado →](docs/guias-inicio/inicio-rapido.md)**
+Para compartir tu aplicación temporalmente con usuarios externos:
+
+```bash
+# Configurar NGROK_AUTHTOKEN en .env
+# Luego ejecutar:
+./start-ngrok.sh
+```
+
+**Incluye:**
+- ✅ Exposición HTTPS automática
+- ✅ URL pública compartible
+- ✅ CORS preconfigurado
+- ✅ Panel de monitoreo en http://localhost:4040
+
+📖 **[Documentación completa →](docs/README.md)**
 
 ---
 

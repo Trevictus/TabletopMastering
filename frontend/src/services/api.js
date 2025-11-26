@@ -12,15 +12,42 @@ import { STORAGE_KEYS, AUTH_ROUTES } from '../constants/auth';
  * - Cancelación de peticiones duplicadas
  */
 
+// Detectar la URL base de la API dinámicamente
+const getApiBaseURL = () => {
+  // Si estamos en desarrollo y hay una variable de entorno, usarla
+  const envApiUrl = import.meta.env.VITE_API_URL;
+  
+  // Si la variable de entorno existe y no es localhost, usarla (para ngrok)
+  if (envApiUrl && !envApiUrl.includes('localhost')) {
+    console.log('🌐 Usando API URL desde variable de entorno:', envApiUrl);
+    return envApiUrl;
+  }
+  
+  // Detectar si estamos en un dominio de ngrok
+  const currentOrigin = window.location.origin;
+  if (currentOrigin.includes('.ngrok')) {
+    const ngrokApiUrl = `${currentOrigin}/api`;
+    console.log('🌐 Detectado dominio ngrok, usando:', ngrokApiUrl);
+    return ngrokApiUrl;
+  }
+  
+  // Por defecto, usar localhost (desarrollo local)
+  const defaultUrl = 'http://localhost/api';
+  console.log('🌐 Usando API URL por defecto:', defaultUrl);
+  return defaultUrl;
+};
+
 // Configuración base de la API
 const API_CONFIG = {
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost/api',
+  baseURL: getApiBaseURL(),
   timeout: 30000, // 30 segundos
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
+    'ngrok-skip-browser-warning': 'true', // Evita el warning de ngrok
   },
 };
+
 
 /**
  * Instancia principal de Axios

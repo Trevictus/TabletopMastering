@@ -5,11 +5,19 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    allowedHosts: [
-      'localhost',
-      '127.0.0.1',
-      'unchapleted-sana-uncondemning.ngrok-free.dev',
-        'collin-propanedioic-giuseppe.ngrok-free.dev'
-    ]
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: false,
+    // Permitir TODOS los hosts (necesario para ngrok con URLs dinámicas)
+    allowedHosts: true,
+    hmr: {
+      protocol: 'wss',
+      clientPort: 443,
+      host: undefined
+    }
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 5173
   }
 })
