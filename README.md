@@ -63,80 +63,66 @@
 
 ## 🚀 Inicio Rápido
 
-### Requisitos Previos
-
-- **Node.js** v20.0.0 o superior
-- **MongoDB** v7.0+ (local o MongoDB Atlas)
-- **npm** v9+ o **yarn**
-- **Git** para clonar el repositorio
-
-### Instalación Rápida (3 Pasos)
+### Opción 1: Docker (Recomendado - 2 Pasos)
 
 ```bash
-# 1. Clonar el repositorio
+# 1. Clonar y configurar
 git clone https://github.com/Trevictus/TabletopMastering.git
 cd TabletopMastering
+cp .env.example .env
 
-# 2. Configurar y ejecutar el backend
+# 2. Iniciar aplicación
+docker compose up -d
+```
+
+**¡Listo!** Abre tu navegador en `http://localhost`
+
+### Opción 2: Con ngrok (Acceso Público)
+
+```bash
+# 1. Configurar token de ngrok en .env
+# NGROK_AUTHTOKEN=tu_token_aqui
+
+# 2. Ejecutar script de inicio
+./start-ngrok.sh
+```
+
+Se mostrará una URL pública tipo: `https://abc123.ngrok-free.dev`
+
+### Opción 3: Desarrollo Local (Sin Docker)
+
+**Requisitos:** Node.js 20+, MongoDB
+
+```bash
+# Terminal 1 - Backend
 cd backend
 npm install
 cp .env.example .env
-# Edita .env con tu configuración de MongoDB
 npm run dev
 
-# 3. (En otra terminal) Configurar y ejecutar el frontend
+# Terminal 2 - Frontend  
 cd frontend
 npm install
 npm run dev
 ```
 
-### Configuración del .env (Backend)
+Abre `http://localhost:5173`
+
+### Variables de Entorno (.env)
 
 ```env
-# Servidor
-PORT=5000
-NODE_ENV=development
-
-# Base de datos
-MONGODB_URI=mongodb://localhost:27017/tabletop_mastering
-# O usa MongoDB Atlas:
-# MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/tabletop_mastering
+# MongoDB
+MONGO_USERNAME=admin
+MONGO_PASSWORD=changeme
+MONGO_DBNAME=tabletop_mastering
 
 # JWT
-JWT_SECRET=tu_clave_secreta_muy_segura_aqui
+JWT_SECRET=tu_clave_secreta_muy_segura
 JWT_EXPIRE=7d
 
-# CORS
-FRONTEND_URL=http://localhost:5173
+# ngrok (opcional - para acceso público)
+NGROK_AUTHTOKEN=tu_token_de_ngrok
 ```
-
-### 🐳 Inicio Rápido con Docker (Recomendado)
-
-```bash
-# Iniciar todos los servicios con Docker Compose
-docker compose up -d
-
-# Acceder a la aplicación
-# Frontend: http://localhost
-# Backend API: http://localhost/api
-# MongoDB: localhost:27017
-```
-
-### 🌐 Exposición Pública con ngrok
-
-Para compartir tu aplicación temporalmente con usuarios externos:
-
-```bash
-# Configurar NGROK_AUTHTOKEN en .env
-# Luego ejecutar:
-./start-ngrok.sh
-```
-
-**Incluye:**
-- ✅ Exposición HTTPS automática
-- ✅ URL pública compartible
-- ✅ CORS preconfigurado
-- ✅ Panel de monitoreo en http://localhost:4040
 
 📖 **[Documentación completa →](docs/README.md)**
 
