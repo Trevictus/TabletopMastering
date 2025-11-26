@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { GroupProvider } from './context/GroupContext';
 import { ToastProvider } from './context/ToastContext';
@@ -6,11 +6,113 @@ import { ToastContainer } from './components/common/Toast';
 import ProtectedRoute from './components/routes/ProtectedRoute';
 import PublicRoute from './components/routes/PublicRoute';
 import Navbar from './components/layout/Navbar';
-import { Home, Login, Register, Dashboard, Profile, Games, Rankings, Groups, CreateGroup, Calendar, NotFound } from './pages';
+import { Home, Login, Register, Dashboard, Profile, Games, Rankings, Groups, CreateGroup, GroupDetail, Calendar, NotFound } from './pages';
 import './styles/variables.css';
 import './styles/components.css';
 import './styles/layout.css';
 import './App.css';
+
+function AppContent() {
+  const location = useLocation();
+  const showLogin = location.pathname === '/login';
+  const showRegister = location.pathname === '/register';
+
+  return (
+    <>
+      <div className="page-container">
+        <Navbar />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Home />} />
+            <Route path="/register" element={<Home />} />
+
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/games" 
+              element={
+                <ProtectedRoute>
+                  <Games />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/rankings" 
+              element={
+                <ProtectedRoute>
+                  <Rankings />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/groups" 
+              element={
+                <ProtectedRoute>
+                  <Groups />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/groups/new" 
+              element={
+                <ProtectedRoute>
+                  <CreateGroup />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/groups/:id" 
+              element={
+                <ProtectedRoute>
+                  <GroupDetail />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/calendar" 
+              element={
+                <ProtectedRoute>
+                  <Calendar />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+      </div>
+
+      {/* Modals superpuestos */}
+      {showLogin && (
+        <PublicRoute>
+          <Login />
+        </PublicRoute>
+      )}
+      {showRegister && (
+        <PublicRoute>
+          <Register />
+        </PublicRoute>
+      )}
+
+      <ToastContainer />
+    </>
+  );
+}
 
 function App() {
   return (
@@ -18,91 +120,7 @@ function App() {
       <AuthProvider>
         <GroupProvider>
           <ToastProvider>
-            <div className="page-container">
-              <Navbar />
-              <main className="main-content">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-              
-              <Route 
-                path="/login" 
-                element={
-                  <PublicRoute>
-                    <Login />
-                  </PublicRoute>
-                } 
-              />
-              <Route 
-                path="/register" 
-                element={
-                  <PublicRoute>
-                    <Register />
-                  </PublicRoute>
-                } 
-              />
-
-              <Route 
-                path="/dashboard" 
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/profile" 
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/games" 
-                element={
-                  <ProtectedRoute>
-                    <Games />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/rankings" 
-                element={
-                  <ProtectedRoute>
-                    <Rankings />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/groups" 
-                element={
-                  <ProtectedRoute>
-                    <Groups />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/groups/new" 
-                element={
-                  <ProtectedRoute>
-                    <CreateGroup />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/calendar" 
-                element={
-                  <ProtectedRoute>
-                    <Calendar />
-                  </ProtectedRoute>
-                } 
-              />
-
-              <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
-            </div>
-            <ToastContainer />
+            <AppContent />
           </ToastProvider>
         </GroupProvider>
       </AuthProvider>

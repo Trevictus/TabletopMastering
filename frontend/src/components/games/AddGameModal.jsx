@@ -206,18 +206,20 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
         <>
           <div className={styles.modeSelector}>
             <Button
-              variant="primary"
+              variant={mode === 'search' ? 'primary' : 'outline'}
+              size="small"
               fullWidth
               onClick={() => setMode('search')}
             >
-              <GiDiceFire /> Buscar en BoardGameGeek
+              <GiDiceFire /> BGG
             </Button>
             <Button
-              variant="outline"
+              variant={mode === 'custom' ? 'primary' : 'outline'}
+              size="small"
               fullWidth
               onClick={() => setMode('custom')}
             >
-              <MdAdd /> Crear Juego Personalizado
+              <MdAdd /> Personalizado
             </Button>
           </div>
 
@@ -225,12 +227,12 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
             <Input
               name="search"
               type="text"
-              placeholder="Ej: Catan, Wingspan, Terraforming Mars..."
+              placeholder="Nombre del juego..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               icon={<MdSearch />}
             />
-            <Button type="submit" disabled={loading || !searchQuery.trim()}>
+            <Button type="submit" size="small" disabled={loading || !searchQuery.trim()}>
               {loading ? 'Buscando...' : 'Buscar'}
             </Button>
           </form>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useGroup } from '../../context/GroupContext';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   GiPerspectiveDiceSixFacesRandom, 
@@ -11,6 +12,7 @@ import {
 import { MdGroupAdd, MdAddCircle } from 'react-icons/md';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
+import gameService from '../../services/gameService';
 import styles from './Dashboard.module.css';
 
 /**
@@ -19,8 +21,57 @@ import styles from './Dashboard.module.css';
  */
 const Dashboard = () => {
   const { user } = useAuth();
+  const { groups, loadGroups } = useGroup();
   const location = useLocation();
   const [welcomeMessage, setWelcomeMessage] = useState('');
+  const [stats, setStats] = useState({
+    totalMatches: 0,
+    totalWins: 0,
+    groupsCount: 0,
+    totalPoints: 0,
+    gamesCount: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Cargar grupos
+    loadGroups();
+  }, []);
+
+  useEffect(() => {
+    // Cargar estadísticas reales del usuario
+    const loadUserStats = async () => {
+      try {
+        // Contar juegos del usuario
+        let gamesCount = 0;
+        try {
+          const gamesResponse = await gameService.getGames({ limit: 1 });
+          gamesCount = gamesResponse.total || 0;
+        } catch (error) {
+          console.error('Error loading games:', error);
+        }
+        
+        // Usar datos del contexto de usuario si están disponibles
+        if (user) {
+          setStats({
+            totalMatches: user.stats?.totalMatches || 0,
+            totalWins: user.stats?.totalWins || 0,
+            groupsCount: groups.length || 0,
+            totalPoints: user.stats?.totalPoints || 0,
+            gamesCount: gamesCount
+          });
+        }
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      loadUserStats();
+    }
+  }, [user, groups]);
 
   useEffect(() => {
     // Mostrar mensaje de bienvenida si viene del login
@@ -68,7 +119,7 @@ const Dashboard = () => {
             <GiDiceFire />
           </div>
           <div className={styles.statContent}>
-            <h3 className={styles.statValue}>{user?.stats?.totalMatches || 0}</h3>
+            <h3 className={styles.statValue}>{stats.totalMatches}</h3>
             <p className={styles.statLabel}>Partidas Jugadas</p>
           </div>
         </Card>
@@ -78,7 +129,7 @@ const Dashboard = () => {
             <GiTrophy />
           </div>
           <div className={styles.statContent}>
-            <h3 className={styles.statValue}>{user?.stats?.totalWins || 0}</h3>
+            <h3 className={styles.statValue}>{stats.totalWins}</h3>
             <p className={styles.statLabel}>Victorias</p>
           </div>
         </Card>
@@ -88,7 +139,7 @@ const Dashboard = () => {
             <GiTeamIdea />
           </div>
           <div className={styles.statContent}>
-            <h3 className={styles.statValue}>{user?.groups?.length || 0}</h3>
+            <h3 className={styles.statValue}>{stats.groupsCount}</h3>
             <p className={styles.statLabel}>Grupos Activos</p>
           </div>
         </Card>
@@ -98,7 +149,7 @@ const Dashboard = () => {
             <GiCardPlay />
           </div>
           <div className={styles.statContent}>
-            <h3 className={styles.statValue}>{user?.stats?.totalPoints || 0}</h3>
+            <h3 className={styles.statValue}>{stats.totalPoints}</h3>
             <p className={styles.statLabel}>Puntos Totales</p>
           </div>
         </Card>
@@ -155,15 +206,72 @@ const Dashboard = () => {
         <h2 className={styles.sectionTitle}>Actividad Reciente</h2>
         
         <Card variant="elevated">
-          <div className={styles.emptyState}>
-            <GiPerspectiveDiceSixFacesRandom className={styles.emptyIcon} />
-            <h3 className={styles.emptyTitle}>
-              No hay actividad reciente
-            </h3>
-            <p className={styles.emptyDescription}>
-              Comienza registrando tu primera partida o únete a un grupo
-            </p>
-          </div>
+          {stats.groupsCount > 0 || stats.gamesCount > 0 ? (
+            <div className={styles.activityList}>
+              {stats.groupsCount > 0 && (
+                <div className={styles.activityItem}>
+                  <GiTeamIdea className={styles.activityIcon} />
+                  <div>
+                    <p className={styles.activityText}>
+                      Te has unido a <strong>{stats.groupsCount}</strong> {stats.groupsCount === 1 ? 'grupo' : 'grupos'}
+                    </p>
+                    <span className={styles.activityTime}>Recientemente</span>
+                  </div>
+                </div>
+              )}
+              {stats.gamesCount > 0 && (
+                <div className={styles.activityItem}>
+                  <GiCardPlay className={styles.activityIcon} />
+                  <div>
+                    <p className={styles.activityText}>
+                      Has añadido <strong>{stats.gamesCount}</strong> {stats.gamesCount === 1 ? 'juego' : 'juegos'} a tu colección
+                    </p>
+                    <span className={styles.activityTime}>Recientemente</span>
+                  </div>
+                </div>
+              )}
+              {stats.totalMatches > 0 && (
+                <div className={styles.activityItem}>
+                  <GiDiceFire className={styles.activityIcon} />
+                  <div>
+                    <p className={styles.activityText}>
+                      Has jugado <strong>{stats.totalMatches}</strong> {stats.totalMatches === 1 ? 'partida' : 'partidas'}
+                    </p>
+                    <span className={styles.activityTime}>Recientemente</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className={styles.emptyState}>
+              <GiPerspectiveDiceSixFacesRandom className={styles.emptyIcon} />
+              <h3 className={styles.emptyTitle}>
+                Aún no hay actividad
+              </h3>
+              <p className={styles.emptyDescription}>
+                {stats.groupsCount === 0 
+                  ? 'Crea o únete a un grupo para comenzar a registrar partidas' 
+                  : stats.totalMatches === 0
+                  ? 'Registra tu primera partida para ver tu actividad aquí'
+                  : 'La actividad reciente aparecerá aquí'}
+              </p>
+              <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+                {stats.groupsCount === 0 ? (
+                  <Link to="/groups">
+                    <Button variant="primary" size="medium">
+                      <MdGroupAdd /> Ver Grupos
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link to="/matches/new">
+                    <Button variant="primary" size="medium">
+                      <MdAddCircle /> Registrar Partida
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
         </Card>
       </section>
     </div>

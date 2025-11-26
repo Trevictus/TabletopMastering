@@ -156,56 +156,43 @@ const Games = () => {
             <div>
               <h1>Catálogo de Juegos</h1>
               <p className={styles.subtitle}>
-                {selectedGroup ? (
-                  <>Grupo: <strong>{selectedGroup.name}</strong> - {totalGames} {totalGames === 1 ? 'juego' : 'juegos'}</>
-                ) : (
-                  <>Mis Juegos Personales - {totalGames} {totalGames === 1 ? 'juego' : 'juegos'}</>
-                )}
+                {totalGames} {totalGames === 1 ? 'juego' : 'juegos'}
               </p>
             </div>
           </div>
+          {!selectedGroup && (
+            <Button
+              variant="primary"
+              size="small"
+              onClick={() => setShowAddModal(true)}
+            >
+              <MdAdd /> Añadir Juego
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Botón añadir juego siempre visible */}
-      <div className={styles.actionsBar}>
-        <Button
-          variant="primary"
-          onClick={() => setShowAddModal(true)}
-          className={styles.addButton}
-        >
-          <MdAdd /> Añadir Juego
-        </Button>
-      </div>
-
-      {/* Selector de grupo */}
-      {!loading && groups.length > 0 && (
-        <Card variant="elevated" className={styles.groupSelector}>
-          <div className={styles.groupSelectorHeader}>
-            <h3>Cambiar Vista</h3>
-          </div>
-          <div className={styles.groupList}>
-            <Button
-              variant={!selectedGroup ? 'primary' : 'outline'}
-              fullWidth
+      {/* Nav de Grupos - Horizontal sin scroll */}
+      {(groups.length > 0 || selectedGroup) && (
+        <div className={styles.groupNav}>
+          <div className={styles.groupNavContent}>
+            <button
+              className={`${styles.groupNavButton} ${!selectedGroup ? styles.active : ''}`}
               onClick={() => selectGroup(null)}
             >
-              📚 Mis Juegos Personales
-              {!selectedGroup && ' ✓'}
-            </Button>
+              📚 Mis Juegos
+            </button>
             {groups.map(group => (
-              <Button
+              <button
                 key={group._id}
-                variant={selectedGroup?._id === group._id ? 'primary' : 'outline'}
-                fullWidth
+                className={`${styles.groupNavButton} ${selectedGroup?._id === group._id ? styles.active : ''}`}
                 onClick={() => selectGroup(group)}
               >
-                👥 {group.name}
-                {selectedGroup?._id === group._id && ' ✓'}
-              </Button>
+                🎲 {group.name}
+              </button>
             ))}
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Loading inicial */}

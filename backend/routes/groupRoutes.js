@@ -4,6 +4,7 @@ const {
   createGroup,
   getMyGroups,
   getGroup,
+  getGroupPublic,
   joinGroup,
   updateGroup,
   regenerateInviteCode,
@@ -76,6 +77,9 @@ const memberValidation = [
   param('id').isMongoId().withMessage('ID de grupo inválido'),
   param('userId').isMongoId().withMessage('ID de usuario inválido'),
 ];
+
+// Rutas públicas (sin autenticación)
+router.get('/public/:id', idValidation, validate, getGroupPublic);
 
 // Rutas protegidas - Rutas específicas primero
 router.post('/', protect, createGroupValidation, validate, createGroup);

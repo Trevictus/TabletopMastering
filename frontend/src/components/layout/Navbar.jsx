@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { GiPerspectiveDiceSixFacesRandom, GiCardPlay, GiTrophy, GiTeamIdea } from 'react-icons/gi';
-import { MdPerson, MdExitToApp, MdDashboard, MdCalendarToday } from 'react-icons/md';
+import { MdPerson, MdExitToApp, MdDashboard } from 'react-icons/md';
+import { FaUserCircle } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../common/Button';
 import styles from './Navbar.module.css';
@@ -78,27 +79,19 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <Link to="/calendar" className={`${styles.navLink} ${isActive('/calendar')}`}>
-                <MdCalendarToday className={styles.linkIcon} />
-                Calendario
-              </Link>
-            </li>
-            <li>
               <Link to="/rankings" className={`${styles.navLink} ${isActive('/rankings')}`}>
                 <GiTrophy className={styles.linkIcon} />
                 Rankings
               </Link>
             </li>
             <li>
-              <Link to="/profile" className={`${styles.navLink} ${styles.profileLink} ${isActive('/profile')}`}>
-                <div className={styles.userAvatar}>
-                  {user?.avatar ? (
-                    <img src={user.avatar} alt={user.name} />
-                  ) : (
-                    <MdPerson className={styles.avatarIcon} />
-                  )}
-                </div>
-                <span>{user?.name}</span>
+              <Link to="/profile" className={`${styles.navLink} ${isActive('/profile')}`}>
+                {user?.avatar ? (
+                  <img src={user.avatar} alt={user.name} className={styles.userAvatar} />
+                ) : (
+                  <FaUserCircle className={styles.linkIcon} />
+                )}
+                {user?.name || 'Perfil'}
               </Link>
             </li>
             

@@ -531,10 +531,37 @@ const getGroupRanking = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Obtener información pública de un grupo por ID (sin requerir ser miembro)
+ * @route   GET /api/groups/public/:id
+ * @access  Public
+ */
+const getGroupPublic = async (req, res, next) => {
+  try {
+    const group = await Group.findById(req.params.id)
+      .populate(groupPopulateOptions);
+
+    if (!group || !group.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: 'Grupo no encontrado',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: group,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createGroup,
   getMyGroups,
   getGroup,
+  getGroupPublic,
   joinGroup,
   updateGroup,
   regenerateInviteCode,

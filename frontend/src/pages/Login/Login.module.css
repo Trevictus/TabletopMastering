@@ -1,55 +1,83 @@
 .loginPage {
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-  padding: var(--spacing-2xl);
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  padding: 2rem;
+  padding-top: 90px;
+  z-index: 900;
+  overflow: hidden;
 }
 
 .loginContainer {
   width: 100%;
-  max-width: 550px;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
 }
 
 .loginCard {
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-lg);
-  box-shadow: 0 20px 40px rgba(42, 31, 21, 0.15);
-  padding: var(--spacing-3xl) var(--spacing-2xl);
-  border: 2px solid rgba(139, 125, 107, 0.2);
+  background: linear-gradient(145deg, #ffffff 0%, #faf8f3 100%);
+  border-radius: 16px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6), 
+              0 0 0 1px rgba(212, 175, 55, 0.2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  padding: 2.5rem 2rem;
+  border: none;
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.loginCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #8b4513 0%, #d4af37 100%);
+  border-radius: 16px 16px 0 0;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .header {
   text-align: center;
-  margin-bottom: var(--spacing-3xl);
+  margin-bottom: 1.5rem;
 }
 
 .icon {
-  font-size: 5rem;
+  font-size: 2.5rem;
   color: var(--accent-color);
-  margin-bottom: var(--spacing-lg);
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+  margin-bottom: 0.5rem;
 }
 
 .title {
-  font-size: var(--font-size-3xl);
-  color: var(--primary-color);
-  margin: 0 0 var(--spacing-md);
+  font-size: 1.5rem;
   font-weight: 700;
+  color: var(--primary-color);
+  margin: 0 0 0.25rem 0;
 }
 
 .subtitle {
-  font-size: var(--font-size-lg);
+  font-size: 0.875rem;
   color: var(--text-secondary);
   margin: 0;
 }
@@ -57,43 +85,46 @@
 .serverError {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md);
+  gap: 0.5rem;
+  padding: 0.625rem;
   background-color: rgba(139, 46, 46, 0.1);
-  border: 1px solid var(--error-color);
-  border-radius: var(--border-radius);
-  color: var(--error-color);
-  font-size: var(--font-size-sm);
-  margin-bottom: var(--spacing-xl);
+  border: 1px solid #8b2e2e;
+  border-radius: 8px;
+  color: #8b2e2e;
+  font-size: 0.8rem;
+  margin-bottom: 0.75rem;
 }
 
 .form {
-  margin-top: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0;
 }
 
 .rememberMe {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-xl);
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .checkbox {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   cursor: pointer;
-  accent-color: var(--primary-color);
+  accent-color: #8b4513;
 }
 
 .checkboxLabel {
-  font-size: var(--font-size-md);
-  color: var(--text-secondary);
+  font-size: 0.8rem;
+  color: #5c4f42;
   cursor: pointer;
   user-select: none;
 }
 
 .submitButton {
-  margin-top: var(--spacing-lg);
+  margin-top: 0.25rem;
 }
 
 .submitButton:disabled {
@@ -103,7 +134,7 @@
 
 .divider {
   text-align: center;
-  margin: var(--spacing-2xl) 0;
+  margin: 1rem 0 0.75rem;
   position: relative;
 }
 
@@ -120,20 +151,21 @@
 .dividerText {
   position: relative;
   display: inline-block;
-  padding: 0 var(--spacing-md);
+  padding: 0 1rem;
   background-color: var(--bg-primary);
   color: var(--text-secondary);
-  font-size: var(--font-size-sm);
+  font-size: 0.875rem;
 }
 
 .registerLink {
   text-align: center;
-  margin-top: var(--spacing-xl);
+  margin-top: 0;
 }
 
 .registerText {
-  font-size: var(--font-size-md);
+  font-size: 0.875rem;
   color: var(--text-secondary);
+  margin: 0;
 }
 
 .link {
@@ -151,30 +183,30 @@
 /* Responsive */
 @media (max-width: 768px) {
   .loginPage {
-    padding: var(--spacing-lg);
+    padding: 0.5rem;
   }
 
   .loginContainer {
-    padding: var(--spacing-lg);
+    max-width: 95%;
   }
 
   .loginCard {
-    padding: var(--spacing-xl);
+    padding: 1.25rem 1rem;
   }
 
   .header {
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: 0.875rem;
   }
 
   .icon {
-    font-size: 3rem;
+    font-size: 2rem;
   }
 
   .title {
-    font-size: var(--font-size-2xl);
+    font-size: 1.375rem;
   }
 
   .subtitle {
-    font-size: var(--font-size-md);
+    font-size: 0.75rem;
   }
 }

@@ -7,9 +7,9 @@ const groupService = {
     return response.data;
   },
 
-  // Obtener detalles de un grupo específico
+  // Obtener detalles de un grupo específico (pública, sin requerir ser miembro)
   getGroupById: async (groupId) => {
-    const response = await api.get(`/groups/${groupId}`);
+    const response = await api.get(`/groups/public/${groupId}`);
     return response.data;
   },
 

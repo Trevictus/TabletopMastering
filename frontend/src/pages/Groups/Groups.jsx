@@ -3,13 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useGroup } from '../../context/GroupContext';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { MdAddCircle, MdPersonAdd, MdContentCopy, MdCheckCircle, MdClose } from 'react-icons/md';
+import { MdAddCircle, MdPersonAdd, MdContentCopy, MdCheckCircle } from 'react-icons/md';
 import { GiTeamIdea } from 'react-icons/gi';
 import groupService from '../../services/groupService';
 import Button from '../../components/common/Button';
 import Loading from '../../components/common/Loading';
-import Modal from '../../components/common/Modal';
-import Input from '../../components/common/Input';
 import styles from './Groups.module.css';
 
 /**
@@ -22,13 +20,9 @@ const Groups = () => {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [expandedGroup, setExpandedGroup] = useState(null);
-  const [inviteEmails, setInviteEmails] = useState({});
-  const [invitingGroupId, setInvitingGroupId] = useState(null);
-  const [copiedCode, setCopiedCode] = useState(null);
   const [showJoinModal, setShowJoinModal] = useState(false);
-  const [joinCode, setJoinCode] = useState('');
-  const [joiningGroup, setJoiningGroup] = useState(false);
+  const [inviteCode, setInviteCode] = useState('');
+  const [joiningLoading, setJoiningLoading] = useState(false);
 
   useEffect(() => {
     const loadInitialGroups = async () => {
@@ -47,77 +41,36 @@ const Groups = () => {
 
   const handleSelectGroup = (group) => {
     selectGroup(group);
-    navigate('/rankings', {
-      state: { message: `Grupo "${group.name}" seleccionado` }
-    });
+    navigate(`/groups/${group._id}`);
   };
 
-  const handleInviteUser = async (groupId) => {
-    const email = inviteEmails[groupId]?.trim();
+  const handleJoinGroup = async (e) => {
+    e.preventDefault();
     
-    if (!email) {
-      toast.error('Por favor ingresa un email');
-      return;
-    }
-
-    setInvitingGroupId(groupId);
-    try {
-      await groupService.inviteUserToGroup(groupId, email);
-      toast.success('Invitación enviada correctamente');
-      setInviteEmails({ ...inviteEmails, [groupId]: '' });
-      setExpandedGroup(null);
-      setError('');
-      // Recargar grupos después de invitar
-      await loadGroups();
-    } catch (err) {
-      const message = err.response?.data?.message || 'Error al invitar usuario';
-      toast.error(message);
-      setError(message);
-    } finally {
-      setInvitingGroupId(null);
-    }
-  };
-
-  const handleCopyCode = (code) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(code);
-    toast.success('Código copiado al portapapeles');
-    setTimeout(() => setCopiedCode(null), 2000);
-  };
-
-  const handleJoinGroup = async () => {
-    const code = joinCode.trim();
-    
-    if (!code) {
+    if (!inviteCode.trim()) {
       toast.error('Por favor ingresa un código de invitación');
       return;
     }
 
-    setJoiningGroup(true);
+    setJoiningLoading(true);
     try {
-      await groupService.joinGroup(code);
-      toast.success('Te has unido al grupo exitosamente');
-      setJoinCode('');
-      setShowJoinModal(false);
-      await loadGroups();
+      const response = await groupService.joinGroup(inviteCode);
+      
+      if (response.success) {
+        toast.success('¡Te has unido al grupo exitosamente!');
+        setInviteCode('');
+        setShowJoinModal(false);
+        
+        // Recargar los grupos
+        await loadGroups();
+      }
     } catch (err) {
       const message = err.response?.data?.message || 'Error al unirse al grupo';
       toast.error(message);
     } finally {
-      setJoiningGroup(false);
+      setJoiningLoading(false);
     }
   };
-
-  const joinModalFooter = (
-    <>
-      <Button variant="outline" onClick={() => setShowJoinModal(false)} disabled={joiningGroup}>
-        <MdClose /> Cancelar
-      </Button>
-      <Button variant="primary" onClick={handleJoinGroup} disabled={joiningGroup || !joinCode.trim()}>
-        <MdPersonAdd /> {joiningGroup ? 'Uniéndose...' : 'Unirse al Grupo'}
-      </Button>
-    </>
-  );
 
   return (
     <div className={styles.groupsPage}>
@@ -133,14 +86,18 @@ const Groups = () => {
           </div>
         </div>
         <div className={styles.headerActions}>
-          <Button variant="outline" onClick={() => setShowJoinModal(true)}>
-            <MdPersonAdd /> Unirse a Grupo
-          </Button>
           <Link to="/groups/new">
-            <Button variant="primary">
+            <Button variant="primary" size="small">
               <MdAddCircle /> Crear Grupo
             </Button>
           </Link>
+          <Button 
+            variant="secondary"
+            size="small"
+            onClick={() => setShowJoinModal(true)}
+          >
+            <MdPersonAdd /> Unirse
+          </Button>
         </div>
       </div>
 
@@ -160,7 +117,7 @@ const Groups = () => {
         <div className={styles.groupsGrid}>
           {groups.map(group => (
             <div key={group._id} className={styles.groupCard}>
-              {/* Header */}
+              {/* Header con nombre y descripción */}
               <div className={styles.cardHeader}>
                 <h3 className={styles.groupName}>{group.name}</h3>
                 {group.description && (
@@ -168,57 +125,48 @@ const Groups = () => {
                 )}
               </div>
 
-              {/* Body */}
+              {/* Members Quick View */}
               <div className={styles.cardBody}>
-                {/* Invite Code - Visual Focus */}
-                <div className={styles.inviteCodeBox}>
-                  <button
-                    className={styles.codeButton}
-                    onClick={() => handleCopyCode(group.inviteCode)}
-                  >
-                    <div className={styles.codeBadge}>{group.inviteCode}</div>
-                    <div className={styles.copyIndicator}>
-                      {copiedCode === group.inviteCode ? '✓ Copiado' : '📋 Copiar'}
-                    </div>
-                  </button>
-                </div>
-
-                {/* Stats */}
-                <div className={styles.statsCompact}>
-                  <div className={styles.statCompact}>
-                    <span className={styles.statNum}>{(group.members?.length || 0) + 1}</span>
-                    <span className={styles.statLabel}>Miembros</span>
+                <div className={styles.membersList}>
+                  <div className={styles.membersHeader}>
+                    <span className={styles.membersLabel}>Integrantes ({(group.members?.length || 0) + 1})</span>
                   </div>
-                  <div className={styles.statCompact}>
-                    <span className={styles.statNum}>{group.totalMatches || 0}</span>
-                    <span className={styles.statLabel}>Partidas</span>
-                  </div>
-                </div>
-
-                {/* Members */}
-                <div className={styles.membersCompact}>
-                  {user && (
-                    <div className={styles.memberBadge}>
-                      👤 {user.name} <span className={styles.badgeLabel}>Admin</span>
-                    </div>
-                  )}
-                  {group.members && group.members.length > 0 && (
-                    group.members.map((member, idx) => (
-                      <div key={idx} className={styles.memberBadge}>
-                        👤 {member.name || member.email}
+                  <div className={styles.memberItems}>
+                    {user && (
+                      <div className={styles.memberItem}>
+                        <div className={styles.memberAvatar}>
+                          {user.name?.charAt(0).toUpperCase() || '?'}
+                        </div>
+                        <div className={styles.memberInfo}>
+                          <p className={styles.memberName}>{user.name}</p>
+                          <p className={styles.memberRole}>Admin</p>
+                        </div>
                       </div>
-                    ))
-                  )}
+                    )}
+                    {group.members && group.members.length > 0 && (
+                      group.members.map((member, idx) => (
+                        <div key={idx} className={styles.memberItem}>
+                          <div className={styles.memberAvatar}>
+                            {member.name?.charAt(0).toUpperCase() || member.email?.charAt(0).toUpperCase() || '?'}
+                          </div>
+                          <div className={styles.memberInfo}>
+                            <p className={styles.memberName}>{member.name || member.email}</p>
+                            <p className={styles.memberRole}>Miembro</p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Footer */}
+              {/* Footer con botón de ver grupo */}
               <div className={styles.cardFooter}>
                 <button
-                  className={styles.rankingsButton}
-                  onClick={() => handleSelectGroup(group)}
+                  className={styles.viewGroupButton}
+                  onClick={() => navigate(`/groups/${group._id}`)}
                 >
-                  Ver Rankings →
+                  Ver Grupo Completo →
                 </button>
               </div>
             </div>
@@ -234,41 +182,77 @@ const Groups = () => {
           <p className={styles.emptyDescription}>
             Crea tu primer grupo o únete a uno existente para comenzar
           </p>
-          <Link to="/groups/new">
-            <Button variant="primary" size="large">
-              <MdAddCircle /> Crear Primer Grupo
+          <div className={styles.emptyActions}>
+            <Link to="/groups/new">
+              <Button variant="primary" size="large">
+                <MdAddCircle /> Crear Primer Grupo
+              </Button>
+            </Link>
+            <Button 
+              variant="secondary" 
+              size="large"
+              onClick={() => setShowJoinModal(true)}
+            >
+              <MdPersonAdd /> Unirse a Grupo
             </Button>
-          </Link>
+          </div>
         </div>
       )}
 
-      {/* Modal para unirse a un grupo */}
-      <Modal
-        isOpen={showJoinModal}
-        onClose={() => setShowJoinModal(false)}
-        title="Unirse a un Grupo"
-        footer={joinModalFooter}
-        size="small"
-      >
-        <div className={styles.joinModalContent}>
-          <p className={styles.joinModalDescription}>
-            Ingresa el código de invitación que te compartieron para unirte a un grupo existente.
-          </p>
-          <Input
-            label="Código de Invitación"
-            name="joinCode"
-            type="text"
-            placeholder="Ej: ABC123XYZ"
-            value={joinCode}
-            onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-            maxLength={20}
-            autoFocus
-          />
-          <div className={styles.joinModalHelper}>
-            💡 El código lo puedes obtener del administrador del grupo
+      {/* Modal Unirse a Grupo */}
+      {showJoinModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowJoinModal(false)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>Unirse a un Grupo</h2>
+              <button
+                className={styles.closeButton}
+                onClick={() => setShowJoinModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form className={styles.joinForm} onSubmit={handleJoinGroup}>
+              <div className={styles.formGroup}>
+                <label htmlFor="inviteCode">Código de Invitación</label>
+                <input
+                  id="inviteCode"
+                  type="text"
+                  className={styles.input}
+                  placeholder="Ej: ABC12345"
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                  maxLength="8"
+                  disabled={joiningLoading}
+                  autoFocus
+                />
+                <small className={styles.hint}>
+                  Solicita el código de invitación al administrador del grupo
+                </small>
+              </div>
+
+              <div className={styles.formActions}>
+                <button
+                  type="button"
+                  className={styles.cancelButton}
+                  onClick={() => setShowJoinModal(false)}
+                  disabled={joiningLoading}
+                >
+                  Cancelar
+                </button>
+                <Button
+                  variant="primary"
+                  type="submit"
+                  disabled={joiningLoading || !inviteCode.trim()}
+                >
+                  {joiningLoading ? 'Uniéndome...' : 'Unirme'}
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
-      </Modal>
+      )}
     </div>
   );
 };

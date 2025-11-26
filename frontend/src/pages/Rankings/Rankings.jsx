@@ -43,9 +43,11 @@ const Rankings = () => {
       const response = await rankingService.getGroupRanking(selectedGroup._id, {
         sortBy: sortBy,
       });
-      setRanking(response.data || []);
+      const rankingData = Array.isArray(response.data) ? response.data : response.data?.ranking || [];
+      setRanking(rankingData);
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al cargar el ranking');
+      console.error('Error cargando ranking:', err);
+      setError('');
       setRanking([]);
     } finally {
       setLoading(false);
@@ -68,7 +70,7 @@ const Rankings = () => {
 
   return (
     <div className={styles.rankingsPage}>
-      {/* Header */}
+      {/* Header con Nav de Grupos */}
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.headerTitle}>
@@ -77,9 +79,9 @@ const Rankings = () => {
               <h1>Rankings</h1>
               <p className={styles.subtitle}>
                 {selectedGroup ? (
-                  <>Grupo: <strong>{selectedGroup.name}</strong> - {ranking.length} {ranking.length === 1 ? 'jugador' : 'jugadores'}</>
+                  <>{ranking.length} {ranking.length === 1 ? 'jugador' : 'jugadores'}</>
                 ) : (
-                  <>Selecciona un grupo para ver el ranking</>
+                  <>Selecciona un grupo</>
                 )}
               </p>
             </div>
@@ -87,26 +89,21 @@ const Rankings = () => {
         </div>
       </div>
 
-      {/* Selector de grupo */}
-      {!loading && groups.length > 0 && (
-        <Card variant="elevated" className={styles.groupSelector}>
-          <div className={styles.groupSelectorHeader}>
-            <h3>Cambiar Grupo</h3>
-          </div>
-          <div className={styles.groupList}>
+      {/* Nav de Grupos - Horizontal sin scroll */}
+      {groups.length > 0 && (
+        <div className={styles.groupNav}>
+          <div className={styles.groupNavContent}>
             {groups.map(group => (
-              <Button
+              <button
                 key={group._id}
-                variant={selectedGroup?._id === group._id ? 'primary' : 'outline'}
-                fullWidth
+                className={`${styles.groupNavButton} ${selectedGroup?._id === group._id ? styles.active : ''}`}
                 onClick={() => selectGroup(group)}
               >
-                👥 {group.name}
-                {selectedGroup?._id === group._id && ' ✓'}
-              </Button>
+                🎲 {group.name}
+              </button>
             ))}
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Loading inicial */}

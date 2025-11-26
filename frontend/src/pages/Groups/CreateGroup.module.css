@@ -1,9 +1,9 @@
 .createGroupPage {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-2xl);
-  padding: var(--spacing-2xl);
-  max-width: 700px;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  max-width: 550px;
   margin: 0 auto;
 }
 
@@ -36,13 +36,13 @@
 
 /* Formulario */
 .formCard {
-  padding: var(--spacing-2xl);
+  padding: var(--spacing-lg);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xl);
+  gap: var(--spacing-md);
 }
 
 .formGroup {
@@ -108,7 +108,7 @@
 
 /* Info Card */
 .infoCard {
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
 }
 
 .infoContent h3 {
