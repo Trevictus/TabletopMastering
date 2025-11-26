@@ -60,6 +60,9 @@ services:
         condition: service_healthy
     environment:
       VITE_API_URL: ${VITE_API_URL:-http://localhost/api}
+      DANGEROUSLY_DISABLE_HOST_CHECK: "true"
+      VITE_HOST_CHECK: "false"
+    command: sh -c "npm run dev -- --host 0.0.0.0 --strictPort false --clearScreen false"
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -82,10 +85,29 @@ services:
     networks:
       - frontend-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
-      interval: 30s
-      timeout: 3s
+      test: ["CMD-SHELL", "pidof nginx || exit 1"]
+      interval: 5s
+      timeout: 2s
       retries: 3
+      start_period: 5s
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: tabletop-ngrok
+    restart: unless-stopped
+    depends_on:
+      nginx:
+        condition: service_healthy
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    command:
+      - "http"
+      - "nginx:80"
+      - "--log=stdout"
+    ports:
+      - "4040:4040"  # Web interface de ngrok
+    networks:
+      - frontend-network
 
 volumes:
   mongodb_data:
