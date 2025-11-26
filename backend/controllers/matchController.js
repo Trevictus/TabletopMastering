@@ -44,15 +44,8 @@ exports.getMatches = async (req, res, next) => {
   try {
     const { groupId, status, page = 1, limit = 20 } = req.query;
 
-    if (!groupId) {
-      return res.status(400).json({
-        success: false,
-        message: 'groupId es obligatorio',
-      });
-    }
-
     const result = await matchService.getMatches(
-      groupId,
+      groupId || null,
       req.user._id,
       status,
       page,

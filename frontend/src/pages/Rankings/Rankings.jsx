@@ -26,10 +26,8 @@ const Rankings = () => {
 
   // Cargar grupos al montar
   useEffect(() => {
-    if (groups.length === 0) {
-      loadGroups();
-    }
-  }, []);
+    loadGroups();
+  }, [loadGroups]);
 
   // Cargar ranking (memoizado)
   const loadRanking = useCallback(async () => {

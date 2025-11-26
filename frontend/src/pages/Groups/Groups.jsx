@@ -3,11 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useGroup } from '../../context/GroupContext';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { MdAddCircle, MdPersonAdd, MdContentCopy, MdCheckCircle } from 'react-icons/md';
+import { MdAddCircle, MdPersonAdd, MdContentCopy, MdCheckCircle, MdClose } from 'react-icons/md';
 import { GiTeamIdea } from 'react-icons/gi';
 import groupService from '../../services/groupService';
 import Button from '../../components/common/Button';
 import Loading from '../../components/common/Loading';
+import Modal from '../../components/common/Modal';
+import Input from '../../components/common/Input';
 import styles from './Groups.module.css';
 
 /**
@@ -24,6 +26,9 @@ const Groups = () => {
   const [inviteEmails, setInviteEmails] = useState({});
   const [invitingGroupId, setInvitingGroupId] = useState(null);
   const [copiedCode, setCopiedCode] = useState(null);
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [joinCode, setJoinCode] = useState('');
+  const [joiningGroup, setJoiningGroup] = useState(false);
 
   useEffect(() => {
     const loadInitialGroups = async () => {
@@ -80,6 +85,40 @@ const Groups = () => {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
+  const handleJoinGroup = async () => {
+    const code = joinCode.trim();
+    
+    if (!code) {
+      toast.error('Por favor ingresa un código de invitación');
+      return;
+    }
+
+    setJoiningGroup(true);
+    try {
+      await groupService.joinGroup(code);
+      toast.success('Te has unido al grupo exitosamente');
+      setJoinCode('');
+      setShowJoinModal(false);
+      await loadGroups();
+    } catch (err) {
+      const message = err.response?.data?.message || 'Error al unirse al grupo';
+      toast.error(message);
+    } finally {
+      setJoiningGroup(false);
+    }
+  };
+
+  const joinModalFooter = (
+    <>
+      <Button variant="outline" onClick={() => setShowJoinModal(false)} disabled={joiningGroup}>
+        <MdClose /> Cancelar
+      </Button>
+      <Button variant="primary" onClick={handleJoinGroup} disabled={joiningGroup || !joinCode.trim()}>
+        <MdPersonAdd /> {joiningGroup ? 'Uniéndose...' : 'Unirse al Grupo'}
+      </Button>
+    </>
+  );
+
   return (
     <div className={styles.groupsPage}>
       {/* Header */}
@@ -93,11 +132,16 @@ const Groups = () => {
             </p>
           </div>
         </div>
-        <Link to="/groups/new">
-          <Button variant="primary">
-            <MdAddCircle /> Crear Grupo
+        <div className={styles.headerActions}>
+          <Button variant="outline" onClick={() => setShowJoinModal(true)}>
+            <MdPersonAdd /> Unirse a Grupo
           </Button>
-        </Link>
+          <Link to="/groups/new">
+            <Button variant="primary">
+              <MdAddCircle /> Crear Grupo
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Error */}
@@ -197,6 +241,34 @@ const Groups = () => {
           </Link>
         </div>
       )}
+
+      {/* Modal para unirse a un grupo */}
+      <Modal
+        isOpen={showJoinModal}
+        onClose={() => setShowJoinModal(false)}
+        title="Unirse a un Grupo"
+        footer={joinModalFooter}
+        size="small"
+      >
+        <div className={styles.joinModalContent}>
+          <p className={styles.joinModalDescription}>
+            Ingresa el código de invitación que te compartieron para unirte a un grupo existente.
+          </p>
+          <Input
+            label="Código de Invitación"
+            name="joinCode"
+            type="text"
+            placeholder="Ej: ABC123XYZ"
+            value={joinCode}
+            onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+            maxLength={20}
+            autoFocus
+          />
+          <div className={styles.joinModalHelper}>
+            💡 El código lo puedes obtener del administrador del grupo
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

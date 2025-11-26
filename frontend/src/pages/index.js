@@ -7,5 +7,6 @@ export { default as Games } from './Games/Games';
 export { default as Rankings } from './Rankings/Rankings';
 export { default as Groups } from './Groups/Groups';
 export { default as CreateGroup } from './Groups/CreateGroup';
+export { default as Calendar } from './Calendar/Calendar';
 export { default as NotFound } from './NotFound/NotFound';
 

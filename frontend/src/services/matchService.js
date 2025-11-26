@@ -7,6 +7,12 @@ const matchService = {
     return response.data;
   },
 
+  // Obtener todas las partidas del usuario de todos sus grupos
+  getAllUserMatches: async (params = {}) => {
+    const response = await api.get('/matches', { params });
+    return response.data;
+  },
+
   // Crear nueva partida
   createMatch: async (matchData) => {
     const response = await api.post('/matches', matchData);
@@ -28,6 +34,18 @@ const matchService = {
   // Eliminar partida
   deleteMatch: async (matchId) => {
     const response = await api.delete(`/matches/${matchId}`);
+    return response.data;
+  },
+
+  // Confirmar asistencia a una partida
+  confirmAttendance: async (matchId) => {
+    const response = await api.post(`/matches/${matchId}/confirm`);
+    return response.data;
+  },
+
+  // Cancelar asistencia (actualizar confirmed a false)
+  cancelAttendance: async (matchId) => {
+    const response = await api.delete(`/matches/${matchId}/confirm`);
     return response.data;
   },
 };

@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { GiPerspectiveDiceSixFacesRandom, GiCardPlay, GiTrophy, GiTeamIdea } from 'react-icons/gi';
-import { MdPerson, MdExitToApp, MdDashboard } from 'react-icons/md';
+import { MdPerson, MdExitToApp, MdDashboard, MdCalendarToday } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../common/Button';
 import styles from './Navbar.module.css';
@@ -75,6 +75,12 @@ const Navbar = () => {
               <Link to="/games" className={`${styles.navLink} ${isActive('/games')}`}>
                 <GiCardPlay className={styles.linkIcon} />
                 Juegos
+              </Link>
+            </li>
+            <li>
+              <Link to="/calendar" className={`${styles.navLink} ${isActive('/calendar')}`}>
+                <MdCalendarToday className={styles.linkIcon} />
+                Calendario
               </Link>
             </li>
             <li>

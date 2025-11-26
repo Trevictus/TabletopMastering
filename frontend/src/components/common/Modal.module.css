@@ -103,7 +103,7 @@
 }
 
 .modalBody {
-  padding: 1.5rem;
+  padding: 2rem;
   overflow-y: auto;
   flex: 1;
   background-color: #ffffff !important;
