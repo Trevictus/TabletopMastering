@@ -114,11 +114,11 @@ const removeMemberFromGroup = async (group, userId) => {
 };
 
 /**
- * Opciones de populate estándar para grupos (optimizado con select mínimo)
+ * Opciones de populate estándar para grupos (incluye datos completos de miembros)
  */
 const groupPopulateOptions = [
-  { path: 'admin', select: 'name email avatar -_id' },
-  { path: 'members.user', select: 'name email avatar stats -_id' },
+  { path: 'admin', select: 'name email avatar stats' },
+  { path: 'members.user', select: 'name email avatar stats' },
 ];
 
 /**

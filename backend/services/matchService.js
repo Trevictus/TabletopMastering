@@ -383,6 +383,14 @@ exports.finishMatch = async (matchId, userId, winnerId = null, results = [], dur
   // Actualizar ranking automáticamente
   const rankingReport = await rankingService.updateMatchStatistics(match);
 
+  // Actualizar estadísticas del grupo
+  if (match.group) {
+    await Group.findByIdAndUpdate(
+      match.group,
+      { $inc: { 'stats.totalMatches': 1 } }
+    );
+  }
+
   await match.populate(MATCH_POPULATE_OPTIONS);
 
   return { match, rankingReport };

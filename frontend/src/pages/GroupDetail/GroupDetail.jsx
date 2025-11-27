@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MdArrowBack, MdPersonAdd, MdContentCopy, MdCheckCircle } from 'react-icons/md';
 import { GiTeamIdea } from 'react-icons/gi';
@@ -21,25 +21,43 @@ const GroupDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [copiedCode, setCopiedCode] = useState(false);
-
-  const loadGroupDetail = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const response = await groupService.getGroupById(id);
-      setGroup(response.data);
-    } catch (err) {
-      const message = err.response?.data?.message || 'Error al cargar el grupo';
-      setError(message);
-      toast.error(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
+    
+    const loadGroupDetail = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const response = await groupService.getGroupById(id);
+        // Solo actualizar estado si el componente sigue montado
+        if (isMountedRef.current) {
+          setGroup(response.data);
+        }
+      } catch (err) {
+        // Ignorar errores de cancelación (peticiones duplicadas o componente desmontado)
+        if (err.name === 'CanceledError' || err.message?.includes('cancelada') || err.message?.includes('canceled')) {
+          return;
+        }
+        if (isMountedRef.current) {
+          const message = err.response?.data?.message || 'Error al cargar el grupo';
+          setError(message);
+          toast.error(message);
+        }
+      } finally {
+        if (isMountedRef.current) {
+          setLoading(false);
+        }
+      }
+    };
+
     loadGroupDetail();
-  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [id, toast]);
 
   const handleCopyCode = () => {
     if (group?.inviteCode) {
@@ -68,8 +86,35 @@ const GroupDetail = () => {
     );
   }
 
-  const isAdmin = user?._id === group.createdBy;
-  const memberCount = (group.members?.length || 0) + 1;
+  // Determinar si el usuario actual es admin
+  const adminUser = group.admin;
+  const isAdmin = user?._id === adminUser?._id || user?._id === group.createdBy;
+  const memberCount = (group.members?.length || 0);
+
+  // Función helper para formatear fecha de unión
+  const formatJoinDate = (date) => {
+    if (!date) return '';
+    return new Date(date).toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+
+  // Función helper para obtener iniciales
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.charAt(0).toUpperCase();
+  };
+
+  // Función helper para verificar si es una URL de avatar válida
+  const isValidAvatar = (avatar) => {
+    return avatar && !avatar.includes('placeholder') && avatar.startsWith('http');
+  };
 
   return (
     <div className={styles.groupDetailPage}>
@@ -100,45 +145,103 @@ const GroupDetail = () => {
               </div>
               <div className={styles.infoCard}>
                 <span className={styles.infoLabel}>Partidas</span>
-                <span className={styles.infoValue}>{group.totalMatches || 0}</span>
+                <span className={styles.infoValue}>{group.stats?.totalMatches || 0}</span>
               </div>
               <div className={styles.infoCard}>
                 <span className={styles.infoLabel}>Estado</span>
-                <span className={styles.infoValue}>{group.status || 'Activo'}</span>
+                <span className={styles.infoValue}>{group.isActive ? 'Activo' : 'Inactivo'}</span>
               </div>
             </div>
           </section>
 
           {/* Members Section */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Integrantes del Grupo</h2>
+            <h2 className={styles.sectionTitle}>Integrantes del Grupo ({memberCount})</h2>
             <div className={styles.membersList}>
-              {/* Admin */}
-              {group.createdBy && (
-                <div className={styles.memberCard}>
-                  <div className={styles.memberAvatar}>
-                    {user?.name?.charAt(0).toUpperCase() || '?'}
-                  </div>
-                  <div className={styles.memberContent}>
-                    <h3 className={styles.memberName}>{user?.name}</h3>
-                    <p className={styles.memberRole}>Administrador</p>
-                  </div>
-                  {isAdmin && <span className={styles.adminBadge}>Tú</span>}
-                </div>
-              )}
-              {/* Other Members */}
+              {/* Renderizar todos los miembros */}
               {group.members && group.members.length > 0 && (
-                group.members.map((member) => (
-                  <div key={member._id} className={styles.memberCard}>
-                    <div className={styles.memberAvatar}>
-                      {member.name?.charAt(0).toUpperCase() || member.email?.charAt(0).toUpperCase() || '?'}
+                group.members.map((member) => {
+                  const memberUser = member.user;
+                  const memberRole = member.role;
+                  const isCurrentUser = user?._id === memberUser?._id;
+                  const isMemberAdmin = memberRole === 'admin';
+                  const isMemberModerator = memberRole === 'moderator';
+                  
+                  return (
+                    <div 
+                      key={member._id} 
+                      className={`${styles.memberCard} ${isMemberAdmin ? styles.memberCardAdmin : ''}`}
+                    >
+                      {/* Avatar */}
+                      <div className={styles.memberAvatarContainer}>
+                        {isValidAvatar(memberUser?.avatar) ? (
+                          <img 
+                            src={memberUser.avatar} 
+                            alt={memberUser?.name || 'Miembro'} 
+                            className={styles.memberAvatarImg}
+                          />
+                        ) : (
+                          <div className={`${styles.memberAvatar} ${isMemberAdmin ? styles.memberAvatarAdmin : ''}`}>
+                            {getInitials(memberUser?.name)}
+                          </div>
+                        )}
+                        {isMemberAdmin && (
+                          <span className={styles.adminCrown}>👑</span>
+                        )}
+                      </div>
+
+                      {/* Info del miembro */}
+                      <div className={styles.memberContent}>
+                        <div className={styles.memberHeader}>
+                          <h3 className={styles.memberName}>
+                            {memberUser?.name || 'Usuario'}
+                            {isCurrentUser && <span className={styles.youBadge}>Tú</span>}
+                          </h3>
+                          <span className={`${styles.roleBadge} ${
+                            isMemberAdmin ? styles.roleBadgeAdmin : 
+                            isMemberModerator ? styles.roleBadgeMod : styles.roleBadgeMember
+                          }`}>
+                            {isMemberAdmin ? 'Admin' : isMemberModerator ? 'Moderador' : 'Miembro'}
+                          </span>
+                        </div>
+                        
+                        {/* Estadísticas del miembro */}
+                        <div className={styles.memberStats}>
+                          <div className={styles.memberStat}>
+                            <span className={styles.statIcon}>🎮</span>
+                            <span className={styles.statValue}>{memberUser?.stats?.totalMatches || 0}</span>
+                            <span className={styles.statLabel}>partidas</span>
+                          </div>
+                          <div className={styles.memberStat}>
+                            <span className={styles.statIcon}>🏆</span>
+                            <span className={styles.statValue}>{memberUser?.stats?.totalWins || 0}</span>
+                            <span className={styles.statLabel}>victorias</span>
+                          </div>
+                          <div className={styles.memberStat}>
+                            <span className={styles.statIcon}>⭐</span>
+                            <span className={styles.statValue}>{memberUser?.stats?.totalPoints || 0}</span>
+                            <span className={styles.statLabel}>puntos</span>
+                          </div>
+                        </div>
+
+                        {/* Fecha de unión */}
+                        {member.joinedAt && (
+                          <p className={styles.memberJoined}>
+                            Se unió el {formatJoinDate(member.joinedAt)}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className={styles.memberContent}>
-                      <h3 className={styles.memberName}>{member.name || member.email}</h3>
-                      <p className={styles.memberRole}>Miembro</p>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
+              )}
+
+              {/* Mensaje si no hay miembros */}
+              {(!group.members || group.members.length === 0) && (
+                <div className={styles.noMembers}>
+                  <p>No hay miembros en este grupo aún.</p>
+                  <p className={styles.noMembersHint}>¡Comparte el código de invitación para añadir miembros!</p>
+                </div>
               )}
             </div>
           </section>

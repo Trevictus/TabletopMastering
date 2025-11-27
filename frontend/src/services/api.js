@@ -56,8 +56,15 @@ const api = axios.create(API_CONFIG);
 
 /**
  * Map para almacenar peticiones en progreso y evitar duplicados
+ * Deshabilitado por defecto para evitar problemas con React StrictMode
  */
 const pendingRequests = new Map();
+
+/**
+ * Flag para habilitar/deshabilitar la cancelación de peticiones duplicadas
+ * Deshabilitado por defecto porque puede causar problemas con React 18 StrictMode
+ */
+const ENABLE_DUPLICATE_REQUEST_CANCELLATION = false;
 
 /**
  * Genera una key única para cada petición
@@ -68,13 +75,12 @@ const generateRequestKey = (config) => {
 };
 
 /**
- * Remueve una petición del mapa de pendientes
+ * Remueve una petición del mapa de pendientes (sin cancelarla)
  */
 const removePendingRequest = (config) => {
+  if (!ENABLE_DUPLICATE_REQUEST_CANCELLATION) return;
   const requestKey = generateRequestKey(config);
   if (pendingRequests.has(requestKey)) {
-    const cancelToken = pendingRequests.get(requestKey);
-    cancelToken.cancel('Petición duplicada cancelada');
     pendingRequests.delete(requestKey);
   }
 };
@@ -83,6 +89,7 @@ const removePendingRequest = (config) => {
  * Añade una petición al mapa de pendientes
  */
 const addPendingRequest = (config) => {
+  if (!ENABLE_DUPLICATE_REQUEST_CANCELLATION) return;
   const requestKey = generateRequestKey(config);
   config.cancelToken = config.cancelToken || new axios.CancelToken((cancel) => {
     if (!pendingRequests.has(requestKey)) {
