@@ -228,11 +228,13 @@ const Games = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               icon={<MdSearch />}
+              variant="compact"
               className={styles.searchInput}
             />
             
             <Button
               variant="outline"
+              size="small"
               onClick={() => setShowFilters(!showFilters)}
               className={styles.filterButton}
             >

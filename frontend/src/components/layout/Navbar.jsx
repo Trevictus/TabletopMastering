@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { GiPerspectiveDiceSixFacesRandom, GiCardPlay, GiTrophy, GiTeamIdea, GiScrollUnfurled } from 'react-icons/gi';
-import { MdPerson, MdExitToApp, MdHome } from 'react-icons/md';
+import { MdPerson, MdExitToApp, MdHome, MdCalendarToday } from 'react-icons/md';
 import { FaUserCircle } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../common/Button';
@@ -70,6 +70,12 @@ const Navbar = () => {
               <Link to="/groups" className={`${styles.navLink} ${isActive('/groups')}`}>
                 <GiTeamIdea className={styles.linkIcon} />
                 Grupos
+              </Link>
+            </li>
+            <li>
+              <Link to="/calendar" className={`${styles.navLink} ${isActive('/calendar')}`}>
+                <MdCalendarToday className={styles.linkIcon} />
+                Calendario
               </Link>
             </li>
             <li>

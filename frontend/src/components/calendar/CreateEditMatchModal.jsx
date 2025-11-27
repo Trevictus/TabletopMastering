@@ -98,11 +98,13 @@ const CreateEditMatchModal = ({ isOpen, onClose, onSave, match = null }) => {
       });
       setErrors({});
     } else if (!match && isOpen) {
-      // Resetear formulario
+      // Resetear formulario con la fecha de hoy
+      const today = new Date();
+      const dateStr = today.toISOString().split('T')[0];
       setFormData({
         gameId: '',
         groupId: '',
-        scheduledDate: new Date().toISOString().split('T')[0],
+        scheduledDate: dateStr,
         scheduledTime: '18:00',
         location: '',
         notes: '',

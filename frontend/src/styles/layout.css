@@ -124,7 +124,7 @@
 
 .main-content {
   flex: 1;
-  padding: var(--spacing-xl) 0;
+  padding: 0;
 }
 
 /* Dashboard grid */

@@ -123,6 +123,12 @@ const Groups = () => {
                 {group.description && (
                   <p className={styles.groupDescription}>{group.description}</p>
                 )}
+                {group.inviteCode && (
+                  <div className={styles.inviteCodeDisplay}>
+                    <span className={styles.inviteCodeLabel}>Código de invitación:</span>
+                    <span className={styles.inviteCodeValue}>{group.inviteCode}</span>
+                  </div>
+                )}
               </div>
 
               {/* Members Quick View */}

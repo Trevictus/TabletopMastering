@@ -8,49 +8,49 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid var(--border-color);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .calendarTitle {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-sm);
 }
 
 .calendarTitle h2 {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   color: var(--text-primary);
   margin: 0;
 }
 
 .todayButton {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
 }
 
 /* Días de la semana */
 .weekDays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
 }
 
 .weekDay {
   text-align: center;
   font-weight: 600;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   color: var(--text-secondary);
-  padding: 0.5rem;
+  padding: 0.25rem;
 }
 
 /* Cuadrícula de días */
 .daysGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 0.5rem;
-  min-height: 500px;
+  gap: 0.25rem;
+  min-height: 350px;
 }
 
 .emptyDay {
@@ -60,9 +60,9 @@
 .dayCell {
   background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  padding: 0.5rem;
-  min-height: 100px;
+  border-radius: var(--border-radius-sm);
+  padding: 0.35rem;
+  min-height: 70px;
   cursor: pointer;
   transition: all var(--transition-fast);
   position: relative;
@@ -74,8 +74,7 @@
 .dayCell:hover {
   background-color: var(--hover-bg);
   border-color: var(--primary-color);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .dayCell.today {
@@ -87,8 +86,8 @@
 .dayNumber {
   font-weight: 600;
   color: var(--text-primary);
-  font-size: var(--font-size-sm);
-  margin-bottom: 0.25rem;
+  font-size: var(--font-size-xs);
+  margin-bottom: 0.15rem;
 }
 
 /* Lista de partidas en el día */
@@ -103,9 +102,9 @@
 .matchItem {
   background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
   color: white;
-  padding: 0.4rem;
+  padding: 0.25rem 0.35rem;
   border-radius: var(--border-radius-sm);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   cursor: pointer;
   transition: all var(--transition-fast);
   position: relative;
@@ -121,8 +120,8 @@
 
 .matchTime {
   font-weight: 600;
-  margin-bottom: 0.15rem;
-  font-size: 0.65rem;
+  margin-bottom: 0.1rem;
+  font-size: 0.6rem;
 }
 
 .matchName {
@@ -185,9 +184,9 @@
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-sm);
   border-top: 1px solid var(--border-color);
   justify-content: center;
 }
@@ -195,14 +194,14 @@
 .legendItem {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: var(--font-size-sm);
+  gap: 0.35rem;
+  font-size: var(--font-size-xs);
   color: var(--text-secondary);
 }
 
 .legendBadge {
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   border-radius: var(--border-radius-sm);
   display: inline-block;
 }
@@ -230,43 +229,47 @@
 /* Responsive */
 @media (max-width: 768px) {
   .daysGrid {
-    gap: 0.25rem;
-    min-height: 400px;
+    gap: 0.15rem;
+    min-height: 300px;
   }
 
   .dayCell {
-    min-height: 80px;
-    padding: 0.3rem;
+    min-height: 60px;
+    padding: 0.25rem;
   }
 
   .dayNumber {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
   }
 
   .matchItem {
-    font-size: 0.6rem;
-    padding: 0.3rem;
+    font-size: 0.55rem;
+    padding: 0.2rem 0.25rem;
   }
 
   .matchTime {
-    font-size: 0.55rem;
+    font-size: 0.5rem;
   }
 
   .calendarTitle h2 {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-md);
   }
 
   .weekDay {
-    font-size: 0.7rem;
-    padding: 0.3rem;
+    font-size: 0.65rem;
+    padding: 0.2rem;
   }
 
   .legend {
-    font-size: 0.7rem;
+    gap: 0.35rem;
+  }
+
+  .legendItem {
+    font-size: 0.65rem;
   }
 
   .legendBadge {
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
   }
 }

@@ -70,6 +70,7 @@
 .small {
   padding: var(--spacing-sm) var(--spacing-lg);
   font-size: var(--font-size-md);
+  min-height: 44px;
 }
 
 .large {

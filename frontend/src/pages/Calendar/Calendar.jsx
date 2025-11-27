@@ -44,12 +44,16 @@ const Calendar = () => {
       setMatches(response.data || []);
     } catch (err) {
       console.error('Error al cargar partidas:', err);
-      setError(err.response?.data?.message || 'Error al cargar las partidas');
-      showToast('Error al cargar las partidas', 'error');
+      // Si el endpoint no existe (404), mostrar mensaje informativo
+      if (err.response?.status === 404) {
+        setError('El módulo de partidas aún no está disponible. Próximamente podrás gestionar tu calendario.');
+      } else {
+        setError(err.response?.data?.message || 'Error al cargar las partidas');
+      }
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, []);
 
   // Cargar partidas al montar
   useEffect(() => {
@@ -65,6 +69,7 @@ const Calendar = () => {
       setShowCreateModal(false);
     } catch (err) {
       showToast(err.response?.data?.message || 'Error al crear la partida', 'error');
+      throw err;
     }
   };
 
@@ -201,65 +206,45 @@ const Calendar = () => {
         <div className={styles.headerContent}>
           <div className={styles.headerTitle}>
             <MdCalendarToday className={styles.headerIcon} />
-            <div>
-              <h1>Calendario de Partidas</h1>
-              <p className={styles.subtitle}>
-                Gestiona tus partidas programadas de todos tus grupos
-              </p>
-            </div>
+            <h1>Calendario</h1>
           </div>
           <Button
             variant="primary"
+            size="small"
             onClick={() => setShowCreateModal(true)}
-            className={styles.createButton}
           >
             <MdAdd /> Nueva Partida
           </Button>
         </div>
       </div>
 
-      {/* Estadísticas */}
+      {/* Estadísticas compactas */}
       <div className={styles.statsBar}>
-        <Card variant="elevated" className={styles.statCard}>
-          <div className={styles.statIcon}>📅</div>
-          <div className={styles.statContent}>
-            <span className={styles.statValue}>{matches.length}</span>
-            <span className={styles.statLabel}>Total partidas</span>
-          </div>
-        </Card>
-
-        <Card variant="elevated" className={styles.statCard}>
-          <div className={styles.statIcon}>🎯</div>
-          <div className={styles.statContent}>
-            <span className={styles.statValue}>{upcomingMatches}</span>
-            <span className={styles.statLabel}>Próximas</span>
-          </div>
-        </Card>
-
+        <div className={styles.statItem}>
+          <span className={styles.statIcon}>📅</span>
+          <span className={styles.statValue}>{matches.length}</span>
+          <span className={styles.statLabel}>Total</span>
+        </div>
+        <div className={styles.statDivider}></div>
+        <div className={styles.statItem}>
+          <span className={styles.statIcon}>🎯</span>
+          <span className={styles.statValue}>{upcomingMatches}</span>
+          <span className={styles.statLabel}>Próximas</span>
+        </div>
         {pendingConfirmations > 0 && (
-          <Card variant="elevated" className={`${styles.statCard} ${styles.warning}`}>
-            <div className={styles.statIcon}>⏰</div>
-            <div className={styles.statContent}>
+          <>
+            <div className={styles.statDivider}></div>
+            <div className={`${styles.statItem} ${styles.warning}`}>
+              <span className={styles.statIcon}>⏰</span>
               <span className={styles.statValue}>{pendingConfirmations}</span>
-              <span className={styles.statLabel}>Pendientes de confirmar</span>
+              <span className={styles.statLabel}>Pendientes</span>
             </div>
-          </Card>
+          </>
         )}
       </div>
 
-      {/* Error */}
-      {error && (
-        <Card variant="elevated" className={styles.errorCard}>
-          <span>⚠️</span>
-          <span>{error}</span>
-        </Card>
-      )}
-
-      {/* Loading */}
-      {loading && <Loading message="Cargando calendario..." />}
-
       {/* Calendario */}
-      {!loading && (
+      {!loading ? (
         <Card variant="elevated" className={styles.calendarCard}>
           <CalendarGrid
             currentDate={currentDate}
@@ -269,24 +254,8 @@ const Calendar = () => {
             onMatchClick={handleMatchClick}
           />
         </Card>
-      )}
-
-      {/* Empty state */}
-      {!loading && matches.length === 0 && (
-        <Card variant="elevated" className={styles.emptyState}>
-          <GiDiceFire className={styles.emptyIcon} />
-          <h2 className={styles.emptyTitle}>No hay partidas programadas</h2>
-          <p className={styles.emptyDescription}>
-            Comienza creando tu primera partida con tus grupos
-          </p>
-          <Button
-            variant="primary"
-            onClick={() => setShowCreateModal(true)}
-            className={styles.emptyButton}
-          >
-            <MdAdd /> Crear Primera Partida
-          </Button>
-        </Card>
+      ) : (
+        <Loading message="Cargando..." />
       )}
 
       {/* Modal de crear/editar partida */}

@@ -231,6 +231,7 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               icon={<MdSearch />}
+              variant="compact"
             />
             <Button type="submit" size="small" disabled={loading || !searchQuery.trim()}>
               {loading ? 'Buscando...' : 'Buscar'}

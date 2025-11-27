@@ -16,6 +16,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .icon {
@@ -26,6 +27,7 @@
   align-items: center;
   pointer-events: none;
   font-size: 1.25rem;
+  z-index: 1;
 }
 
 .input {
@@ -40,6 +42,7 @@
   border-radius: var(--border-radius);
   transition: all var(--transition-fast);
   font-family: var(--font-family);
+  box-sizing: border-box;
 }
 
 .input:focus {
@@ -96,4 +99,24 @@
   margin-top: var(--spacing-xs);
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
+}
+
+/* Variante Compact */
+.compact {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-md);
+  border-radius: 8px;
+  height: 44px;
+}
+
+.compact.inputWithIcon {
+  padding-left: 2.75rem;
+}
+
+.formGroup[data-variant="compact"] {
+  margin-bottom: 0;
+}
+
+.formGroup[data-variant="compact"] .label {
+  display: none;
 }

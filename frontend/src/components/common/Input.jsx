@@ -27,6 +27,7 @@ const Input = ({
   helpText,
   disabled = false,
   required = false,
+  variant = 'default',
   icon,
   onChange,
   onBlur,
@@ -38,13 +39,21 @@ const Input = ({
     icon && styles.inputWithIcon,
     error && styles.error,
     disabled && styles.disabled,
+    variant === 'compact' && styles.compact,
     className
   ]
     .filter(Boolean)
     .join(' ');
 
+  const wrapperClasses = [
+    styles.inputWrapper,
+    variant === 'compact' && styles.compactWrapper
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <div className={styles.formGroup}>
+    <div className={styles.formGroup} data-variant={variant}>
       {label && (
         <label htmlFor={name} className={styles.label}>
           {label}
@@ -52,7 +61,7 @@ const Input = ({
         </label>
       )}
       
-      <div className={styles.inputWrapper}>
+      <div className={wrapperClasses}>
         {icon && <span className={styles.icon}>{icon}</span>}
         
         <input
@@ -94,6 +103,7 @@ Input.propTypes = {
   helpText: PropTypes.string,
   disabled: PropTypes.bool,
   required: PropTypes.bool,
+  variant: PropTypes.oneOf(['default', 'compact']),
   icon: PropTypes.node,
   onChange: PropTypes.func,
   onBlur: PropTypes.func,
