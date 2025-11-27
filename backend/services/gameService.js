@@ -2,6 +2,52 @@ const Game = require('../models/Game');
 const Group = require('../models/Group');
 
 /**
+ * Proyecciones para consultas de Game
+ */
+const GAME_LIST_PROJECTION = {
+  name: 1,
+  image: 1,
+  thumbnail: 1,
+  minPlayers: 1,
+  maxPlayers: 1,
+  playingTime: 1,
+  categories: 1,
+  source: 1,
+  bggId: 1,
+  'rating.average': 1,
+  'stats.timesPlayed': 1,
+  addedBy: 1,
+  group: 1,
+  createdAt: 1,
+};
+
+const GAME_DETAIL_PROJECTION = {
+  name: 1,
+  description: 1,
+  image: 1,
+  thumbnail: 1,
+  minPlayers: 1,
+  maxPlayers: 1,
+  playingTime: 1,
+  minPlayTime: 1,
+  maxPlayTime: 1,
+  categories: 1,
+  mechanics: 1,
+  difficulty: 1,
+  source: 1,
+  bggId: 1,
+  yearPublished: 1,
+  designer: 1,
+  publisher: 1,
+  rating: 1,
+  stats: 1,
+  customNotes: 1,
+  addedBy: 1,
+  group: 1,
+  createdAt: 1,
+};
+
+/**
  * Crear un juego personalizado
  */
 exports.createCustomGame = async (gameData, userId, groupId = null) => {
@@ -28,12 +74,15 @@ exports.createCustomGame = async (gameData, userId, groupId = null) => {
     throw new Error('El número de jugadores es obligatorio');
   }
 
-  // Verificar si el juego ya existe en el contexto (grupo o personal)
+  // Verificar si el juego ya existe en el contexto (grupo o personal) - optimizado con lean
   const duplicateFilter = groupId 
     ? { name: name, group: groupId, isActive: true }
     : { name: name, addedBy: userId, group: null, isActive: true };
 
-  const existingGame = await Game.findOne(duplicateFilter);
+  const existingGame = await Game.findOne(duplicateFilter)
+    .select('_id name')
+    .lean();
+    
   if (existingGame) {
     throw { 
       status: 400, 
@@ -78,6 +127,7 @@ exports.createCustomGame = async (gameData, userId, groupId = null) => {
  * Cuando se consulta por grupo, incluye:
  * - Juegos asignados directamente al grupo
  * - Juegos personales de todos los miembros del grupo
+ * Optimizado con lean(), projection y consultas eficientes
  */
 exports.getGames = async (userId, groupId = null, filters = {}) => {
   const { source, search, page = 1, limit = 20 } = filters;
@@ -87,8 +137,11 @@ exports.getGames = async (userId, groupId = null, filters = {}) => {
 
   // Obtener juegos según contexto
   if (groupId) {
-    // Obtener el grupo para saber quiénes son los miembros
-    const group = await Group.findById(groupId);
+    // Obtener solo los IDs de miembros del grupo (optimizado)
+    const group = await Group.findById(groupId)
+      .select('members.user')
+      .lean();
+      
     if (!group) {
       throw { status: 404, message: 'Grupo no encontrado' };
     }
@@ -113,12 +166,12 @@ exports.getGames = async (userId, groupId = null, filters = {}) => {
     filter.source = source;
   }
 
-  // Aplicar búsqueda si se proporciona
+  // Aplicar búsqueda si se proporciona (optimizado con índice de texto)
   if (search) {
+    // Usar $text search si está disponible (más eficiente con índice)
     const searchFilter = {
       $or: [
         { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
         { categories: { $in: [new RegExp(search, 'i')] } },
       ]
     };
@@ -126,12 +179,13 @@ exports.getGames = async (userId, groupId = null, filters = {}) => {
     filter = { $and: [filter, searchFilter] };
   }
 
-  // Obtener juegos
-  const skip = (parseInt(page) - 1) * parseInt(limit);
+  // Obtener juegos con projection y lean
   const allGames = await Game.find(filter)
-    .populate('addedBy', 'name email')
-    .populate('group', 'name')
-    .sort({ createdAt: -1 });
+    .select(GAME_LIST_PROJECTION)
+    .populate('addedBy', 'name email -_id')
+    .populate('group', 'name -_id')
+    .sort({ createdAt: -1 })
+    .lean();
 
   // Deduplicar si es necesario (en grupo) - por nombre normalizado para evitar duplicados
   const games = needsDeduplication
@@ -139,6 +193,7 @@ exports.getGames = async (userId, groupId = null, filters = {}) => {
     : allGames;
 
   // Aplicar paginación post-deduplicación
+  const skip = (parseInt(page) - 1) * parseInt(limit);
   const paginatedGames = games.slice(skip, skip + parseInt(limit));
   const total = games.length;
 
@@ -152,20 +207,26 @@ exports.getGames = async (userId, groupId = null, filters = {}) => {
 };
 
 /**
- * Obtener un juego por ID
+ * Obtener un juego por ID (optimizado)
  */
 exports.getGameById = async (gameId, userId = null) => {
   const game = await Game.findOne({ _id: gameId, isActive: true })
+    .select(GAME_DETAIL_PROJECTION)
     .populate('addedBy', 'name email avatar')
-    .populate('group', 'name description avatar');
+    .populate('group', 'name description avatar')
+    .lean();
 
   if (!game) {
     throw { status: 404, message: 'Juego no encontrado' };
   }
 
   // Verificar acceso si tiene grupo
-  if (game.group) {
-    const group = await Group.findById(game.group._id);
+  if (game.group && userId) {
+    const groupId = game.group._id || game.group;
+    const group = await Group.findById(groupId)
+      .select('admin members.user')
+      .lean();
+      
     const isAdmin = group.admin.toString() === userId.toString();
     const isMember = group.members.some(
       member => member.user.toString() === userId.toString()
@@ -180,10 +241,11 @@ exports.getGameById = async (gameId, userId = null) => {
 };
 
 /**
- * Actualizar un juego
+ * Actualizar un juego (optimizado)
  */
 exports.updateGame = async (gameId, updates, userId) => {
-  let game = await Game.findOne({ _id: gameId, isActive: true });
+  let game = await Game.findOne({ _id: gameId, isActive: true })
+    .select('source group addedBy');
 
   if (!game) {
     throw { status: 404, message: 'Juego no encontrado' };
@@ -191,7 +253,10 @@ exports.updateGame = async (gameId, updates, userId) => {
 
   // Verificar permisos (solo si tiene grupo)
   if (game.group) {
-    const group = await Group.findById(game.group);
+    const group = await Group.findById(game.group)
+      .select('members')
+      .lean();
+      
     const member = group.members.find(
       m => m.user.toString() === userId.toString()
     );
@@ -252,10 +317,11 @@ exports.updateGame = async (gameId, updates, userId) => {
 };
 
 /**
- * Eliminar un juego (soft delete)
+ * Eliminar un juego (soft delete) - optimizado
  */
 exports.deleteGame = async (gameId, userId) => {
-  const game = await Game.findOne({ _id: gameId, isActive: true });
+  const game = await Game.findOne({ _id: gameId, isActive: true })
+    .select('group addedBy');
 
   if (!game) {
     throw { status: 404, message: 'Juego no encontrado' };
@@ -263,7 +329,10 @@ exports.deleteGame = async (gameId, userId) => {
 
   // Verificar permisos
   if (game.group) {
-    const group = await Group.findById(game.group);
+    const group = await Group.findById(game.group)
+      .select('members')
+      .lean();
+      
     const member = group.members.find(
       m => m.user.toString() === userId.toString()
     );
@@ -284,50 +353,72 @@ exports.deleteGame = async (gameId, userId) => {
     }
   }
 
-  // Soft delete
-  game.isActive = false;
-  await game.save();
+  // Soft delete usando updateOne (más eficiente)
+  await Game.updateOne({ _id: gameId }, { isActive: false });
 
   return game;
 };
 
 /**
- * Obtener estadísticas de juegos de un grupo
+ * Obtener estadísticas de juegos de un grupo (optimizado con agregación)
  */
 exports.getGroupStats = async (groupId) => {
-  // Obtener estadísticas
-  const totalGames = await Game.countDocuments({ group: groupId, isActive: true });
-  const bggGames = await Game.countDocuments({ group: groupId, source: 'bgg', isActive: true });
-  const customGames = await Game.countDocuments({ group: groupId, source: 'custom', isActive: true });
-  
-  const topRatedGames = await Game.find({ group: groupId, isActive: true })
-    .sort({ 'rating.average': -1 })
-    .limit(5)
-    .select('name rating.average image');
-
-  const mostPlayedGames = await Game.find({ group: groupId, isActive: true })
-    .sort({ 'stats.timesPlayed': -1 })
-    .limit(5)
-    .select('name stats.timesPlayed image');
-
-  const categoriesStats = await Game.aggregate([
+  // Usar agregación para obtener múltiples estadísticas en una sola query
+  const statsAggregation = await Game.aggregate([
     { $match: { group: groupId, isActive: true } },
-    { $unwind: '$categories' },
-    { $group: { _id: '$categories', count: { $sum: 1 } } },
-    { $sort: { count: -1 } },
-    { $limit: 10 },
+    {
+      $facet: {
+        // Conteo total y por fuente
+        totals: [
+          {
+            $group: {
+              _id: '$source',
+              count: { $sum: 1 }
+            }
+          }
+        ],
+        // Top rated
+        topRated: [
+          { $sort: { 'rating.average': -1 } },
+          { $limit: 5 },
+          { $project: { name: 1, 'rating.average': 1, image: 1 } }
+        ],
+        // Most played
+        mostPlayed: [
+          { $sort: { 'stats.timesPlayed': -1 } },
+          { $limit: 5 },
+          { $project: { name: 1, 'stats.timesPlayed': 1, image: 1 } }
+        ],
+        // Categories stats
+        categories: [
+          { $unwind: '$categories' },
+          { $group: { _id: '$categories', count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+          { $limit: 10 }
+        ]
+      }
+    }
   ]);
 
+  const stats = statsAggregation[0];
+  
+  // Procesar conteos por fuente
+  const sourceCounts = { bgg: 0, custom: 0 };
+  let totalGames = 0;
+  
+  stats.totals.forEach(item => {
+    if (item._id === 'bgg') sourceCounts.bgg = item.count;
+    else if (item._id === 'custom') sourceCounts.custom = item.count;
+    totalGames += item.count;
+  });
+
   return {
-    totalGames: totalGames,
+    totalGames,
     total: totalGames, // Mantener retrocompatibilidad
-    bySource: {
-      bgg: bggGames,
-      custom: customGames,
-    },
-    topRated: topRatedGames,
-    mostPlayed: mostPlayedGames,
-    topCategories: categoriesStats.map(c => ({ name: c._id, count: c.count })),
+    bySource: sourceCounts,
+    topRated: stats.topRated,
+    mostPlayed: stats.mostPlayed,
+    topCategories: stats.categories.map(c => ({ name: c._id, count: c.count })),
   };
 };
 

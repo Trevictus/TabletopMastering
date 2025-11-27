@@ -154,11 +154,16 @@ const gameSchema = new mongoose.Schema(
 );
 
 // Índices para búsquedas más eficientes
-gameSchema.index({ name: 'text', description: 'text' });
-gameSchema.index({ group: 1, name: 1 });
-gameSchema.index({ bggId: 1 }, { sparse: true });
-gameSchema.index({ source: 1 });
-gameSchema.index({ 'rating.average': -1 });
+gameSchema.index({ name: 'text', description: 'text' });  // Búsqueda de texto completo
+gameSchema.index({ group: 1, name: 1 });  // Juegos por grupo ordenados por nombre
+gameSchema.index({ group: 1, isActive: 1, createdAt: -1 });  // Juegos activos de grupo por fecha
+gameSchema.index({ bggId: 1 }, { sparse: true });  // Búsqueda por ID de BGG (sparse para nulls)
+gameSchema.index({ source: 1, isActive: 1 });  // Filtrar por fuente
+gameSchema.index({ 'rating.average': -1, isActive: 1 });  // Top rated juegos activos
+gameSchema.index({ addedBy: 1, group: 1, isActive: 1 });  // Juegos personales vs grupo
+gameSchema.index({ 'stats.timesPlayed': -1, isActive: 1 });  // Juegos más jugados
+gameSchema.index({ categories: 1 });  // Filtrar por categoría
+gameSchema.index({ minPlayers: 1, maxPlayers: 1 });  // Filtrar por número de jugadores
 
 // Método para verificar si necesita actualización desde BGG (30 días)
 gameSchema.methods.needsBGGUpdate = function() {

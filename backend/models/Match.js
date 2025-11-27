@@ -94,9 +94,13 @@ const matchSchema = new mongoose.Schema(
 );
 
 // Índices para búsquedas eficientes
-matchSchema.index({ group: 1, scheduledDate: -1 });
-matchSchema.index({ game: 1, status: 1 });
-matchSchema.index({ 'players.user': 1 });
+matchSchema.index({ group: 1, scheduledDate: -1 });  // Partidas por grupo ordenadas por fecha
+matchSchema.index({ group: 1, status: 1, scheduledDate: -1 });  // Filtrar por grupo+estado+fecha
+matchSchema.index({ game: 1, status: 1 });  // Estadísticas por juego
+matchSchema.index({ 'players.user': 1, status: 1 });  // Partidas de un usuario por estado
+matchSchema.index({ createdBy: 1, createdAt: -1 });  // Partidas creadas por usuario
+matchSchema.index({ status: 1, scheduledDate: 1 });  // Próximas partidas programadas
+matchSchema.index({ winner: 1 }, { sparse: true });  // Consultas de ganadores (sparse para optimizar)
 
 // Validación: al menos 2 jugadores
 matchSchema.pre('save', function (next) {

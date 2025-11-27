@@ -2,7 +2,7 @@ const Group = require('../models/Group');
 const User = require('../models/User');
 
 /**
- * Genera un código de invitación único
+ * Genera un código de invitación único (optimizado con exists)
  * @returns {Promise<string>} Código de invitación único
  */
 const generateUniqueInviteCode = async () => {
@@ -13,8 +13,9 @@ const generateUniqueInviteCode = async () => {
 
   while (!isUnique && attempts < maxAttempts) {
     inviteCode = Group.generateInviteCode();
-    const existingGroup = await Group.findOne({ inviteCode });
-    if (!existingGroup) {
+    // Usar exists en lugar de findOne (más eficiente)
+    const exists = await Group.exists({ inviteCode });
+    if (!exists) {
       isUnique = true;
     }
     attempts++;
@@ -28,15 +29,14 @@ const generateUniqueInviteCode = async () => {
 };
 
 /**
- * Añade un grupo al array de grupos del usuario
+ * Añade un grupo al array de grupos del usuario (ya optimizado con $addToSet)
  * @param {ObjectId} userId - ID del usuario
  * @param {ObjectId} groupId - ID del grupo
  */
 const addGroupToUser = async (userId, groupId) => {
-  await User.findByIdAndUpdate(
-    userId,
-    { $addToSet: { groups: groupId } }, // $addToSet evita duplicados
-    { runValidators: true }
+  await User.updateOne(
+    { _id: userId },
+    { $addToSet: { groups: groupId } }
   );
 };
 
@@ -46,10 +46,9 @@ const addGroupToUser = async (userId, groupId) => {
  * @param {ObjectId} groupId - ID del grupo
  */
 const removeGroupFromUser = async (userId, groupId) => {
-  await User.findByIdAndUpdate(
-    userId,
-    { $pull: { groups: groupId } },
-    { runValidators: true }
+  await User.updateOne(
+    { _id: userId },
+    { $pull: { groups: groupId } }
   );
 };
 
@@ -115,18 +114,25 @@ const removeMemberFromGroup = async (group, userId) => {
 };
 
 /**
- * Opciones de populate estándar para grupos
+ * Opciones de populate estándar para grupos (optimizado con select mínimo)
  */
 const groupPopulateOptions = [
-  { path: 'admin', select: 'name email avatar' },
-  { path: 'members.user', select: 'name email avatar stats createdAt' },
+  { path: 'admin', select: 'name email avatar -_id' },
+  { path: 'members.user', select: 'name email avatar stats -_id' },
 ];
 
 /**
  * Opciones de populate simplificadas (sin miembros completos)
  */
 const groupPopulateOptionsSimple = [
-  { path: 'admin', select: 'name email avatar' },
+  { path: 'admin', select: 'name avatar -_id' },
+];
+
+/**
+ * Opciones de populate para listados (mínimo necesario)
+ */
+const groupPopulateOptionsList = [
+  { path: 'admin', select: 'name -_id' },
 ];
 
 module.exports = {
@@ -138,4 +144,5 @@ module.exports = {
   removeMemberFromGroup,
   groupPopulateOptions,
   groupPopulateOptionsSimple,
+  groupPopulateOptionsList,
 };

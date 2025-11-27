@@ -68,10 +68,14 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Índices para mejorar rendimiento de rankings
-userSchema.index({ 'stats.totalPoints': -1 });
-userSchema.index({ groups: 1, 'stats.totalPoints': -1 });
-userSchema.index({ isActive: 1, 'stats.totalPoints': -1 });
+// Índices para mejorar rendimiento de rankings y búsquedas
+// Nota: email ya tiene índice único implícito por unique: true en el schema
+userSchema.index({ 'stats.totalPoints': -1 });  // Ranking global por puntos
+userSchema.index({ groups: 1, 'stats.totalPoints': -1 });  // Ranking por grupo
+userSchema.index({ isActive: 1, 'stats.totalPoints': -1 });  // Ranking de usuarios activos
+userSchema.index({ 'stats.totalWins': -1 });  // Ranking por victorias
+userSchema.index({ createdAt: -1 });  // Usuarios más recientes
+userSchema.index({ name: 'text' });  // Búsqueda de texto en nombre
 
 // Middleware para hashear la contraseña antes de guardar
 userSchema.pre('save', async function (next) {

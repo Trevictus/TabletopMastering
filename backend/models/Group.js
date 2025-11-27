@@ -145,10 +145,12 @@ groupSchema.set('toJSON', { virtuals: true });
 groupSchema.set('toObject', { virtuals: true });
 
 // Índices para optimizar búsquedas
-groupSchema.index({ inviteCode: 1 }, { unique: true });
-groupSchema.index({ admin: 1 });
-groupSchema.index({ 'members.user': 1 });
-groupSchema.index({ isActive: 1, createdAt: -1 }); // Para listar grupos activos ordenados
-groupSchema.index({ 'members.user': 1, isActive: 1 }); // Índice compuesto para búsquedas de grupos de usuario
+groupSchema.index({ inviteCode: 1 }, { unique: true });  // Búsqueda por código de invitación
+groupSchema.index({ admin: 1 });  // Grupos de un administrador
+groupSchema.index({ 'members.user': 1 });  // Búsqueda de grupos por miembro
+groupSchema.index({ isActive: 1, createdAt: -1 });  // Listar grupos activos ordenados
+groupSchema.index({ 'members.user': 1, isActive: 1 });  // Índice compuesto para grupos activos de usuario
+groupSchema.index({ name: 'text', description: 'text' });  // Búsqueda de texto en nombre y descripción
+groupSchema.index({ 'stats.totalMatches': -1 });  // Grupos más activos
 
 module.exports = mongoose.model('Group', groupSchema);

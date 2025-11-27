@@ -3,31 +3,47 @@ const pointsCalculator = require('./pointsCalculator');
 
 /**
  * Servicio para manejar ranking y estadísticas de usuarios
+ * Optimizado con lean(), projections y consultas eficientes
  */
 
 /**
- * Actualiza los puntos de un usuario
+ * Proyección para datos de ranking
+ */
+const RANKING_USER_PROJECTION = {
+  name: 1,
+  avatar: 1,
+  stats: 1,
+};
+
+/**
+ * Actualiza los puntos de un usuario (usando findByIdAndUpdate atómico)
  * @param {string} userId - ID del usuario
  * @param {number} pointsEarned - Puntos ganados
  * @param {boolean} isWinner - Si fue ganador
  * @returns {object} Usuario actualizado
  */
 const updateUserPoints = async (userId, pointsEarned, isWinner = false) => {
-  const user = await User.findById(userId);
+  const updateOps = {
+    $inc: {
+      'stats.totalPoints': pointsEarned,
+      'stats.totalMatches': 1,
+    }
+  };
+  
+  if (isWinner) {
+    updateOps.$inc['stats.totalWins'] = 1;
+  }
+  
+  const user = await User.findByIdAndUpdate(
+    userId,
+    updateOps,
+    { new: true, select: 'stats' }
+  ).lean();
   
   if (!user) {
     throw new Error(`Usuario ${userId} no encontrado`);
   }
 
-  // Actualizar stats
-  user.stats.totalPoints += pointsEarned;
-  user.stats.totalMatches += 1;
-  
-  if (isWinner) {
-    user.stats.totalWins += 1;
-  }
-
-  await user.save();
   return user;
 };
 
@@ -70,7 +86,7 @@ const updateMatchStatistics = async (match) => {
 };
 
 /**
- * Obtiene el ranking de un grupo
+ * Obtiene el ranking de un grupo (optimizado con lean y projection)
  * @param {string} groupId - ID del grupo
  * @returns {Array} Array de usuarios ordenados por puntos
  */
@@ -78,8 +94,9 @@ const getGroupRanking = async (groupId) => {
   const users = await User.find({
     groups: groupId,
   })
-    .select('name avatar stats')
-    .sort({ 'stats.totalPoints': -1 });
+    .select(RANKING_USER_PROJECTION)
+    .sort({ 'stats.totalPoints': -1 })
+    .lean();
 
   return users.map((user, index) => ({
     position: index + 1,
@@ -96,13 +113,14 @@ const getGroupRanking = async (groupId) => {
 };
 
 /**
- * Obtiene el ranking global de todos los usuarios
+ * Obtiene el ranking global de todos los usuarios (optimizado con lean y projection)
  * @returns {Array} Array de usuarios ordenados por puntos
  */
 const getGlobalRanking = async () => {
   const users = await User.find({ isActive: true })
-    .select('name avatar stats')
-    .sort({ 'stats.totalPoints': -1 });
+    .select(RANKING_USER_PROJECTION)
+    .sort({ 'stats.totalPoints': -1 })
+    .lean();
 
   return users.map((user, index) => ({
     position: index + 1,

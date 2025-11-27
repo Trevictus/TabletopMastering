@@ -3,14 +3,17 @@ const Group = require('../models/Group');
 const bggService = require('./bggService');
 
 /**
- * Validar y obtener acceso al grupo para operaciones BGG
+ * Validar y obtener acceso al grupo para operaciones BGG (optimizado)
  */
 exports.validateGroupAccess = async (groupId, userId) => {
   if (!groupId) {
     return null;
   }
 
-  const group = await Group.findById(groupId);
+  const group = await Group.findById(groupId)
+    .select('admin members.user')
+    .lean();
+    
   if (!group) {
     throw { status: 404, message: 'Grupo no encontrado' };
   }
@@ -54,7 +57,7 @@ exports.getBGGGameDetails = async (bggId) => {
 };
 
 /**
- * Añadir un juego de BGG
+ * Añadir un juego de BGG (optimizado)
  */
 exports.addBGGGame = async (bggId, userId, groupId = null, customNotes = '') => {
   // Validaciones
@@ -64,7 +67,10 @@ exports.addBGGGame = async (bggId, userId, groupId = null, customNotes = '') => 
 
   // Verificar que el grupo existe y el usuario es miembro o admin (si se proporciona)
   if (groupId) {
-    const group = await Group.findById(groupId);
+    const group = await Group.findById(groupId)
+      .select('admin members.user')
+      .lean();
+      
     if (!group) {
       throw { status: 404, message: 'Grupo no encontrado' };
     }
@@ -78,12 +84,14 @@ exports.addBGGGame = async (bggId, userId, groupId = null, customNotes = '') => 
       throw { status: 403, message: 'No eres miembro de este grupo' };
     }
 
-    // Verificar si el juego ya existe en el grupo
+    // Verificar si el juego ya existe en el grupo (optimizado con exists)
     const existingGame = await Game.findOne({ 
       bggId: bggId, 
       group: groupId,
       isActive: true 
-    });
+    })
+      .select('_id name')
+      .lean();
 
     if (existingGame) {
       throw { 
@@ -99,7 +107,9 @@ exports.addBGGGame = async (bggId, userId, groupId = null, customNotes = '') => 
       addedBy: userId,
       group: null,
       isActive: true 
-    });
+    })
+      .select('_id name')
+      .lean();
 
     if (existingGame) {
       throw { 
@@ -122,10 +132,12 @@ exports.addBGGGame = async (bggId, userId, groupId = null, customNotes = '') => 
     isActive: true,
   });
 
-  // Verificar que el juego se guardó correctamente y popularlo
+  // Verificar que el juego se guardó y devolver con populate mínimo
   const savedGame = await Game.findById(game._id)
-    .populate('addedBy', 'name email')
-    .populate('group', 'name');
+    .select('name image thumbnail minPlayers maxPlayers source bggId addedBy group createdAt')
+    .populate('addedBy', 'name -_id')
+    .populate('group', 'name -_id')
+    .lean();
 
   if (!savedGame) {
     throw new Error('Error al guardar el juego en la base de datos');
@@ -135,10 +147,11 @@ exports.addBGGGame = async (bggId, userId, groupId = null, customNotes = '') => 
 };
 
 /**
- * Sincronizar juego de BGG (actualizar datos)
+ * Sincronizar juego de BGG (actualizar datos) - optimizado
  */
 exports.syncBGGGame = async (gameId, userId) => {
-  const game = await Game.findOne({ _id: gameId, isActive: true });
+  const game = await Game.findOne({ _id: gameId, isActive: true })
+    .select('source bggId group');
 
   if (!game) {
     throw { status: 404, message: 'Juego no encontrado' };
@@ -148,9 +161,12 @@ exports.syncBGGGame = async (gameId, userId) => {
     throw new Error('Este endpoint solo funciona con juegos de BGG');
   }
 
-  // Verificar permisos
+  // Verificar permisos si tiene grupo
   if (game.group) {
-    const group = await Group.findById(game.group);
+    const group = await Group.findById(game.group)
+      .select('admin members.user')
+      .lean();
+      
     const isAdmin = group.admin.toString() === userId.toString();
     const isMember = group.members.some(
       m => m.user.toString() === userId.toString()
@@ -167,30 +183,35 @@ exports.syncBGGGame = async (gameId, userId) => {
   // Obtener datos actualizados de BGG
   const bggData = await bggService.getGameDetails(game.bggId);
 
-  // Actualizar el juego directamente para evitar problemas de validación cruzada
-  game.name = bggData.name;
-  game.description = bggData.description;
-  game.image = bggData.image;
-  game.thumbnail = bggData.thumbnail;
-  game.yearPublished = bggData.yearPublished;
-  game.minPlayers = bggData.minPlayers;
-  game.maxPlayers = bggData.maxPlayers;
-  game.playingTime = bggData.playingTime;
-  game.minPlayTime = bggData.minPlayTime;
-  game.maxPlayTime = bggData.maxPlayTime;
-  game.categories = bggData.categories;
-  game.mechanics = bggData.mechanics;
-  game.designer = bggData.designer;
-  game.publisher = bggData.publisher;
-  game.rating = bggData.rating;
-  game.bggLastSync = new Date();
+  // Usar findByIdAndUpdate para una actualización atómica y eficiente
+  const updatedGame = await Game.findByIdAndUpdate(
+    gameId,
+    {
+      $set: {
+        name: bggData.name,
+        description: bggData.description,
+        image: bggData.image,
+        thumbnail: bggData.thumbnail,
+        yearPublished: bggData.yearPublished,
+        minPlayers: bggData.minPlayers,
+        maxPlayers: bggData.maxPlayers,
+        playingTime: bggData.playingTime,
+        minPlayTime: bggData.minPlayTime,
+        maxPlayTime: bggData.maxPlayTime,
+        categories: bggData.categories,
+        mechanics: bggData.mechanics,
+        designer: bggData.designer,
+        publisher: bggData.publisher,
+        rating: bggData.rating,
+        bggLastSync: new Date(),
+      }
+    },
+    { new: true }
+  )
+    .populate('addedBy', 'name -_id')
+    .populate('group', 'name -_id')
+    .lean();
 
-  // Guardar y popular
-  const updatedGame = await game.save();
-  await updatedGame.populate('addedBy', 'name email');
-  await updatedGame.populate('group', 'name');
-
-  // Verificar que la sincronización fue exitosa
   if (!updatedGame) {
     throw new Error('Error al sincronizar el juego con BGG');
   }

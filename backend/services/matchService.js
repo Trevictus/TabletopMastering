@@ -6,29 +6,54 @@ const pointsCalculator = require('./pointsCalculator');
 const rankingService = require('./rankingService');
 
 /**
- * Constantes de populate
+ * Constantes de populate optimizadas con proyecciones mínimas
  */
 const MATCH_POPULATE_OPTIONS = [
-  { path: 'game', select: 'name image' },
-  { path: 'group', select: 'name' },
-  { path: 'players.user', select: 'name email avatar' },
-  { path: 'createdBy', select: 'name email avatar' },
-  { path: 'winner', select: 'name email avatar' },
+  { path: 'game', select: 'name image thumbnail -_id', options: { lean: true } },
+  { path: 'group', select: 'name -_id', options: { lean: true } },
+  { path: 'players.user', select: 'name avatar -_id', options: { lean: true } },
+  { path: 'createdBy', select: 'name avatar -_id', options: { lean: true } },
+  { path: 'winner', select: 'name avatar -_id', options: { lean: true } },
+];
+
+const MATCH_POPULATE_LIST = [
+  { path: 'game', select: 'name image -_id', options: { lean: true } },
+  { path: 'group', select: 'name -_id', options: { lean: true } },
+  { path: 'players.user', select: 'name avatar -_id', options: { lean: true } },
+  { path: 'createdBy', select: 'name -_id', options: { lean: true } },
 ];
 
 const MATCH_POPULATE_DETAILED = [
-  { path: 'game', select: 'name image description' },
-  { path: 'group', select: 'name avatar' },
-  { path: 'players.user', select: 'name email avatar' },
-  { path: 'createdBy', select: 'name email avatar' },
-  { path: 'winner', select: 'name email avatar' },
+  { path: 'game', select: 'name image description minPlayers maxPlayers playingTime', options: { lean: true } },
+  { path: 'group', select: 'name avatar', options: { lean: true } },
+  { path: 'players.user', select: 'name email avatar stats', options: { lean: true } },
+  { path: 'createdBy', select: 'name email avatar', options: { lean: true } },
+  { path: 'winner', select: 'name email avatar', options: { lean: true } },
 ];
 
 /**
- * Validar que el usuario es miembro del grupo
+ * Proyecciones para consultas de Match
+ */
+const MATCH_LIST_PROJECTION = {
+  game: 1,
+  group: 1,
+  scheduledDate: 1,
+  status: 1,
+  location: 1,
+  players: 1,
+  winner: 1,
+  createdBy: 1,
+  createdAt: 1,
+};
+
+/**
+ * Validar que el usuario es miembro del grupo (optimizado con projection)
  */
 exports.validateGroupMembership = async (groupId, userId) => {
-  const group = await Group.findById(groupId);
+  const group = await Group.findById(groupId)
+    .select('members')
+    .lean();
+    
   if (!group) {
     throw { status: 404, message: 'Grupo no encontrado' };
   }
@@ -53,26 +78,39 @@ exports.createMatch = async (gameId, groupId, scheduledDate, userId, playerIds =
     throw new Error('gameId, groupId y scheduledDate son obligatorios');
   }
 
-  // Verificar que el juego existe
-  const game = await Game.findById(gameId).populate('group');
+  // Verificar que el juego existe (solo necesitamos saber que existe)
+  const game = await Game.findById(gameId)
+    .select('_id name group')
+    .lean();
+    
   if (!game) {
     throw { status: 404, message: 'Juego no encontrado' };
   }
 
-  // Verificar que el grupo existe y el usuario es miembro
-  const group = await this.validateGroupMembership(groupId, userId);
+  // Verificar que el grupo existe y el usuario es miembro (usando projection)
+  const group = await Group.findById(groupId)
+    .select('members')
+    .lean();
+    
+  if (!group) {
+    throw { status: 404, message: 'Grupo no encontrado' };
+  }
+  
+  const memberUserIds = new Set(group.members.map(m => m.user.toString()));
+  
+  if (!memberUserIds.has(userId.toString())) {
+    throw { status: 403, message: 'No eres miembro de este grupo' };
+  }
 
   // Validar fecha
   if (new Date(scheduledDate) < new Date()) {
     throw new Error('La fecha de la partida no puede ser en el pasado');
   }
 
-  // Preparar jugadores
-  let players = [];
+  // Preparar jugadores usando Set para unicidad
   const userIdStr = userId.toString();
-  
-  // Asegurar que el creador siempre esté incluido
   const uniquePlayerIds = new Set();
+  
   if (playerIds && Array.isArray(playerIds) && playerIds.length > 0) {
     playerIds.forEach(id => uniquePlayerIds.add(id.toString()));
   }
@@ -81,18 +119,14 @@ exports.createMatch = async (gameId, groupId, scheduledDate, userId, playerIds =
     uniquePlayerIds.add(userIdStr);
   }
   
-  // Validar que todos los jugadores existen y son miembros del grupo
+  // Validar que todos los jugadores son miembros del grupo (optimizado sin queries adicionales)
+  const players = [];
   for (const playerId of uniquePlayerIds) {
-    const user = await User.findById(playerId);
-    if (!user) {
-      throw { status: 404, message: `Usuario ${playerId} no encontrado` };
-    }
-
-    const isPlayerMember = group.members.some(
-      member => member.user.toString() === playerId
-    );
-    if (!isPlayerMember) {
-      throw { status: 403, message: `El usuario ${user.name} no es miembro del grupo` };
+    if (!memberUserIds.has(playerId)) {
+      // Solo hacemos query si el usuario no está en el grupo
+      const user = await User.findById(playerId).select('name').lean();
+      const userName = user ? user.name : playerId;
+      throw { status: 403, message: `El usuario ${userName} no es miembro del grupo` };
     }
 
     players.push({
@@ -124,7 +158,7 @@ exports.createMatch = async (gameId, groupId, scheduledDate, userId, playerIds =
 };
 
 /**
- * Listar partidas con filtros
+ * Listar partidas con filtros (optimizado con lean y projection)
  */
 exports.getMatches = async (groupId, userId, status = null, page = 1, limit = 20) => {
   // Construir filtro
@@ -136,10 +170,12 @@ exports.getMatches = async (groupId, userId, status = null, page = 1, limit = 20
     filter.group = groupId;
   } else {
     // Si no hay groupId, obtener todas las partidas donde el usuario es jugador
-    // Primero obtener todos los grupos del usuario
+    // Optimizado: solo obtener _id de grupos
     const userGroups = await Group.find({
       'members.user': userId
-    }).select('_id');
+    })
+      .select('_id')
+      .lean();
     
     const groupIds = userGroups.map(g => g._id);
     filter.group = { $in: groupIds };
@@ -151,38 +187,47 @@ exports.getMatches = async (groupId, userId, status = null, page = 1, limit = 20
 
   // Paginación
   const skip = (parseInt(page) - 1) * parseInt(limit);
+  const limitNum = parseInt(limit);
 
-  // Consulta
-  const matches = await Match.find(filter)
-    .populate(MATCH_POPULATE_OPTIONS)
-    .sort({ scheduledDate: -1 })
-    .skip(skip)
-    .limit(parseInt(limit));
-
-  // Total de documentos
-  const total = await Match.countDocuments(filter);
+  // Consultas en paralelo para mejor rendimiento
+  const [matches, total] = await Promise.all([
+    Match.find(filter)
+      .select(MATCH_LIST_PROJECTION)
+      .populate(MATCH_POPULATE_LIST)
+      .sort({ scheduledDate: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .lean(),
+    Match.countDocuments(filter)
+  ]);
 
   return {
     matches,
     count: matches.length,
     total,
-    pages: Math.ceil(total / parseInt(limit)),
+    pages: Math.ceil(total / limitNum),
     currentPage: parseInt(page),
   };
 };
 
 /**
- * Obtener una partida por ID con acceso verificado
+ * Obtener una partida por ID con acceso verificado (optimizado)
  */
 exports.getMatchById = async (matchId, userId) => {
-  const match = await Match.findById(matchId).populate(MATCH_POPULATE_DETAILED);
+  const match = await Match.findById(matchId)
+    .populate(MATCH_POPULATE_DETAILED)
+    .lean();
 
   if (!match) {
     throw { status: 404, message: 'Partida no encontrada' };
   }
 
-  // Verificar permiso de acceso
-  const group = await Group.findById(match.group._id);
+  // Verificar permiso de acceso (usando datos ya cargados del populate)
+  const groupId = match.group._id || match.group;
+  const group = await Group.findById(groupId)
+    .select('members')
+    .lean();
+    
   const isMember = group.members.some(
     member => member.user.toString() === userId.toString()
   );
@@ -195,18 +240,28 @@ exports.getMatchById = async (matchId, userId) => {
 };
 
 /**
- * Actualizar una partida
+ * Actualizar una partida (optimizado)
  */
 exports.updateMatch = async (matchId, updates, userId) => {
-  const match = await Match.findById(matchId);
+  // Solo obtener los campos necesarios para validación
+  const match = await Match.findById(matchId)
+    .select('createdBy group status scheduledDate location notes');
+    
   if (!match) {
     throw { status: 404, message: 'Partida no encontrada' };
   }
 
   // Solo el creador o admin del grupo puede editar
   const isCreator = match.createdBy.toString() === userId.toString();
-  const group = await Group.findById(match.group);
-  const isGroupAdmin = group.admin.toString() === userId.toString();
+  
+  // Solo consultar grupo si no es el creador
+  let isGroupAdmin = false;
+  if (!isCreator) {
+    const group = await Group.findById(match.group)
+      .select('admin')
+      .lean();
+    isGroupAdmin = group.admin.toString() === userId.toString();
+  }
 
   if (!isCreator && !isGroupAdmin) {
     throw { status: 403, message: 'No tienes permiso para editar esta partida' };
@@ -235,7 +290,7 @@ exports.updateMatch = async (matchId, updates, userId) => {
 };
 
 /**
- * Finalizar una partida y registrar resultados
+ * Finalizar una partida y registrar resultados (optimizado)
  */
 exports.finishMatch = async (matchId, userId, winnerId = null, results = [], duration = null, notes = null) => {
   const match = await Match.findById(matchId);
@@ -245,8 +300,15 @@ exports.finishMatch = async (matchId, userId, winnerId = null, results = [], dur
 
   // Solo el creador o admin del grupo puede terminar
   const isCreator = match.createdBy.toString() === userId.toString();
-  const group = await Group.findById(match.group);
-  const isGroupAdmin = group.admin.toString() === userId.toString();
+  
+  // Solo consultar grupo si no es el creador
+  let isGroupAdmin = false;
+  if (!isCreator) {
+    const group = await Group.findById(match.group)
+      .select('admin')
+      .lean();
+    isGroupAdmin = group.admin.toString() === userId.toString();
+  }
 
   if (!isCreator && !isGroupAdmin) {
     throw { status: 403, message: 'No tienes permiso para terminar esta partida' };
@@ -327,10 +389,12 @@ exports.finishMatch = async (matchId, userId, winnerId = null, results = [], dur
 };
 
 /**
- * Confirmar asistencia a partida
+ * Confirmar asistencia a partida (optimizado)
  */
 exports.confirmAttendance = async (matchId, userId) => {
-  const match = await Match.findById(matchId);
+  const match = await Match.findById(matchId)
+    .select('players status');
+    
   if (!match) {
     throw { status: 404, message: 'Partida no encontrada' };
   }
@@ -359,18 +423,27 @@ exports.confirmAttendance = async (matchId, userId) => {
 };
 
 /**
- * Eliminar una partida
+ * Eliminar una partida (optimizado)
  */
 exports.deleteMatch = async (matchId, userId) => {
-  const match = await Match.findById(matchId);
+  const match = await Match.findById(matchId)
+    .select('createdBy group status');
+    
   if (!match) {
     throw { status: 404, message: 'Partida no encontrada' };
   }
 
   // Solo el creador o admin del grupo puede eliminar
   const isCreator = match.createdBy.toString() === userId.toString();
-  const group = await Group.findById(match.group);
-  const isGroupAdmin = group.admin.toString() === userId.toString();
+  
+  // Solo consultar grupo si no es el creador
+  let isGroupAdmin = false;
+  if (!isCreator) {
+    const group = await Group.findById(match.group)
+      .select('admin')
+      .lean();
+    isGroupAdmin = group.admin.toString() === userId.toString();
+  }
 
   if (!isCreator && !isGroupAdmin) {
     throw { status: 403, message: 'No tienes permiso para eliminar esta partida' };
@@ -394,11 +467,14 @@ exports.getGlobalRanking = async () => {
 };
 
 /**
- * Obtener ranking de un grupo
+ * Obtener ranking de un grupo (optimizado)
  */
 exports.getGroupRanking = async (groupId, userId) => {
-  // Verificar que el grupo existe
-  const group = await Group.findById(groupId);
+  // Verificar que el grupo existe y el usuario es miembro en una sola query
+  const group = await Group.findById(groupId)
+    .select('members')
+    .lean();
+    
   if (!group) {
     throw { status: 404, message: 'Grupo no encontrado' };
   }
