@@ -214,7 +214,7 @@ const MatchDetailsModal = ({
               <div>
                 <span className={styles.label}>Creado por:</span>
                 <span className={styles.value}>
-                  {match.createdBy?.username || match.createdBy?.email || 'Desconocido'}
+                  {match.createdBy?.name || match.createdBy?.email || 'Desconocido'}
                   {isCreator && ' (Tú)'}
                 </span>
               </div>
@@ -242,7 +242,7 @@ const MatchDetailsModal = ({
             {match.players && match.players.length > 0 ? (
               match.players.map((player, index) => {
                 const playerId = player.user?._id || player.user;
-                const playerName = player.user?.username || player.user?.email || 'Usuario';
+                const playerName = player.user?.name || player.user?.email || 'Usuario';
                 const isCurrentUser = playerId === user?._id;
                 
                 return (

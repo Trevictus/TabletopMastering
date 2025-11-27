@@ -346,7 +346,7 @@ const CreateEditMatchModal = ({ isOpen, onClose, onSave, match = null }) => {
             <div className={styles.playersList}>
               {groupMembers.map(member => {
                 const userId = member.user?._id || member.user;
-                const userName = member.user?.username || member.user?.email || 'Usuario';
+                const userName = member.user?.name || member.user?.email || 'Usuario';
                 const isSelected = formData.playerIds.includes(userId);
                 
                 return (

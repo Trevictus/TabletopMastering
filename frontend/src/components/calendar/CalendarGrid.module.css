@@ -8,49 +8,55 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-md);
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid var(--border-color);
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--bg-tertiary);
 }
 
 .calendarTitle {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
 }
 
 .calendarTitle h2 {
-  font-size: var(--font-size-lg);
-  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--primary-color);
   margin: 0;
 }
 
 .todayButton {
   font-size: var(--font-size-xs);
+  padding: 0.25rem 0.75rem;
 }
 
 /* Días de la semana */
 .weekDays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 0.25rem;
-  margin-bottom: 0.25rem;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .weekDay {
   text-align: center;
-  font-weight: 600;
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
-  padding: 0.25rem;
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  color: var(--primary-color);
+  padding: 0.5rem;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.05) 0%, rgba(212, 175, 55, 0.05) 100%);
+  border-radius: var(--border-radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* Cuadrícula de días */
 .daysGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 0.25rem;
-  min-height: 350px;
+  gap: 0.5rem;
+  min-height: 400px;
 }
 
 .emptyDay {
@@ -59,12 +65,12 @@
 
 .dayCell {
   background-color: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
-  padding: 0.35rem;
-  min-height: 70px;
+  border: 1px solid rgba(139, 125, 107, 0.15);
+  border-radius: var(--border-radius);
+  padding: 0.5rem;
+  min-height: 85px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -72,169 +78,249 @@
 }
 
 .dayCell:hover {
-  background-color: var(--hover-bg);
+  background-color: var(--bg-secondary);
   border-color: var(--primary-color);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.15);
+  transform: translateY(-2px);
 }
 
 .dayCell.today {
-  background-color: #fff8e6;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.15) 100%);
   border: 2px solid var(--accent-color);
-  font-weight: 700;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.dayCell.today:hover {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0.2) 100%);
 }
 
 .dayNumber {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
-  font-size: var(--font-size-xs);
-  margin-bottom: 0.15rem;
+  font-size: var(--font-size-sm);
+  margin-bottom: 0.35rem;
+}
+
+.dayCell.today .dayNumber {
+  color: var(--accent-dark);
 }
 
 /* Lista de partidas en el día */
 .matchesList {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.35rem;
   overflow-y: auto;
   flex: 1;
 }
 
 .matchItem {
-  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
-  color: white;
-  padding: 0.25rem 0.35rem;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: var(--text-light);
+  padding: 0.35rem 0.5rem;
   border-radius: var(--border-radius-sm);
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .matchItem:hover {
-  transform: scale(1.02);
-  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  filter: brightness(1.1);
+}
+
+.matchItem:active {
+  transform: translateY(0);
 }
 
 .matchTime {
-  font-weight: 600;
-  margin-bottom: 0.1rem;
-  font-size: 0.6rem;
+  font-weight: 700;
+  margin-bottom: 0.15rem;
+  font-size: 0.65rem;
+  opacity: 0.9;
 }
 
 .matchName {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: 500;
 }
 
-/* Estados de partidas */
+/* Estados de partidas - Usando la paleta de colores del proyecto */
 .matchItem.programada {
-  background: linear-gradient(135deg, #5a6c7d 0%, #4a5c6d 100%);
+  background: linear-gradient(135deg, var(--info-color) 0%, #4a5a6a 100%);
 }
 
 .matchItem.en_curso {
-  background: linear-gradient(135deg, #3d6b1f 0%, #2d5016 100%);
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
 }
 
 .matchItem.finalizada {
-  background: linear-gradient(135deg, #8b7d6b 0%, #6b5d4b 100%);
+  background: linear-gradient(135deg, var(--text-tertiary) 0%, var(--text-secondary) 100%);
 }
 
 .matchItem.cancelada {
-  background: linear-gradient(135deg, #a8a8a8 0%, #888888 100%);
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
   text-decoration: line-through;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
-/* Partida próxima (24h) */
+/* Partida próxima (24h) - Usa el color de acento dorado */
 .matchItem.upcoming {
-  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
-  animation: pulse 2s infinite;
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
+  animation: gentlePulse 3s ease-in-out infinite;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-@keyframes pulse {
+@keyframes gentlePulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7);
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0);
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.6);
   }
 }
 
 .upcomingBadge {
   position: absolute;
-  top: 2px;
-  right: 2px;
-  font-size: 0.7rem;
+  top: 3px;
+  right: 4px;
+  font-size: 0.65rem;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .moreMatches {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
   text-align: center;
-  padding: 0.25rem;
-  background-color: var(--bg-tertiary);
+  padding: 0.35rem;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
   border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  border: 1px solid var(--border-color);
 }
 
 /* Leyenda */
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-md);
-  padding-top: var(--spacing-sm);
-  border-top: 1px solid var(--border-color);
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+  border-top: 2px solid var(--bg-tertiary);
   justify-content: center;
 }
 
 .legendItem {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: var(--font-size-xs);
+  gap: 0.5rem;
+  font-size: var(--font-size-sm);
   color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .legendBadge {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: var(--border-radius-sm);
   display: inline-block;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .legendBadge.programada {
-  background: linear-gradient(135deg, #5a6c7d 0%, #4a5c6d 100%);
+  background: linear-gradient(135deg, var(--info-color) 0%, #4a5a6a 100%);
 }
 
 .legendBadge.upcoming {
-  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
 }
 
 .legendBadge.en_curso {
-  background: linear-gradient(135deg, #3d6b1f 0%, #2d5016 100%);
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
 }
 
 .legendBadge.finalizada {
-  background: linear-gradient(135deg, #8b7d6b 0%, #6b5d4b 100%);
+  background: linear-gradient(135deg, var(--text-tertiary) 0%, var(--text-secondary) 100%);
 }
 
 .legendBadge.cancelada {
-  background: linear-gradient(135deg, #a8a8a8 0%, #888888 100%);
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .daysGrid {
-    gap: 0.15rem;
-    min-height: 300px;
+    gap: 0.25rem;
+    min-height: 320px;
+  }
+
+  .weekDays {
+    gap: 0.25rem;
+  }
+
+  .weekDay {
+    font-size: 0.7rem;
+    padding: 0.35rem;
   }
 
   .dayCell {
-    min-height: 60px;
+    min-height: 70px;
+    padding: 0.35rem;
+    border-radius: var(--border-radius-sm);
+  }
+
+  .dayNumber {
+    font-size: 0.75rem;
+  }
+
+  .matchItem {
+    font-size: 0.6rem;
+    padding: 0.25rem 0.35rem;
+  }
+
+  .matchTime {
+    font-size: 0.55rem;
+  }
+
+  .calendarTitle h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  .legend {
+    gap: 0.5rem;
+  }
+
+  .legendItem {
+    font-size: 0.75rem;
+  }
+
+  .legendBadge {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendarHeader {
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .daysGrid {
+    gap: 0.15rem;
+    min-height: 280px;
+  }
+
+  .dayCell {
+    min-height: 55px;
     padding: 0.25rem;
   }
 
@@ -248,28 +334,12 @@
   }
 
   .matchTime {
-    font-size: 0.5rem;
-  }
-
-  .calendarTitle h2 {
-    font-size: var(--font-size-md);
+    display: none;
   }
 
   .weekDay {
-    font-size: 0.65rem;
-    padding: 0.2rem;
-  }
-
-  .legend {
-    gap: 0.35rem;
-  }
-
-  .legendItem {
-    font-size: 0.65rem;
-  }
-
-  .legendBadge {
-    width: 12px;
-    height: 12px;
+    font-size: 0.6rem;
+    padding: 0.25rem;
+    letter-spacing: 0;
   }
 }
