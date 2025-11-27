@@ -1,11 +1,11 @@
-# 📖 Guía de Usuario - Tabletop Mastering
+# Guía de Usuario - Tabletop Mastering
 
-## 🎯 ¿Qué es Tabletop Mastering?
+## ¿Qué es Tabletop Mastering?
 Aplicación web para gestionar partidas de juegos de mesa en grupo: organiza sesiones, registra resultados, lleva estadísticas y consulta tu historial.
 
 ---
 
-## 🚀 Inicio Rápido
+## Inicio Rápido
 
 ### 1. Acceder a la aplicación
 Abre tu navegador en: `http://localhost` (o la URL proporcionada)
@@ -23,7 +23,7 @@ Abre tu navegador en: `http://localhost` (o la URL proporcionada)
 
 ---
 
-## 👥 Grupos
+## Grupos
 
 ### Crear un grupo
 1. Ve a **"Grupos"** en la barra superior
@@ -46,7 +46,7 @@ Abre tu navegador en: `http://localhost` (o la URL proporcionada)
 
 ---
 
-## 🎮 Juegos
+## Juegos
 
 ### Ver catálogo
 1. Ve a **"Juegos"** en la barra superior
@@ -81,7 +81,7 @@ Abre tu navegador en: `http://localhost` (o la URL proporcionada)
 
 ---
 
-## 🎲 Partidas (En desarrollo)
+## Partidas (En desarrollo)
 
 ### Crear partida
 1. Selecciona un juego
@@ -99,7 +99,7 @@ Abre tu navegador en: `http://localhost` (o la URL proporcionada)
 
 ---
 
-## 📊 Historial
+## Historial
 
 ### Ver historial de partidas
 1. Ve a **"Historial"** en la barra superior
@@ -120,7 +120,7 @@ Abre tu navegador en: `http://localhost` (o la URL proporcionada)
 
 ---
 
-## 🏆 Rankings (Próximamente)
+## Rankings (Próximamente)
 
 Consulta tu posición y la de otros jugadores:
 - Por grupo
@@ -129,7 +129,7 @@ Consulta tu posición y la de otros jugadores:
 
 ---
 
-## 👤 Perfil
+## Perfil
 
 ### Ver perfil
 1. Click en el icono de **perfil** (esquina superior derecha)
@@ -159,7 +159,7 @@ Visualiza tus próximas partidas programadas en formato calendario.
 
 ---
 
-## ❓ Preguntas Frecuentes
+## Preguntas Frecuentes
 
 ### ¿Cómo invito a mis amigos?
 Comparte el **código del grupo** (8 caracteres). Lo encuentras en los detalles del grupo.
