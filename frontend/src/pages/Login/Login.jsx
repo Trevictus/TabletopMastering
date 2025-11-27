@@ -14,7 +14,7 @@ const Login = () => {
   const { login } = useAuth();
   const toast = useToast();
 
-  const from = location.state?.from || '/dashboard';
+  const from = location.state?.from || '/home';
   const [formData, setFormData] = useState({
     email: '',
     password: '',

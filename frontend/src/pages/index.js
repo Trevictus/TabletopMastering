@@ -9,5 +9,6 @@ export { default as Groups } from './Groups/Groups';
 export { default as CreateGroup } from './Groups/CreateGroup';
 export { default as GroupDetail } from './GroupDetail/GroupDetail';
 export { default as Calendar } from './Calendar/Calendar';
+export { default as History } from './History/History';
 export { default as NotFound } from './NotFound/NotFound';
 

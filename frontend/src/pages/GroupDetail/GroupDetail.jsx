@@ -22,10 +22,6 @@ const GroupDetail = () => {
   const [error, setError] = useState('');
   const [copiedCode, setCopiedCode] = useState(false);
 
-  useEffect(() => {
-    loadGroupDetail();
-  }, [id]);
-
   const loadGroupDetail = async () => {
     setLoading(true);
     setError('');
@@ -40,6 +36,10 @@ const GroupDetail = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadGroupDetail();
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCopyCode = () => {
     if (group?.inviteCode) {

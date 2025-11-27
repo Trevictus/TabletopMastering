@@ -6,7 +6,7 @@ import { ToastContainer } from './components/common/Toast';
 import ProtectedRoute from './components/routes/ProtectedRoute';
 import PublicRoute from './components/routes/PublicRoute';
 import Navbar from './components/layout/Navbar';
-import { Home, Login, Register, Dashboard, Profile, Games, Rankings, Groups, CreateGroup, GroupDetail, Calendar, NotFound } from './pages';
+import { Home, Login, Register, Dashboard, Profile, Games, Rankings, Groups, CreateGroup, GroupDetail, Calendar, History, NotFound } from './pages';
 import './styles/variables.css';
 import './styles/components.css';
 import './styles/layout.css';
@@ -28,7 +28,7 @@ function AppContent() {
             <Route path="/register" element={<Home />} />
 
             <Route 
-              path="/dashboard" 
+              path="/home" 
               element={
                 <ProtectedRoute>
                   <Dashboard />
@@ -88,6 +88,14 @@ function AppContent() {
               element={
                 <ProtectedRoute>
                   <Calendar />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/history" 
+              element={
+                <ProtectedRoute>
+                  <History />
                 </ProtectedRoute>
               } 
             />

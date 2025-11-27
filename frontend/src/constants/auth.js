@@ -42,7 +42,7 @@ export const AUTH_SUCCESS = {
 export const AUTH_ROUTES = {
   LOGIN: '/login',
   REGISTER: '/register',
-  DASHBOARD: '/dashboard',
+  DASHBOARD: '/home',
   PROFILE: '/profile',
   HOME: '/',
 };

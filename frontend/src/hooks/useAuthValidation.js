@@ -24,9 +24,9 @@ export const useAuthValidation = () => {
 
   /**
    * Requiere que el usuario NO esté autenticado
-   * Redirige a dashboard si ya lo está
+   * Redirige a inicio si ya lo está
    */
-  const requireGuest = (redirectTo = '/dashboard') => {
+  const requireGuest = (redirectTo = '/home') => {
     useEffect(() => {
       if (!loading && isAuthenticated) {
         navigate(redirectTo, { replace: true });

@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { GiPerspectiveDiceSixFacesRandom, GiCardPlay, GiTrophy, GiTeamIdea } from 'react-icons/gi';
-import { MdPerson, MdExitToApp, MdDashboard } from 'react-icons/md';
+import { GiPerspectiveDiceSixFacesRandom, GiCardPlay, GiTrophy, GiTeamIdea, GiScrollUnfurled } from 'react-icons/gi';
+import { MdPerson, MdExitToApp, MdHome } from 'react-icons/md';
 import { FaUserCircle } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../common/Button';
@@ -27,7 +27,7 @@ const Navbar = () => {
   return (
     <nav className={styles.navbar}>
       <div className={styles.container}>
-        <Link to={isAuthenticated ? "/dashboard" : "/"} className={styles.brand}>
+        <Link to={isAuthenticated ? "/home" : "/"} className={styles.brand}>
           <GiPerspectiveDiceSixFacesRandom className={styles.brandIcon} />
           <span>Tabletop Mastering</span>
         </Link>
@@ -61,8 +61,8 @@ const Navbar = () => {
         {isAuthenticated && (
           <ul className={styles.nav}>
             <li>
-              <Link to="/dashboard" className={`${styles.navLink} ${isActive('/dashboard')}`}>
-                <MdDashboard className={styles.linkIcon} />
+              <Link to="/home" className={`${styles.navLink} ${isActive('/home')}`}>
+                <MdHome className={styles.linkIcon} />
                 Inicio
               </Link>
             </li>
@@ -82,6 +82,12 @@ const Navbar = () => {
               <Link to="/rankings" className={`${styles.navLink} ${isActive('/rankings')}`}>
                 <GiTrophy className={styles.linkIcon} />
                 Rankings
+              </Link>
+            </li>
+            <li>
+              <Link to="/history" className={`${styles.navLink} ${isActive('/history')}`}>
+                <GiScrollUnfurled className={styles.linkIcon} />
+                Historial
               </Link>
             </li>
             <li>

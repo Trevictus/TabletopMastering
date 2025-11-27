@@ -16,9 +16,9 @@ const PublicRoute = ({ children }) => {
     return <Loading fullScreen message="Cargando..." />;
   }
 
-  // Si está autenticado, redirigir al dashboard
+  // Si está autenticado, redirigir al inicio
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   // Si no está autenticado, mostrar el contenido (login/register)

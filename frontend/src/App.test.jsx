@@ -22,7 +22,7 @@ function App() {
               {/* Rutas Públicas */}
               <Route path="/" element={<Home />} />
               
-              {/* Rutas Públicas (redirigen a dashboard si ya está autenticado) */}
+              {/* Rutas Públicas (redirigen a inicio si ya está autenticado) */}
               <Route 
                 path="/login" 
                 element={
@@ -42,7 +42,7 @@ function App() {
 
               {/* Rutas Protegidas (requieren autenticación) */}
               <Route 
-                path="/dashboard" 
+                path="/home" 
                 element={
                   <ProtectedRoute>
                     <Dashboard />

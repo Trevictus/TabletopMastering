@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { useGroup } from '../../context/GroupContext';
 import { MdArrowBack } from 'react-icons/md';
 import { GiTeamIdea } from 'react-icons/gi';
@@ -15,7 +14,6 @@ import groupService from '../../services/groupService';
  */
 const CreateGroup = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { loadGroups } = useGroup();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -50,10 +48,15 @@ const CreateGroup = () => {
       // Recargar grupos
       await loadGroups();
 
-      // Navegar a grupos
-      navigate('/groups', {
-        state: { message: `✅ Grupo "${formData.name}" creado exitosamente` }
-      });
+      // Navegar al grupo recién creado o a la lista de grupos
+      const groupId = response.data?._id || response.data?.id;
+      if (groupId) {
+        navigate(`/groups/${groupId}`);
+      } else {
+        navigate('/groups', {
+          state: { message: `✅ Grupo "${formData.name}" creado exitosamente` }
+        });
+      }
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Error al crear el grupo');
     } finally {

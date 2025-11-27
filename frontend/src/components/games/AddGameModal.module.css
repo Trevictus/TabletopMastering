@@ -27,8 +27,43 @@
   margin-bottom: 1rem;
   background: transparent;
   align-items: center;
+  justify-content: flex-start;
   width: 100%;
   max-width: 500px;
+}
+
+.searchForm > div:first-child {
+  flex: 1;
+  max-width: 360px;
+}
+
+/* Ajustar input del modal */
+.searchForm .inputWrapper .input {
+  font-size: 0.875rem !important;
+  padding: 0.4rem 0.65rem !important;
+  padding-left: 2.2rem !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  box-sizing: border-box !important;
+  line-height: 1.3 !important;
+}
+
+.searchForm .icon {
+  font-size: 0.95rem !important;
+  left: 0.65rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.searchForm button {
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 0.4rem 0.85rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.3 !important;
+  flex-shrink: 0;
 }
 
 .error {

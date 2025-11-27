@@ -14,7 +14,7 @@ import styles from './Home.module.css';
 /**
  * Página de inicio (Home)
  * Muestra landing page para no autenticados
- * Redirige a Dashboard si está autenticado
+ * Redirige a Inicio si está autenticado
  */
 const Home = () => {
   const location = useLocation();
@@ -23,19 +23,19 @@ const Home = () => {
   const [welcomeMessage, setWelcomeMessage] = useState('');
 
   useEffect(() => {
-    // Si está autenticado y entra directamente a /, redirigir a dashboard
+    // Si está autenticado y entra directamente a /, redirigir a inicio
     if (!loading && isAuthenticated) {
       const currentPath = location.pathname;
       // Solo redirigir si está en /, /login o /register
       if (currentPath === '/' || currentPath === '/login' || currentPath === '/register') {
-        navigate('/dashboard', { replace: true });
+        navigate('/home', { replace: true });
         return;
       }
       
       // Si viene de una ruta protegida, también redirigir
       const from = location.state?.from;
       if (from && from !== '/' && from !== '/login' && from !== '/register') {
-        navigate('/dashboard', { replace: true });
+        navigate('/home', { replace: true });
       }
     }
 

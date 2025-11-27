@@ -16,7 +16,7 @@ import gameService from '../../services/gameService';
 import styles from './Dashboard.module.css';
 
 /**
- * Página Dashboard - Panel principal del usuario autenticado
+ * Página Inicio - Panel principal del usuario autenticado
  * Muestra resumen de actividad, estadísticas y accesos rápidos
  */
 const Dashboard = () => {
