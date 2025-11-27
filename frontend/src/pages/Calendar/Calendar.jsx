@@ -41,6 +41,8 @@ const Calendar = () => {
         limit: 1000 // Cargar todas las partidas
       });
       
+      // La respuesta tiene estructura { success, count, total, pages, currentPage, data }
+      // donde 'data' es el array de partidas
       setMatches(response.data || []);
     } catch (err) {
       console.error('Error al cargar partidas:', err);

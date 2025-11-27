@@ -15,6 +15,17 @@ const getFirstDayOfMonth = (year, month) => {
   return new Date(year, month, 1).getDay();
 };
 
+/**
+ * Formatea una fecha a YYYY-MM-DD en hora local (sin problemas de zona horaria)
+ */
+const formatDateLocal = (date) => {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const DAYS_OF_WEEK = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 const MONTHS = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -48,12 +59,11 @@ const CalendarGrid = ({
     // Días del mes actual
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = formatDateLocal(date);
       
-      // Filtrar partidas de este día
+      // Filtrar partidas de este día (comparando en hora local)
       const dayMatches = matches.filter(match => {
-        const matchDate = new Date(match.scheduledDate);
-        return matchDate.toISOString().split('T')[0] === dateStr;
+        return formatDateLocal(match.scheduledDate) === dateStr;
       });
 
       days.push({
@@ -62,7 +72,7 @@ const CalendarGrid = ({
         date,
         dateStr,
         matches: dayMatches,
-        isToday: dateStr === new Date().toISOString().split('T')[0],
+        isToday: dateStr === formatDateLocal(new Date()),
         key: `day-${day}`
       });
     }
