@@ -85,6 +85,21 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Ruta de bienvenida para /api
+app.get('/api', (req, res) => {
+  res.json({
+    success: true,
+    message: '🎲 Bienvenido a Tabletop Mastering API',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth',
+      groups: '/api/groups',
+      games: '/api/games',
+      matches: '/api/matches',
+    },
+  });
+});
+
 // Rutas de la API
 app.use('/api/auth', authRoutes);
 app.use('/api/groups', groupRoutes);
