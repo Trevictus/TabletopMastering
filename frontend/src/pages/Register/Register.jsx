@@ -16,6 +16,14 @@ const Register = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
+  // Cerrar modal al hacer clic fuera del formulario
+  const handleOverlayClick = (e) => {
+    // Solo cerrar si el clic fue directamente en el overlay, no en el formulario
+    if (e.target === e.currentTarget) {
+      navigate('/');
+    }
+  };
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -262,9 +270,9 @@ const Register = () => {
   };
 
   return (
-    <div className={styles.registerPage}>
+    <div className={styles.registerPage} onClick={handleOverlayClick}>
       <div className={styles.registerContainer}>
-        <div className={styles.registerCard}>
+        <div className={styles.registerCard} onClick={(e) => e.stopPropagation()}>
           {/* Header */}
           <div className={styles.header}>
             <GiPerspectiveDiceSixFacesRandom className={styles.icon} />
@@ -292,7 +300,7 @@ const Register = () => {
               placeholder="Tu nombre"
               error={touched.name ? errors.name : ''}
               required
-              icon={<MdPerson size={24} />}
+              icon={<MdPerson size={16} />}
               onChange={handleChange}
               onBlur={handleBlur}
               autoComplete="name"
@@ -307,7 +315,7 @@ const Register = () => {
               placeholder="tu-email@ejemplo.com"
               error={touched.email ? errors.email : ''}
               required
-              icon={<MdEmail size={24} />}
+              icon={<MdEmail size={16} />}
               onChange={handleChange}
               onBlur={handleBlur}
               autoComplete="email"
@@ -323,7 +331,7 @@ const Register = () => {
                 placeholder="••••••••"
                 error={touched.password ? errors.password : ''}
                 required
-                icon={<MdLock size={24} />}
+                icon={<MdLock size={16} />}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 autoComplete="new-password"
@@ -360,7 +368,7 @@ const Register = () => {
               placeholder="••••••••"
               error={touched.confirmPassword ? errors.confirmPassword : ''}
               required
-              icon={<MdLock size={24} />}
+              icon={<MdLock size={16} />}
               onChange={handleChange}
               onBlur={handleBlur}
               autoComplete="new-password"

@@ -10,7 +10,7 @@ exports.createGameValidation = [
     .isLength({ min: 2, max: 150 }).withMessage('El nombre debe tener entre 2 y 150 caracteres'),
   
   body('description')
-    .optional()
+    .optional({ values: 'falsy' })
     .trim()
     .isLength({ max: 2000 }).withMessage('La descripción no puede exceder 2000 caracteres'),
   
@@ -37,30 +37,51 @@ exports.createGameValidation = [
     }),
   
   body('playingTime')
-    .optional()
+    .optional({ values: 'falsy' })
     .isInt({ min: 0 }).withMessage('El tiempo de juego debe ser un número positivo'),
   
   body('categories')
-    .optional()
-    .isArray().withMessage('Las categorías deben ser un array'),
+    .optional({ values: 'falsy' })
+    .custom((value) => {
+      // Permitir arrays vacíos o arrays de strings
+      if (Array.isArray(value)) return true;
+      return false;
+    })
+    .withMessage('Las categorías deben ser un array'),
   
   body('mechanics')
-    .optional()
-    .isArray().withMessage('Las mecánicas deben ser un array'),
+    .optional({ values: 'falsy' })
+    .custom((value) => {
+      // Permitir arrays vacíos o arrays de strings
+      if (Array.isArray(value)) return true;
+      return false;
+    })
+    .withMessage('Las mecánicas deben ser un array'),
   
   body('difficulty')
-    .optional()
+    .optional({ values: 'falsy' })
     .isIn(['fácil', 'medio', 'difícil', 'experto', '']).withMessage('Dificultad inválida'),
   
   body('yearPublished')
-    .optional()
+    .optional({ values: 'falsy' })
     .isInt({ min: 1800, max: new Date().getFullYear() + 5 })
     .withMessage('Año de publicación inválido'),
   
   body('image')
-    .optional()
+    .optional({ values: 'falsy' })
     .trim()
-    .isURL().withMessage('La URL de la imagen no es válida'),
+    .custom((value) => {
+      // Si el valor está vacío después del trim, permitirlo
+      if (!value || value === '') return true;
+      // Si tiene valor, debe ser una URL válida
+      try {
+        new URL(value);
+        return true;
+      } catch {
+        return false;
+      }
+    })
+    .withMessage('La URL de la imagen no es válida'),
 ];
 
 /**

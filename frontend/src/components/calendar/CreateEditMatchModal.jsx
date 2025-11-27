@@ -60,7 +60,9 @@ const CreateEditMatchModal = ({ isOpen, onClose, onSave, match = null }) => {
   const loadGroupMembers = useCallback(async (groupId) => {
     try {
       const response = await groupService.getGroupMembers(groupId);
-      setGroupMembers(response.data?.members || []);
+      // La respuesta tiene la estructura { success, count, data: [...miembros] }
+      // donde data es directamente el array de miembros
+      setGroupMembers(response.data || []);
     } catch (err) {
       console.error('Error al cargar miembros:', err);
       setErrors(prev => ({ ...prev, members: 'Error al cargar miembros' }));
@@ -180,8 +182,16 @@ const CreateEditMatchModal = ({ isOpen, onClose, onSave, match = null }) => {
       newErrors.scheduledDate = 'La fecha es obligatoria';
     }
 
-    if (formData.playerIds.length < 2) {
-      newErrors.playerIds = 'Debes seleccionar al menos 2 jugadores';
+    // Asegurar que el usuario actual esté incluido en los jugadores
+    const userIdStr = user?._id?.toString();
+    let finalPlayerIds = [...formData.playerIds];
+    if (userIdStr && !finalPlayerIds.includes(userIdStr)) {
+      finalPlayerIds.push(userIdStr);
+    }
+
+    // Validar que haya al menos 2 jugadores (incluyendo al usuario actual)
+    if (finalPlayerIds.length < 2) {
+      newErrors.playerIds = 'Debes seleccionar al menos 1 jugador adicional (tú ya estás incluido)';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -191,6 +201,7 @@ const CreateEditMatchModal = ({ isOpen, onClose, onSave, match = null }) => {
     }
 
     setLoading(true);
+    setErrors({}); // Limpiar errores previos
 
     try {
       // Combinar fecha y hora
@@ -202,7 +213,7 @@ const CreateEditMatchModal = ({ isOpen, onClose, onSave, match = null }) => {
         scheduledDate: scheduledDateTime.toISOString(),
         location: formData.location,
         notes: formData.notes,
-        playerIds: formData.playerIds
+        playerIds: finalPlayerIds
       };
 
       console.log('Enviando matchData:', matchData);
@@ -331,7 +342,7 @@ const CreateEditMatchModal = ({ isOpen, onClose, onSave, match = null }) => {
         {/* Jugadores */}
         {formData.groupId && groupMembers.length > 0 && (
           <div className={styles.formGroup}>
-            <label>Jugadores Invitados * (mínimo 2)</label>
+            <label>Jugadores Invitados * (mínimo 1 adicional, tú ya estás incluido)</label>
             <div className={styles.playersList}>
               {groupMembers.map(member => {
                 const userId = member.user?._id || member.user;
@@ -346,7 +357,7 @@ const CreateEditMatchModal = ({ isOpen, onClose, onSave, match = null }) => {
                       onChange={() => handlePlayerToggle(userId)}
                     />
                     <span>{userName}</span>
-                    {userId === user?._id && <span className={styles.youBadge}>(Tú)</span>}
+                    {userId === user?._id && <span className={styles.youBadge}>(Tú - incluido automáticamente)</span>}
                   </label>
                 );
               })}

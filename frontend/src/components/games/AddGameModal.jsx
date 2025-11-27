@@ -171,16 +171,33 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
     setError('');
 
     try {
+      // Limpiar y preparar los datos antes de enviar
       const gameData = {
-        ...customGame,
+        name: customGame.name.trim(),
+        description: customGame.description?.trim() || '',
+        minPlayers: parseInt(customGame.minPlayers) || 1,
+        maxPlayers: parseInt(customGame.maxPlayers) || 4,
+        playingTime: parseInt(customGame.playingTime) || 0,
+        yearPublished: parseInt(customGame.yearPublished) || undefined,
         groupId: groupId || null,
         categories: customGame.categories 
-          ? customGame.categories.split(',').map(c => c.trim()) 
+          ? customGame.categories.split(',').map(c => c.trim()).filter(c => c.length > 0)
           : [],
         mechanics: customGame.mechanics 
-          ? customGame.mechanics.split(',').map(m => m.trim()) 
+          ? customGame.mechanics.split(',').map(m => m.trim()).filter(m => m.length > 0)
           : []
       };
+
+      // Solo incluir image si es una URL válida
+      const imageUrl = customGame.image?.trim();
+      if (imageUrl && imageUrl.length > 1) {
+        try {
+          new URL(imageUrl);
+          gameData.image = imageUrl;
+        } catch {
+          // Si no es una URL válida, no la incluimos
+        }
+      }
 
       const response = await gameService.createCustomGame(gameData);
       
@@ -191,7 +208,14 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
       onGameAdded(response.data);
       handleClose();
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Error al crear juego';
+      // Mostrar errores de validación específicos si existen
+      const validationErrors = err.response?.data?.errors;
+      let errorMsg = err.response?.data?.message || 'Error al crear juego';
+      
+      if (validationErrors && Array.isArray(validationErrors)) {
+        errorMsg = validationErrors.map(e => e.message).join('. ');
+      }
+      
       setError(errorMsg);
       toast.error(errorMsg, { title: 'Error al crear' });
     } finally {

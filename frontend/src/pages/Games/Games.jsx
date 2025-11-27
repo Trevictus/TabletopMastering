@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   MdAdd, 
   MdSearch, 
@@ -24,6 +25,7 @@ import styles from './Games.module.css';
  * Lista todos los juegos del grupo con filtros, búsqueda y paginación
  */
 const Games = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { selectedGroup, groups, loadGroups, selectGroup } = useGroup();
   const [games, setGames] = useState([]);
@@ -111,16 +113,6 @@ const Games = () => {
     }
   };
 
-  const handleSync = async (game) => {
-    try {
-      const response = await gameService.syncWithBGG(game._id);
-      setGames(prev => prev.map(g => g._id === game._id ? response.data : g));
-      alert('Juego sincronizado con BoardGameGeek');
-    } catch (err) {
-      alert(err.response?.data?.message || 'Error al sincronizar el juego');
-    }
-  };
-
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(prev => prev - 1);
@@ -160,15 +152,13 @@ const Games = () => {
               </p>
             </div>
           </div>
-          {!selectedGroup && (
-            <Button
-              variant="primary"
-              size="small"
-              onClick={() => setShowAddModal(true)}
-            >
-              <MdAdd /> Añadir Juego
-            </Button>
-          )}
+          <Button
+            variant="primary"
+            size="small"
+            onClick={() => setShowAddModal(true)}
+          >
+            <MdAdd /> Añadir Juego
+          </Button>
         </div>
       </div>
 
@@ -211,7 +201,7 @@ const Games = () => {
           <Button
             variant="outline"
             size="small"
-            onClick={() => window.location.href = '/groups'}
+            onClick={() => navigate('/groups')}
           >
             Crear o Unirse a Grupos
           </Button>
@@ -304,8 +294,8 @@ const Games = () => {
                 key={game._id}
                 game={game}
                 onDelete={handleDelete}
-                onSync={handleSync}
                 canDelete={canDelete(game)}
+                showOwners={!!selectedGroup} // Solo mostrar propietarios cuando hay grupo seleccionado
               />
             ))}
           </div>

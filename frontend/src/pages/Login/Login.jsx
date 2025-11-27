@@ -15,6 +15,15 @@ const Login = () => {
   const toast = useToast();
 
   const from = location.state?.from || '/home';
+
+  // Cerrar modal al hacer clic fuera del formulario
+  const handleOverlayClick = (e) => {
+    // Solo cerrar si el clic fue directamente en el overlay, no en el formulario
+    if (e.target === e.currentTarget) {
+      navigate('/');
+    }
+  };
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -162,9 +171,9 @@ const Login = () => {
   };
 
   return (
-    <div className={styles.loginPage}>
+    <div className={styles.loginPage} onClick={handleOverlayClick}>
       <div className={styles.loginContainer}>
-        <div className={styles.loginCard}>
+        <div className={styles.loginCard} onClick={(e) => e.stopPropagation()}>
           {/* Header */}
           <div className={styles.header}>
             <GiPerspectiveDiceSixFacesRandom className={styles.icon} />
@@ -192,7 +201,7 @@ const Login = () => {
               placeholder="tu-email@ejemplo.com"
               error={touched.email ? errors.email : ''}
               required
-              icon={<MdEmail size={24} />}
+              icon={<MdEmail size={18} />}
               onChange={handleChange}
               onBlur={handleBlur}
               autoComplete="email"
@@ -208,7 +217,7 @@ const Login = () => {
               error={touched.password ? errors.password : ''}
               helpText={!touched.password && !errors.password ? 'Mínimo 8 caracteres' : ''}
               required
-              icon={<MdLock size={24} />}
+              icon={<MdLock size={18} />}
               onChange={handleChange}
               onBlur={handleBlur}
               autoComplete="current-password"

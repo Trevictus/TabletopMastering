@@ -4,9 +4,10 @@ import {
   MdTimer, 
   MdStar, 
   MdDelete,
-  MdSync 
+  MdPerson,
+  MdGroup
 } from 'react-icons/md';
-import { GiDiceFire } from 'react-icons/gi';
+import { GiDiceFire, GiPerspectiveDiceSixFacesRandom } from 'react-icons/gi';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import styles from './GameCard.module.css';
@@ -18,8 +19,8 @@ import styles from './GameCard.module.css';
 const GameCard = ({ 
   game, 
   onDelete, 
-  onSync,
-  canDelete = false 
+  canDelete = false,
+  showOwners = false // Solo mostrar propietarios en vista de grupo
 }) => {
   const {
     name,
@@ -31,23 +32,66 @@ const GameCard = ({
     rating,
     source,
     categories,
-    yearPublished
+    yearPublished,
+    owners = [], // Array de propietarios (cuando hay deduplicación)
+    addedBy // Propietario único (cuando no hay deduplicación)
   } = game;
 
-  const imageUrl = thumbnail || image || 'https://via.placeholder.com/300x200?text=Sin+Imagen';
+  // Verificar si hay una imagen válida
+  const defaultPlaceholder = 'https://via.placeholder.com/300x400?text=Board+Game';
+  const hasValidImage = (thumbnail || image) && 
+    (thumbnail || image) !== defaultPlaceholder &&
+    (thumbnail || image).trim() !== '';
+  
+  const imageUrl = hasValidImage ? (thumbnail || image) : null;
   const players = minPlayers === maxPlayers 
     ? `${minPlayers}` 
     : `${minPlayers}-${maxPlayers}`;
 
+  /**
+   * Formatear la lista de propietarios para mostrar
+   * - 1 propietario: "De: Juan"
+   * - 2 propietarios: "De: Juan, María"
+   * - 3+ propietarios: "De: Juan, María +1"
+   */
+  const formatOwners = () => {
+    // Usar owners si existe, sino usar addedBy
+    const ownerList = owners.length > 0 ? owners : (addedBy ? [addedBy] : []);
+    
+    if (ownerList.length === 0) return null;
+
+    const MAX_VISIBLE = 2;
+    const visibleOwners = ownerList.slice(0, MAX_VISIBLE);
+    const remainingCount = ownerList.length - MAX_VISIBLE;
+
+    const ownerNames = visibleOwners.map(o => o.name || 'Usuario').join(', ');
+    
+    if (remainingCount > 0) {
+      return `${ownerNames} +${remainingCount}`;
+    }
+    
+    return ownerNames;
+  };
+
+  const ownerDisplay = showOwners ? formatOwners() : null;
+  const hasMultipleOwners = owners.length > 1;
+
   return (
     <Card variant="elevated" noPadding className={styles.gameCard}>
       <div className={styles.imageContainer}>
-        <img 
-          src={imageUrl} 
-          alt={name}
-          className={styles.gameImage}
-          loading="lazy"
-        />
+        {hasValidImage ? (
+          <img 
+            src={imageUrl} 
+            alt={name}
+            className={styles.gameImage}
+            loading="lazy"
+          />
+        ) : (
+          <div className={styles.placeholderImage}>
+            <GiPerspectiveDiceSixFacesRandom className={styles.placeholderDice} />
+            <span className={styles.placeholderText}>Sin imagen</span>
+          </div>
+        )}
         {source === 'bgg' && (
           <span className={styles.badge} title="Desde BoardGameGeek">
             <GiDiceFire />
@@ -62,62 +106,65 @@ const GameCard = ({
       </div>
 
       <div className={styles.content}>
-        <h3 className={styles.title} title={name}>
-          {name}
-        </h3>
+        {/* Información principal - crece según contenido */}
+        <div className={styles.mainInfo}>
+          <h3 className={styles.title} title={name}>
+            {name}
+          </h3>
 
-        {yearPublished && (
-          <p className={styles.year}>({yearPublished})</p>
-        )}
+          {yearPublished && (
+            <p className={styles.year}>({yearPublished})</p>
+          )}
 
-        <div className={styles.stats}>
-          <div className={styles.stat}>
-            <MdPeople />
-            <span>{players} jugadores</span>
-          </div>
-          {playingTime > 0 && (
+          <div className={styles.stats}>
             <div className={styles.stat}>
-              <MdTimer />
-              <span>{playingTime} min</span>
+              <MdPeople />
+              <span>{players} jugadores</span>
+            </div>
+            {playingTime > 0 && (
+              <div className={styles.stat}>
+                <MdTimer />
+                <span>{playingTime} min</span>
+              </div>
+            )}
+          </div>
+
+          {categories && categories.length > 0 && (
+            <div className={styles.categories}>
+              {categories.slice(0, 2).map((category, index) => (
+                <span key={index} className={styles.category}>
+                  {category}
+                </span>
+              ))}
+              {categories.length > 2 && (
+                <span className={styles.category}>+{categories.length - 2}</span>
+              )}
             </div>
           )}
         </div>
 
-        {categories && categories.length > 0 && (
-          <div className={styles.categories}>
-            {categories.slice(0, 2).map((category, index) => (
-              <span key={index} className={styles.category}>
-                {category}
-              </span>
-            ))}
-            {categories.length > 2 && (
-              <span className={styles.category}>+{categories.length - 2}</span>
+        {/* Footer fijo - siempre al fondo */}
+        {(ownerDisplay || canDelete) && (
+          <div className={styles.cardFooter}>
+            {/* Mostrar propietarios solo en vista de grupo */}
+            {ownerDisplay && (
+              <div className={styles.owners} title={owners.map(o => o.name).join(', ')}>
+                {hasMultipleOwners ? <MdGroup className={styles.ownerIcon} /> : <MdPerson className={styles.ownerIcon} />}
+                <span className={styles.ownerText}>De: {ownerDisplay}</span>
+              </div>
             )}
-          </div>
-        )}
 
-        {(canDelete || (source === 'bgg' && onSync)) && (
-          <div className={styles.actions}>
-            {source === 'bgg' && onSync && (
-              <Button
-                variant="outline"
-                size="small"
-                onClick={() => onSync(game)}
-                className={styles.actionButton}
-                title="Sincronizar con BGG"
-              >
-                <MdSync />
-              </Button>
-            )}
             {canDelete && (
-              <Button
-                variant="outline"
-                size="small"
-                onClick={() => onDelete(game)}
-                className={styles.deleteButton}
-              >
-                <MdDelete />
-              </Button>
+              <div className={styles.actions}>
+                <Button
+                  variant="outline"
+                  size="small"
+                  onClick={() => onDelete(game)}
+                  className={styles.deleteButton}
+                >
+                  <MdDelete />
+                </Button>
+              </div>
             )}
           </div>
         )}
@@ -140,11 +187,21 @@ GameCard.propTypes = {
     }),
     source: PropTypes.oneOf(['bgg', 'custom']),
     categories: PropTypes.arrayOf(PropTypes.string),
-    yearPublished: PropTypes.number
+    yearPublished: PropTypes.number,
+    owners: PropTypes.arrayOf(PropTypes.shape({
+      _id: PropTypes.string,
+      name: PropTypes.string,
+      email: PropTypes.string
+    })),
+    addedBy: PropTypes.shape({
+      _id: PropTypes.string,
+      name: PropTypes.string,
+      email: PropTypes.string
+    })
   }).isRequired,
   onDelete: PropTypes.func,
-  onSync: PropTypes.func,
-  canDelete: PropTypes.bool
+  canDelete: PropTypes.bool,
+  showOwners: PropTypes.bool
 };
 
 export default GameCard;

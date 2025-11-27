@@ -273,6 +273,7 @@
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
+  align-items: stretch; /* Asegura que todas las tarjetas tengan la misma altura */
 }
 
 .pagination {

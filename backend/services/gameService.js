@@ -75,18 +75,33 @@ exports.createCustomGame = async (gameData, userId, groupId = null) => {
 
 /**
  * Obtener juegos (personales o por grupo sin duplicados)
+ * Cuando se consulta por grupo, incluye:
+ * - Juegos asignados directamente al grupo
+ * - Juegos personales de todos los miembros del grupo
  */
 exports.getGames = async (userId, groupId = null, filters = {}) => {
   const { source, search, page = 1, limit = 20 } = filters;
 
   let filter = { isActive: true };
-  let deduplicationField = null;
+  let needsDeduplication = false;
 
   // Obtener juegos según contexto
   if (groupId) {
-    // Juegos del grupo (sin duplicados por bggId)
-    filter.group = groupId;
-    deduplicationField = 'bggId'; // Deduplicar por bggId si existe
+    // Obtener el grupo para saber quiénes son los miembros
+    const group = await Group.findById(groupId);
+    if (!group) {
+      throw { status: 404, message: 'Grupo no encontrado' };
+    }
+
+    // Obtener IDs de todos los miembros del grupo
+    const memberIds = group.members.map(m => m.user);
+
+    // Incluir juegos del grupo Y juegos personales de los miembros
+    filter.$or = [
+      { group: groupId }, // Juegos asignados al grupo
+      { addedBy: { $in: memberIds }, group: null } // Juegos personales de miembros
+    ];
+    needsDeduplication = true;
   } else {
     // Juegos personales (sin grupo)
     filter.addedBy = userId;
@@ -100,11 +115,15 @@ exports.getGames = async (userId, groupId = null, filters = {}) => {
 
   // Aplicar búsqueda si se proporciona
   if (search) {
-    filter.$or = [
-      { name: { $regex: search, $options: 'i' } },
-      { description: { $regex: search, $options: 'i' } },
-      { categories: { $in: [new RegExp(search, 'i')] } },
-    ];
+    const searchFilter = {
+      $or: [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { categories: { $in: [new RegExp(search, 'i')] } },
+      ]
+    };
+    // Combinar con filtros existentes
+    filter = { $and: [filter, searchFilter] };
   }
 
   // Obtener juegos
@@ -114,9 +133,9 @@ exports.getGames = async (userId, groupId = null, filters = {}) => {
     .populate('group', 'name')
     .sort({ createdAt: -1 });
 
-  // Deduplicar si es necesario (en grupo)
-  const games = deduplicationField 
-    ? this.deduplicateGames(allGames, deduplicationField)
+  // Deduplicar si es necesario (en grupo) - por nombre normalizado para evitar duplicados
+  const games = needsDeduplication
+    ? this.deduplicateGamesByName(allGames)
     : allGames;
 
   // Aplicar paginación post-deduplicación
@@ -313,17 +332,120 @@ exports.getGroupStats = async (groupId) => {
 };
 
 /**
- * Helper: Eliminar duplicados manteniendo el primer registro único
+ * Helper: Generar identificador único para un juego
+ * - Para juegos de BGG: usa bggId (más preciso)
+ * - Para juegos custom: usa nombre normalizado
  */
-exports.deduplicateGames = (games, field) => {
-  const seen = new Set();
-  return games.filter(game => {
-    // Para juegos de BGG, usar bggId
-    const identifier = game[field] || `custom_${game._id}`;
-    if (seen.has(identifier)) {
-      return false;
+exports.getGameIdentifier = (game) => {
+  if (game.source === 'bgg' && game.bggId) {
+    return `bgg_${game.bggId}`;
+  }
+  // Para juegos custom, usar nombre normalizado
+  return `custom_${game.name.toLowerCase().trim()}`;
+};
+
+/**
+ * Helper: Deduplicar juegos y recopilar todos los propietarios
+ * - Usa bggId para juegos de BGG (más preciso)
+ * - Usa nombre normalizado para juegos custom
+ * - Prioriza juegos de BGG sobre custom (datos más completos)
+ * - Recopila todos los propietarios de juegos duplicados
+ */
+exports.deduplicateGamesWithOwners = (games) => {
+  // Map para agrupar juegos por identificador
+  // Estructura: { identifier: { bestGame, owners: Set } }
+  const gameGroups = new Map();
+
+  for (const game of games) {
+    const identifier = this.getGameIdentifier(game);
+    const ownerInfo = game.addedBy ? {
+      _id: game.addedBy._id?.toString() || game.addedBy.toString(),
+      name: game.addedBy.name || 'Usuario',
+      email: game.addedBy.email || ''
+    } : null;
+
+    if (gameGroups.has(identifier)) {
+      const group = gameGroups.get(identifier);
+      
+      // Añadir propietario si no está ya en la lista
+      if (ownerInfo && !group.ownerIds.has(ownerInfo._id)) {
+        group.ownerIds.add(ownerInfo._id);
+        group.owners.push(ownerInfo);
+      }
+
+      // Determinar si este juego es "mejor" que el actual
+      const currentBest = group.bestGame;
+      const shouldReplace = this.shouldReplaceGame(currentBest, game);
+      
+      if (shouldReplace) {
+        group.bestGame = game;
+      }
+    } else {
+      // Primer juego con este identificador
+      const ownerIds = new Set();
+      const owners = [];
+      
+      if (ownerInfo) {
+        ownerIds.add(ownerInfo._id);
+        owners.push(ownerInfo);
+      }
+
+      gameGroups.set(identifier, {
+        bestGame: game,
+        owners,
+        ownerIds
+      });
     }
-    seen.add(identifier);
+  }
+
+  // Construir resultado final con propietarios incluidos
+  const result = [];
+  
+  for (const [, group] of gameGroups) {
+    // Convertir el juego a objeto plano para poder añadir owners
+    const gameObj = group.bestGame.toObject ? group.bestGame.toObject() : { ...group.bestGame };
+    
+    // Añadir array de propietarios al juego
+    gameObj.owners = group.owners;
+    
+    result.push(gameObj);
+  }
+
+  // Ordenar por fecha de creación (más recientes primero)
+  return result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+};
+
+/**
+ * Helper: Determinar si un juego debe reemplazar a otro como "mejor" versión
+ * Prioridad: BGG con grupo > BGG sin grupo > Custom con grupo > Custom sin grupo
+ */
+exports.shouldReplaceGame = (current, candidate) => {
+  // Si el candidato es de BGG y el actual no, reemplazar
+  if (candidate.source === 'bgg' && current.source !== 'bgg') {
     return true;
-  });
+  }
+  
+  // Si ambos son del mismo source, preferir el que tiene grupo
+  if (candidate.source === current.source) {
+    if (candidate.group && !current.group) {
+      return true;
+    }
+  }
+  
+  // Si el candidato es de BGG con grupo y el actual es BGG sin grupo
+  if (candidate.source === 'bgg' && current.source === 'bgg') {
+    if (candidate.group && !current.group) {
+      return true;
+    }
+  }
+  
+  return false;
+};
+
+/**
+ * Helper: Eliminar duplicados por nombre normalizado (legacy - mantener compatibilidad)
+ * @deprecated Usar deduplicateGamesWithOwners en su lugar
+ */
+exports.deduplicateGamesByName = (games) => {
+  return this.deduplicateGamesWithOwners(games);
 };

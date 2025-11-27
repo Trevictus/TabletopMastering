@@ -88,6 +88,12 @@
   margin-top: var(--spacing-lg);
 }
 
+.ctaButton {
+  padding: 0.75rem 1.75rem !important;
+  font-size: 1rem !important;
+  min-width: 140px;
+}
+
 .features {
   max-width: 100%;
   margin: var(--spacing-xl) auto 0;

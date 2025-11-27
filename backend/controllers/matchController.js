@@ -31,6 +31,13 @@ exports.createMatch = async (req, res, next) => {
         message: error.message,
       });
     }
+    // Manejar errores de validación de Mongoose u otros errores
+    if (error.message) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
     next(error);
   }
 };

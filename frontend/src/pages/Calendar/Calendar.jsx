@@ -15,7 +15,7 @@ import styles from './Calendar.module.css';
  * Página de Calendario de Partidas
  */
 const Calendar = () => {
-  const { showToast } = useToast();
+  const toast = useToast();
   
   // Estado del calendario
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -65,10 +65,10 @@ const Calendar = () => {
     try {
       const response = await matchService.createMatch(matchData);
       setMatches(prev => [...prev, response.data]);
-      showToast('Partida creada exitosamente', 'success');
+      toast.success('Partida creada exitosamente');
       setShowCreateModal(false);
     } catch (err) {
-      showToast(err.response?.data?.message || 'Error al crear la partida', 'error');
+      toast.error(err.response?.data?.message || 'Error al crear la partida');
       throw err;
     }
   };
@@ -77,7 +77,7 @@ const Calendar = () => {
     try {
       const response = await matchService.updateMatch(matchId, matchData);
       setMatches(prev => prev.map(m => m._id === matchId ? response.data : m));
-      showToast('Partida actualizada exitosamente', 'success');
+      toast.success('Partida actualizada exitosamente');
       setShowCreateModal(false);
       setEditingMatch(null);
       
@@ -86,7 +86,7 @@ const Calendar = () => {
         setSelectedMatch(response.data);
       }
     } catch (err) {
-      showToast(err.response?.data?.message || 'Error al actualizar la partida', 'error');
+      toast.error(err.response?.data?.message || 'Error al actualizar la partida');
       throw err;
     }
   };
@@ -103,11 +103,11 @@ const Calendar = () => {
     try {
       await matchService.deleteMatch(matchId);
       setMatches(prev => prev.filter(m => m._id !== matchId));
-      showToast('Partida eliminada exitosamente', 'success');
+      toast.success('Partida eliminada exitosamente');
       setShowDetailsModal(false);
       setSelectedMatch(null);
     } catch (err) {
-      showToast(err.response?.data?.message || 'Error al eliminar la partida', 'error');
+      toast.error(err.response?.data?.message || 'Error al eliminar la partida');
       throw err;
     }
   };
@@ -124,9 +124,9 @@ const Calendar = () => {
         setSelectedMatch(response.data);
       }
       
-      showToast('Asistencia confirmada', 'success');
+      toast.success('Asistencia confirmada');
     } catch (err) {
-      showToast(err.response?.data?.message || 'Error al confirmar asistencia', 'error');
+      toast.error(err.response?.data?.message || 'Error al confirmar asistencia');
       throw err;
     }
   };
@@ -143,9 +143,9 @@ const Calendar = () => {
         setSelectedMatch(response.data);
       }
       
-      showToast('Asistencia cancelada', 'success');
+      toast.success('Asistencia cancelada');
     } catch (err) {
-      showToast(err.response?.data?.message || 'Error al cancelar asistencia', 'error');
+      toast.error(err.response?.data?.message || 'Error al cancelar asistencia');
       throw err;
     }
   };

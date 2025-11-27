@@ -74,12 +74,12 @@ const Home = () => {
         </p>
         <div className={styles.ctaButtons}>
           <Link to="/login">
-            <Button variant="primary" size="small">
+            <Button variant="primary" size="large" className={styles.ctaButton}>
               Iniciar Sesión
             </Button>
           </Link>
           <Link to="/register">
-            <Button variant="outline" size="small">
+            <Button variant="outline" size="large" className={styles.ctaButton}>
               Crear Cuenta
             </Button>
           </Link>

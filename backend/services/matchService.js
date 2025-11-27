@@ -69,37 +69,41 @@ exports.createMatch = async (gameId, groupId, scheduledDate, userId, playerIds =
 
   // Preparar jugadores
   let players = [];
+  const userIdStr = userId.toString();
+  
+  // Asegurar que el creador siempre esté incluido
+  const uniquePlayerIds = new Set();
   if (playerIds && Array.isArray(playerIds) && playerIds.length > 0) {
-    // Validar que todos los jugadores existen y son miembros del grupo
-    for (const playerId of playerIds) {
-      const user = await User.findById(playerId);
-      if (!user) {
-        throw { status: 404, message: `Usuario ${playerId} no encontrado` };
-      }
-
-      const isPlayerMember = group.members.some(
-        member => member.user.toString() === playerId
-      );
-      if (!isPlayerMember) {
-        throw { status: 403, message: `El usuario ${user.name} no es miembro del grupo` };
-      }
-
-      players.push({
-        user: playerId,
-        confirmed: playerId === userId.toString(),
-      });
+    playerIds.forEach(id => uniquePlayerIds.add(id.toString()));
+  }
+  // Agregar el creador si no está en la lista
+  if (!uniquePlayerIds.has(userIdStr)) {
+    uniquePlayerIds.add(userIdStr);
+  }
+  
+  // Validar que todos los jugadores existen y son miembros del grupo
+  for (const playerId of uniquePlayerIds) {
+    const user = await User.findById(playerId);
+    if (!user) {
+      throw { status: 404, message: `Usuario ${playerId} no encontrado` };
     }
-  } else {
-    // Al menos el creador de la partida
+
+    const isPlayerMember = group.members.some(
+      member => member.user.toString() === playerId
+    );
+    if (!isPlayerMember) {
+      throw { status: 403, message: `El usuario ${user.name} no es miembro del grupo` };
+    }
+
     players.push({
-      user: userId,
-      confirmed: true,
+      user: playerId,
+      confirmed: playerId === userIdStr,
     });
   }
 
   // Validar mínimo 2 jugadores
   if (players.length < 2) {
-    throw new Error('Una partida debe tener al menos 2 jugadores');
+    throw { status: 400, message: 'Una partida debe tener al menos 2 jugadores' };
   }
 
   // Crear la partida
@@ -123,11 +127,24 @@ exports.createMatch = async (gameId, groupId, scheduledDate, userId, playerIds =
  * Listar partidas con filtros
  */
 exports.getMatches = async (groupId, userId, status = null, page = 1, limit = 20) => {
-  // Verificar que el usuario es miembro del grupo
-  await this.validateGroupMembership(groupId, userId);
-
   // Construir filtro
-  const filter = { group: groupId };
+  const filter = {};
+  
+  // Si se proporciona groupId, validar membresía y filtrar por grupo
+  if (groupId) {
+    await this.validateGroupMembership(groupId, userId);
+    filter.group = groupId;
+  } else {
+    // Si no hay groupId, obtener todas las partidas donde el usuario es jugador
+    // Primero obtener todos los grupos del usuario
+    const userGroups = await Group.find({
+      'members.user': userId
+    }).select('_id');
+    
+    const groupIds = userGroups.map(g => g._id);
+    filter.group = { $in: groupIds };
+  }
+  
   if (status) {
     filter.status = status;
   }
