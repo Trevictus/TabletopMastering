@@ -4,6 +4,7 @@ import { GiDiceFire } from 'react-icons/gi';
 import CalendarGrid from '../../components/calendar/CalendarGrid';
 import CreateEditMatchModal from '../../components/calendar/CreateEditMatchModal';
 import MatchDetailsModal from '../../components/calendar/MatchDetailsModal';
+import RegisterResultsModal from '../../components/calendar/RegisterResultsModal';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import Loading from '../../components/common/Loading';
@@ -26,6 +27,7 @@ const Calendar = () => {
   // Modales
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showResultsModal, setShowResultsModal] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [editingMatch, setEditingMatch] = useState(null);
 
@@ -189,6 +191,48 @@ const Calendar = () => {
     setSelectedMatch(null);
   };
 
+  // Handler para abrir modal de registro de resultados
+  const handleOpenResultsModal = (match) => {
+    setSelectedMatch(match);
+    setShowDetailsModal(false);
+    setShowResultsModal(true);
+  };
+
+  // Handler para cerrar modal de resultados
+  const handleCloseResultsModal = () => {
+    setShowResultsModal(false);
+    setSelectedMatch(null);
+  };
+
+  // Handler para guardar resultados de la partida
+  const handleSaveResults = async (matchId, resultData) => {
+    try {
+      const response = await matchService.finishMatch(matchId, resultData);
+      
+      // Actualizar la partida en la lista con el nuevo estado
+      setMatches(prev => prev.map(m => m._id === matchId ? response.data : m));
+      
+      // Cerrar modal de resultados
+      setShowResultsModal(false);
+      setSelectedMatch(null);
+      
+      // Mostrar mensaje de éxito con info de ranking si está disponible
+      if (response.ranking?.updatedPlayers?.length > 0) {
+        const winnerInfo = response.ranking.updatedPlayers.find(p => p.isWinner);
+        if (winnerInfo) {
+          toast.success(`¡Partida finalizada! ${winnerInfo.stats?.name || 'Ganador'} suma ${winnerInfo.points} puntos al ranking.`);
+        } else {
+          toast.success('¡Resultados guardados correctamente!');
+        }
+      } else {
+        toast.success('¡Resultados guardados correctamente!');
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error al guardar los resultados');
+      throw err;
+    }
+  };
+
   // Estadísticas rápidas
   const upcomingMatches = matches.filter(m => {
     const matchDate = new Date(m.scheduledDate);
@@ -277,6 +321,15 @@ const Calendar = () => {
         onDelete={handleDeleteMatch}
         onConfirm={handleConfirmAttendance}
         onCancelConfirmation={handleCancelConfirmation}
+        onRegisterResults={handleOpenResultsModal}
+      />
+
+      {/* Modal de registro de resultados */}
+      <RegisterResultsModal
+        isOpen={showResultsModal}
+        onClose={handleCloseResultsModal}
+        match={selectedMatch}
+        onSave={handleSaveResults}
       />
     </div>
   );

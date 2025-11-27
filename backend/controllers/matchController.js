@@ -139,14 +139,15 @@ exports.updateMatch = async (req, res, next) => {
 exports.finishMatch = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { winnerId, results, duration } = req.body;
+    const { winnerId, results, duration, notes } = req.body;
 
     const { match, rankingReport } = await matchService.finishMatch(
       id,
       req.user._id,
       winnerId,
       results,
-      duration
+      duration,
+      notes
     );
 
     res.status(200).json({

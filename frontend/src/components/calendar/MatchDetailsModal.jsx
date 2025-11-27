@@ -9,7 +9,8 @@ import {
   MdPerson,
   MdPlace,
   MdAccessTime,
-  MdNotes
+  MdNotes,
+  MdEmojiEvents
 } from 'react-icons/md';
 import { GiCardPlay } from 'react-icons/gi';
 import Modal from '../common/Modal';
@@ -38,17 +39,35 @@ const MatchDetailsModal = ({
   onEdit, 
   onDelete, 
   onConfirm,
-  onCancelConfirmation 
+  onCancelConfirmation,
+  onRegisterResults
 }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
   if (!match) return null;
 
-  const isUserConfirmed = getUserConfirmationStatus(match, user?._id);
-  const isCreator = match.createdBy?._id === user?._id || match.createdBy === user?._id;
+  // Obtener ID del usuario actual (puede estar en _id o id)
+  const currentUserId = user?._id?.toString() || user?.id?.toString();
+  
+  // Obtener ID del creador (puede venir como objeto o string)
+  const creatorId = match.createdBy?._id?.toString() || match.createdBy?.id?.toString() || match.createdBy?.toString();
+  
+  const isUserConfirmed = getUserConfirmationStatus(match, currentUserId);
+  const isCreator = !!(currentUserId && creatorId && creatorId === currentUserId);
+  
   const canEdit = isCreator;
   const canDelete = isCreator;
+
+  // Debug - puedes quitar estos logs después
+  console.log('Match Debug:', {
+    userObject: user,
+    creatorId,
+    currentUserId,
+    isCreator,
+    status: match.status,
+    hasConfirmedPlayers: match.players?.some(p => p.confirmed)
+  });
 
   // Verificar si la partida está próxima (en las próximas 24h)
   const isUpcoming = () => {
@@ -100,6 +119,12 @@ const MatchDetailsModal = ({
 
   const statusBadge = getStatusBadge(match.status);
 
+  // Verificar si se puede registrar resultados (creador/admin y partida programada o en_curso)
+  const canRegisterResults = isCreator && (match.status === 'programada' || match.status === 'en_curso');
+  
+  // Verificar si hay jugadores confirmados para registrar resultados
+  const hasConfirmedPlayers = match.players?.some(p => p.confirmed);
+
   const footer = (
     <div className={styles.footerActions}>
       <div className={styles.leftActions}>
@@ -115,6 +140,16 @@ const MatchDetailsModal = ({
         )}
       </div>
       <div className={styles.rightActions}>
+        {/* Botón Registrar Resultados - Solo visible para creador y partidas no finalizadas */}
+        {canRegisterResults && hasConfirmedPlayers && (
+          <Button 
+            variant="secondary" 
+            onClick={() => onRegisterResults(match)} 
+            disabled={loading}
+          >
+            <MdEmojiEvents /> Registrar Resultados
+          </Button>
+        )}
         {match.status === 'programada' && (
           isUserConfirmed ? (
             <Button 
@@ -294,7 +329,8 @@ MatchDetailsModal.propTypes = {
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   onConfirm: PropTypes.func.isRequired,
-  onCancelConfirmation: PropTypes.func.isRequired
+  onCancelConfirmation: PropTypes.func.isRequired,
+  onRegisterResults: PropTypes.func.isRequired
 };
 
 export default MatchDetailsModal;

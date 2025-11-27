@@ -237,7 +237,7 @@ exports.updateMatch = async (matchId, updates, userId) => {
 /**
  * Finalizar una partida y registrar resultados
  */
-exports.finishMatch = async (matchId, userId, winnerId = null, results = [], duration = null) => {
+exports.finishMatch = async (matchId, userId, winnerId = null, results = [], duration = null, notes = null) => {
   const match = await Match.findById(matchId);
   if (!match) {
     throw { status: 404, message: 'Partida no encontrada' };
@@ -306,6 +306,11 @@ exports.finishMatch = async (matchId, userId, winnerId = null, results = [], dur
   // Actualizar duración y estado
   if (duration) {
     match.duration = duration;
+  }
+
+  // Actualizar notas si se proporcionan
+  if (notes !== null && notes !== undefined) {
+    match.notes = notes;
   }
 
   match.status = 'finalizada';

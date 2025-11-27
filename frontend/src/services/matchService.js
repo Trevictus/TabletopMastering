@@ -48,6 +48,21 @@ const matchService = {
     const response = await api.delete(`/matches/${matchId}/confirm`);
     return response.data;
   },
+
+  /**
+   * Finalizar partida y registrar resultados
+   * @param {string} matchId - ID de la partida
+   * @param {object} resultData - Datos de resultados
+   * @param {string} resultData.winnerId - ID del ganador (opcional)
+   * @param {Array} resultData.results - Array de { userId, score, position }
+   * @param {object} resultData.duration - { value: number, unit: 'minutos'|'horas' }
+   * @param {string} resultData.notes - Notas adicionales (opcional)
+   * @returns {object} { data: match, ranking: rankingReport }
+   */
+  finishMatch: async (matchId, resultData) => {
+    const response = await api.post(`/matches/${matchId}/finish`, resultData);
+    return response.data;
+  },
 };
 
 export default matchService;

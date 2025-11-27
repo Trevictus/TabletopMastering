@@ -59,6 +59,19 @@
   background-color: var(--primary-color);
 }
 
+.danger {
+  color: var(--text-light);
+  background-color: var(--error-color);
+  border-color: var(--error-color);
+}
+
+.danger:hover:not(:disabled) {
+  background-color: #6b2222;
+  border-color: #6b2222;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(139, 46, 46, 0.25);
+}
+
 /* Estados */
 .disabled {
   opacity: 0.5;
