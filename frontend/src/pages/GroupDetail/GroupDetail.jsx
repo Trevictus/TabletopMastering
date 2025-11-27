@@ -9,6 +9,35 @@ import Loading from '../../components/common/Loading';
 import styles from './GroupDetail.module.css';
 
 /**
+ * Componente de Avatar de Miembro con fallback a iniciales
+ */
+const MemberAvatar = ({ member, isAdmin, getInitials, isValidAvatar, styles }) => {
+  const [imgError, setImgError] = useState(false);
+  const memberUser = member.user;
+  const hasValidAvatar = isValidAvatar(memberUser?.avatar) && !imgError;
+
+  return (
+    <div className={styles.memberAvatarContainer}>
+      {hasValidAvatar ? (
+        <img 
+          src={memberUser.avatar} 
+          alt={memberUser?.name || 'Miembro'} 
+          className={styles.memberAvatarImg}
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div className={`${styles.memberAvatar} ${isAdmin ? styles.memberAvatarAdmin : ''}`}>
+          {getInitials(memberUser?.name)}
+        </div>
+      )}
+      {isAdmin && (
+        <span className={styles.adminCrown}>👑</span>
+      )}
+    </div>
+  );
+};
+
+/**
  * Página de detalle del grupo
  * Muestra toda la información del grupo, miembros, juegos, etc.
  */
@@ -113,7 +142,12 @@ const GroupDetail = () => {
 
   // Función helper para verificar si es una URL de avatar válida
   const isValidAvatar = (avatar) => {
-    return avatar && !avatar.includes('placeholder') && avatar.startsWith('http');
+    if (!avatar) return false;
+    // Aceptar data URLs (base64), URLs http/https, y excluir placeholders
+    const isDataUrl = avatar.startsWith('data:image');
+    const isHttpUrl = avatar.startsWith('http://') || avatar.startsWith('https://');
+    const isPlaceholder = avatar.includes('placeholder');
+    return (isDataUrl || isHttpUrl) && !isPlaceholder;
   };
 
   return (
@@ -172,23 +206,14 @@ const GroupDetail = () => {
                       key={member._id} 
                       className={`${styles.memberCard} ${isMemberAdmin ? styles.memberCardAdmin : ''}`}
                     >
-                      {/* Avatar */}
-                      <div className={styles.memberAvatarContainer}>
-                        {isValidAvatar(memberUser?.avatar) ? (
-                          <img 
-                            src={memberUser.avatar} 
-                            alt={memberUser?.name || 'Miembro'} 
-                            className={styles.memberAvatarImg}
-                          />
-                        ) : (
-                          <div className={`${styles.memberAvatar} ${isMemberAdmin ? styles.memberAvatarAdmin : ''}`}>
-                            {getInitials(memberUser?.name)}
-                          </div>
-                        )}
-                        {isMemberAdmin && (
-                          <span className={styles.adminCrown}>👑</span>
-                        )}
-                      </div>
+                      {/* Avatar con fallback */}
+                      <MemberAvatar 
+                        member={member}
+                        isAdmin={isMemberAdmin}
+                        getInitials={getInitials}
+                        isValidAvatar={isValidAvatar}
+                        styles={styles}
+                      />
 
                       {/* Info del miembro */}
                       <div className={styles.memberContent}>
