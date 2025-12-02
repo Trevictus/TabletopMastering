@@ -11,7 +11,8 @@ set -e
 # ============================================
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly ENV_FILE="${SCRIPT_DIR}/.env"
-readonly ENV_EXAMPLE="${SCRIPT_DIR}/.env.example"
+readonly ENV_EXAMPLE="${SCRIPT_DIR}/.env.example.prod"
+readonly COMPOSE_FILE="${SCRIPT_DIR}/docker-compose-prod.yml"
 readonly CREDENTIALS_FILE="${SCRIPT_DIR}/.credentials"
 
 # Colores para output
@@ -94,9 +95,9 @@ check_dependencies() {
 setup_env() {
     log_step "🔐 Configurando variables de entorno..."
     
-    # Verificar que existe .env.example
+    # Verificar que existe .env.example.prod
     if [ ! -f "$ENV_EXAMPLE" ]; then
-        log_error "No se encontró archivo .env.example"
+        log_error "No se encontró archivo .env.example.prod"
         exit 1
     fi
     
@@ -170,19 +171,19 @@ EOF
 
 stop_containers() {
     log_step "📦 Paso 1/4: Deteniendo contenedores existentes..."
-    docker compose down 2>/dev/null || true
+    docker compose -f "$COMPOSE_FILE" down 2>/dev/null || true
     log_success "Contenedores detenidos"
 }
 
 build_images() {
     log_step "🔨 Paso 2/4: Construyendo imágenes de producción..."
-    docker compose build --no-cache
+    docker compose -f "$COMPOSE_FILE" build --no-cache
     log_success "Imágenes construidas"
 }
 
 start_services() {
     log_step "🚀 Paso 3/4: Iniciando servicios..."
-    docker compose up -d
+    docker compose -f "$COMPOSE_FILE" up -d
     log_success "Servicios iniciados"
 }
 
@@ -193,7 +194,7 @@ wait_for_services() {
     local attempt=1
     
     while [ $attempt -le $max_attempts ]; do
-        if docker compose ps | grep -q "healthy"; then
+        if docker compose -f "$COMPOSE_FILE" ps | grep -q "healthy"; then
             log_success "Servicios listos"
             return 0
         fi
@@ -210,7 +211,7 @@ show_status() {
     echo -e "\n${CYAN}════════════════════════════════════════════════════${NC}"
     echo -e "${CYAN}📊 ESTADO DE LOS CONTENEDORES:${NC}"
     echo -e "${CYAN}════════════════════════════════════════════════════${NC}"
-    docker compose ps
+    docker compose -f "$COMPOSE_FILE" ps
 }
 
 show_summary() {
@@ -234,11 +235,11 @@ show_summary() {
     fi
     
     echo -e "\n${YELLOW}📋 Comandos útiles:${NC}"
-    echo -e "   Ver logs:        ${CYAN}docker compose logs -f${NC}"
-    echo -e "   Solo backend:    ${CYAN}docker compose logs -f backend${NC}"
-    echo -e "   Detener:         ${CYAN}docker compose down${NC}"
-    echo -e "   Reiniciar:       ${CYAN}docker compose restart${NC}"
-    echo -e "   Estado:          ${CYAN}docker compose ps${NC}"
+    echo -e "   Ver logs:        ${CYAN}docker compose -f docker-compose-prod.yml logs -f${NC}"
+    echo -e "   Solo backend:    ${CYAN}docker compose -f docker-compose-prod.yml logs -f backend${NC}"
+    echo -e "   Detener:         ${CYAN}docker compose -f docker-compose-prod.yml down${NC}"
+    echo -e "   Reiniciar:       ${CYAN}docker compose -f docker-compose-prod.yml restart${NC}"
+    echo -e "   Estado:          ${CYAN}docker compose -f docker-compose-prod.yml ps${NC}"
 }
 
 # ============================================
