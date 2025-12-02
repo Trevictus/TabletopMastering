@@ -22,6 +22,9 @@ readonly YELLOW='\033[1;33m'
 readonly CYAN='\033[0;36m'
 readonly NC='\033[0m' # No Color
 
+# Flag para detectar si las credenciales de MongoDB cambiaron
+MONGO_CREDENTIALS_CHANGED=false
+
 # ============================================
 # FUNCIONES AUXILIARES
 # ============================================
@@ -142,7 +145,109 @@ create_env_file() {
     # Guardar credenciales en archivo separado (para referencia)
     save_credentials "$jwt_secret" "$mongo_password"
     
+    # Marcar que las credenciales han cambiado para limpiar el volumen de MongoDB
+    MONGO_CREDENTIALS_CHANGED=true
+    
     log_success "Archivo .env creado con claves seguras"
+}
+
+# Verifica si el volumen de MongoDB necesita ser recreado
+# MongoDB solo crea el usuario root en la primera inicialización con volumen vacío
+check_mongodb_volume() {
+    if [ "$MONGO_CREDENTIALS_CHANGED" = true ]; then
+        log_warning "Las credenciales de MongoDB han cambiado"
+        
+        # Verificar si el volumen existe
+        if docker volume ls -q | grep -q "tabletop-mongodb-data"; then
+            log_warning "Se encontró volumen existente: tabletop-mongodb-data"
+            log_info "Intentando actualizar credenciales sin perder datos..."
+            
+            # Intentar crear/actualizar el usuario en MongoDB
+            if update_mongodb_credentials; then
+                log_success "Credenciales de MongoDB actualizadas correctamente"
+                return 0
+            fi
+            
+            # Si falla la actualización, ofrecer opciones
+            echo ""
+            echo -e "${YELLOW}⚠️  No se pudieron actualizar las credenciales automáticamente${NC}"
+            echo -e "${YELLOW}   Opciones disponibles:${NC}"
+            echo ""
+            echo -e "   ${CYAN}1)${NC} Eliminar volumen y empezar desde cero (PERDERÁS TODOS LOS DATOS)"
+            echo -e "   ${CYAN}2)${NC} Cancelar y restaurar credenciales antiguas del backup"
+            echo ""
+            read -p "Elige una opción (1/2): " option
+            
+            case $option in
+                1)
+                    log_warning "Eliminando volumen de MongoDB..."
+                    docker volume rm tabletop-mongodb-data 2>/dev/null || true
+                    log_success "Volumen eliminado. Se creará uno nuevo con las credenciales correctas"
+                    ;;
+                *)
+                    log_error "Despliegue cancelado."
+                    log_info "Restaura el archivo .env.backup con las credenciales antiguas"
+                    exit 1
+                    ;;
+            esac
+        fi
+    fi
+}
+
+# Actualiza las credenciales de MongoDB sin perder datos
+update_mongodb_credentials() {
+    log_info "Iniciando contenedor de MongoDB temporalmente..."
+    
+    # Cargar las nuevas credenciales del .env
+    local mongo_user
+    local mongo_pass
+    local mongo_db
+    mongo_user=$(grep "^MONGO_USERNAME=" "$ENV_FILE" | cut -d'=' -f2)
+    mongo_pass=$(grep "^MONGO_PASSWORD=" "$ENV_FILE" | cut -d'=' -f2)
+    mongo_db=$(grep "^MONGO_DBNAME=" "$ENV_FILE" | cut -d'=' -f2)
+    mongo_db=${mongo_db:-tabletop_mastering}
+    
+    # Iniciar solo MongoDB sin las variables de entorno de inicialización
+    # para poder acceder sin autenticación y crear el usuario
+    docker run -d --rm \
+        --name tabletop-mongodb-temp \
+        -v tabletop-mongodb-data:/data/db \
+        mongo:8 \
+        mongod --bind_ip_all >/dev/null 2>&1
+    
+    # Esperar a que MongoDB esté listo
+    sleep 5
+    
+    # Intentar crear o actualizar el usuario
+    local result
+    result=$(docker exec tabletop-mongodb-temp mongosh --quiet --eval "
+        try {
+            // Intentar eliminar usuario existente si existe
+            db.getSiblingDB('admin').dropUser('${mongo_user}');
+        } catch(e) {}
+        
+        // Crear el nuevo usuario
+        db.getSiblingDB('admin').createUser({
+            user: '${mongo_user}',
+            pwd: '${mongo_pass}',
+            roles: [
+                { role: 'root', db: 'admin' },
+                { role: 'readWrite', db: '${mongo_db}' }
+            ]
+        });
+        print('USER_CREATED_SUCCESS');
+    " 2>&1)
+    
+    # Detener el contenedor temporal
+    docker stop tabletop-mongodb-temp >/dev/null 2>&1 || true
+    
+    # Verificar si tuvo éxito
+    if echo "$result" | grep -q "USER_CREATED_SUCCESS"; then
+        return 0
+    else
+        log_warning "No se pudo crear el usuario: $result"
+        return 1
+    fi
 }
 
 save_credentials() {
@@ -258,6 +363,7 @@ main() {
     check_dependencies
     setup_env
     stop_containers
+    check_mongodb_volume  # Verificar si hay que recrear el volumen de MongoDB
     build_images
     start_services
     wait_for_services
