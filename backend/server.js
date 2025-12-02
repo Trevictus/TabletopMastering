@@ -30,15 +30,11 @@ app.use(cors({
       'http://127.0.0.1:5173',
     ];
 
-    // Permitir dominios de ngrok dinámicamente
     if (!origin) {
       // Permitir peticiones sin origin (como Postman, curl, etc.)
       callback(null, true);
     } else if (allowedOrigins.includes(origin)) {
       // Origin en la lista de permitidos
-      callback(null, true);
-    } else if (origin.includes('.ngrok-free.app') || origin.includes('.ngrok-free.dev') || origin.includes('.ngrok.app') || origin.includes('.ngrok.io')) {
-      // Permitir cualquier dominio de ngrok
       callback(null, true);
     } else {
       console.log('⚠️ CORS bloqueado para origin:', origin);
@@ -47,7 +43,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.use(express.json({ limit: '10mb' }));

@@ -1,17 +1,61 @@
+# ============================================
+# BACKEND - DOCKERIGNORE
+# Excluir archivos innecesarios para reducir contexto de build
+# ============================================
+
+# Dependencias (se instalan en el contenedor)
 node_modules
-npm-debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Variables de entorno
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+
+# Control de versiones
 .git
 .gitignore
+.gitattributes
+
+# IDE/Editor
 .vscode
 .idea
+*.swp
+*.swo
+*~
+
+# Documentación
 *.md
-coverage
-.nyc_output
-dist
-build
+docs/
+LICENSE
+
+# Tests (no necesarios para la imagen)
+tests/
+*.test.js
+*.spec.js
+coverage/
+.nyc_output/
+
+# Scripts de desarrollo
+scripts/
+
+# Archivos de configuración de desarrollo
+.eslintrc*
+.prettierrc*
+eslint.config.js
+.editorconfig
+
+# Archivos del sistema
 .DS_Store
-tests
-docs
+Thumbs.db
+
+# Logs y temporales
+logs/
+*.log
+tmp/
+temp/
+
+# Uploads (se montan como volumen)
+uploads/
