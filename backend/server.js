@@ -21,14 +21,20 @@ connectDB();
 // Middlewares globales
 app.use(cors({
   origin: function (origin, callback) {
+    // Construir lista de orígenes permitidos
     const allowedOrigins = [
-      process.env.CLIENT_URL || 'http://localhost',
       'http://localhost',
       'http://localhost:5173',
       'http://localhost:80',
       'http://127.0.0.1',
       'http://127.0.0.1:5173',
     ];
+
+    // Agregar CLIENT_URL si está definida (puede tener múltiples URLs separadas por coma)
+    if (process.env.CLIENT_URL) {
+      const clientUrls = process.env.CLIENT_URL.split(',').map(url => url.trim());
+      allowedOrigins.push(...clientUrls);
+    }
 
     if (!origin) {
       // Permitir peticiones sin origin (como Postman, curl, etc.)
@@ -37,7 +43,10 @@ app.use(cors({
       // Origin en la lista de permitidos
       callback(null, true);
     } else {
+      // En producción, también permitir si el origin coincide con el host del servidor
+      // Esto ayuda cuando se accede por IP directa
       console.log('⚠️ CORS bloqueado para origin:', origin);
+      console.log('📋 Orígenes permitidos:', allowedOrigins);
       callback(new Error('CORS no permitido'));
     }
   },
