@@ -25,24 +25,24 @@ if [ ! -f .env ]; then
 fi
 
 echo -e "\n${YELLOW}📦 Paso 1: Deteniendo contenedores existentes...${NC}"
-docker compose -f docker-compose.prod.yml down 2>/dev/null || true
+docker compose down 2>/dev/null || true
 
 echo -e "\n${YELLOW}🔨 Paso 2: Construyendo imágenes de producción...${NC}"
-docker compose -f docker-compose.prod.yml build --no-cache
+docker compose build --no-cache
 
 echo -e "\n${YELLOW}🚀 Paso 3: Iniciando servicios...${NC}"
-docker compose -f docker-compose.prod.yml up -d
+docker compose up -d
 
 echo -e "\n${YELLOW}⏳ Paso 4: Esperando que los servicios estén listos...${NC}"
 sleep 10
 
 echo -e "\n${YELLOW}📊 Estado de los contenedores:${NC}"
-docker compose -f docker-compose.prod.yml ps
+docker compose ps
 
 echo -e "\n${GREEN}✅ ¡Despliegue completado!${NC}"
 echo -e "${GREEN}La aplicación está disponible en: http://$(hostname -I | awk '{print $1}')${NC}"
 echo -e "\n${YELLOW}Comandos útiles:${NC}"
-echo -e "  Ver logs:        docker compose -f docker-compose.prod.yml logs -f"
-echo -e "  Detener:         docker compose -f docker-compose.prod.yml down"
-echo -e "  Reiniciar:       docker compose -f docker-compose.prod.yml restart"
-echo -e "  Estado:          docker compose -f docker-compose.prod.yml ps"
+echo -e "  Ver logs:        docker compose logs -f"
+echo -e "  Detener:         docker compose down"
+echo -e "  Reiniciar:       docker compose restart"
+echo -e "  Estado:          docker compose ps"
