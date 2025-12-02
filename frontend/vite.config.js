@@ -8,13 +8,8 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
     strictPort: false,
-    // Permitir TODOS los hosts (necesario para ngrok con URLs dinámicas)
+    // Permitir todos los hosts para Docker
     allowedHosts: true,
-    hmr: {
-      protocol: 'wss',
-      clientPort: 443,
-      host: undefined
-    }
   },
   preview: {
     host: '0.0.0.0',

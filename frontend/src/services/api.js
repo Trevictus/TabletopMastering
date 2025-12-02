@@ -14,24 +14,15 @@ import { STORAGE_KEYS, AUTH_ROUTES } from '../constants/auth';
 
 // Detectar la URL base de la API dinámicamente
 const getApiBaseURL = () => {
-  // Si estamos en desarrollo y hay una variable de entorno, usarla
+  // Si hay una variable de entorno configurada, usarla
   const envApiUrl = import.meta.env.VITE_API_URL;
   
-  // Si la variable de entorno existe y no es localhost, usarla (para ngrok)
-  if (envApiUrl && !envApiUrl.includes('localhost')) {
+  if (envApiUrl) {
     console.log('🌐 Usando API URL desde variable de entorno:', envApiUrl);
     return envApiUrl;
   }
   
-  // Detectar si estamos en un dominio de ngrok
-  const currentOrigin = window.location.origin;
-  if (currentOrigin.includes('.ngrok')) {
-    const ngrokApiUrl = `${currentOrigin}/api`;
-    console.log('🌐 Detectado dominio ngrok, usando:', ngrokApiUrl);
-    return ngrokApiUrl;
-  }
-  
-  // Por defecto, usar localhost (desarrollo local)
+  // Por defecto, usar localhost (desarrollo local con Docker)
   const defaultUrl = 'http://localhost/api';
   console.log('🌐 Usando API URL por defecto:', defaultUrl);
   return defaultUrl;
@@ -44,7 +35,6 @@ const API_CONFIG = {
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'ngrok-skip-browser-warning': 'true', // Evita el warning de ngrok
   },
 };
 
