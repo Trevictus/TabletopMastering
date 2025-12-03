@@ -28,7 +28,9 @@ const Dashboard = () => {
         const now = new Date();
         setUpcomingMatches(matches.filter(m => m.status === 'pending' && new Date(m.scheduledDate) >= now).slice(0, 3));
         setRecentMatches(matches.filter(m => m.status === 'completed').slice(0, 3));
-      } catch {} finally { setLoading(false); }
+      } catch {
+        // Error silencioso
+      } finally { setLoading(false); }
     };
     load();
   }, []);
