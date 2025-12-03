@@ -7,7 +7,7 @@
 FROM node:22-alpine AS base
 
 # Instalar dependencias del sistema necesarias
-RUN apk add --no-cache dumb-init wget ca-certificates
+RUN apk add --no-cache dumb-init wget
 
 WORKDIR /app
 

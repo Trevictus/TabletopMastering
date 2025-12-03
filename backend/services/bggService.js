@@ -1,25 +1,23 @@
-/**
- * Servicio de BoardGameGeek - Configurado para usar MOCK
- * Proporciona datos simulados para búsqueda y detalles de juegos
- */
+const axios = require('axios');
+const xml2js = require('xml2js');
+const { wrapper } = require('axios-cookiejar-support');
+const { CookieJar } = require('tough-cookie');
+const BGGCache = require('../models/BGGCache');
 
-console.log('🎭 [BGG Service] Usando MOCK de BGG');
-module.exports = require('./bggService.mock');
+// Detectar si estamos en modo test a través de variable de entorno
+const USE_MOCK = process.env.USE_BGG_MOCK === 'true' || process.env.NODE_ENV === 'test';
 
-// El código del servicio real ha sido removido ya que siempre se usa el mock
-// Esto simplifica el mantenimiento y evita dependencias externas
-
-if (false) {
+// Si estamos en modo mock, usar el servicio mock en lugar del real
+if (USE_MOCK) {
+  console.log('🎭 [BGG Service] Usando MOCK de BGG para tests');
+  module.exports = require('./bggService.mock');
+} else {
   // Código real del servicio BGG
   const BGG_API_BASE = 'https://boardgamegeek.com/xmlapi2';
 
   // Crear instancia de axios con soporte de cookies
   const jar = new CookieJar();
-  const client = wrapper(axios.create({ 
-    jar,
-    timeout: 15000,
-    maxRedirects: 3,
-  }));
+  const client = wrapper(axios.create({ jar }));
 
   /**
    * Servicio para interactuar con la API de BoardGameGeek
@@ -29,10 +27,8 @@ if (false) {
       this.parser = new xml2js.Parser({ explicitArray: false });
       this.client = client;
       this.lastRequestTime = 0;
-      this.minRequestInterval = 1000;
+      this.minRequestInterval = 1000; // Mínimo 1 segundo entre peticiones
       this.sessionInitialized = false;
-      this.maxRetries = 3;
-      this.retryDelay = 1000;
       this.axiosConfig = {
         headers: {
           'User-Agent': 'TabletopMastering/1.0 (+https://github.com/Trevictus/TabletopMastering)',
@@ -40,13 +36,35 @@ if (false) {
           'Accept-Encoding': 'gzip, deflate',
           'Accept-Language': 'en-US,en;q=0.9',
         },
-        timeout: 15000,
-        maxRedirects: 3,
-        validateStatus: (status) => status >= 200 && status < 500,
+        timeout: 20000,
+        maxRedirects: 5,
+        validateStatus: function (status) {
+          return status >= 200 && status < 500;
+        },
+        withCredentials: true,
       };
     }
 
-
+  /**
+   * Inicializar sesión con BGG para obtener cookies
+   */
+  async initializeSession() {
+    if (this.sessionInitialized) return;
+    
+    try {
+      console.log('🔐 [BGG] Inicializando sesión...');
+      await this.client.get('https://boardgamegeek.com', {
+        headers: this.axiosConfig.headers,
+        timeout: 10000,
+        validateStatus: () => true,
+      });
+      this.sessionInitialized = true;
+      console.log('✅ [BGG] Sesión inicializada');
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      console.warn('⚠️  [BGG] No se pudo inicializar sesión, continuando sin ella...');
+    }
+  }
 
   /**
    * Espera el tiempo necesario para respetar rate limiting
@@ -56,36 +74,10 @@ if (false) {
     const timeSinceLastRequest = now - this.lastRequestTime;
     if (timeSinceLastRequest < this.minRequestInterval) {
       const waitTime = this.minRequestInterval - timeSinceLastRequest;
+      console.log(`⏱️  [BGG] Esperando ${waitTime}ms para respetar rate limit`);
       await new Promise(resolve => setTimeout(resolve, waitTime));
     }
     this.lastRequestTime = Date.now();
-  }
-
-  /**
-   * Ejecutar petición con reintentos automáticos
-   */
-  async requestWithRetry(requestFn, context = 'BGG request') {
-    let lastError;
-    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
-      try {
-        return await requestFn();
-      } catch (error) {
-        lastError = error;
-        const isNetworkError = error.code === 'ENOTFOUND' || 
-                              error.code === 'ECONNREFUSED' || 
-                              error.code === 'ETIMEDOUT' ||
-                              error.code === 'EAI_AGAIN';
-        
-        if (attempt < this.maxRetries && (isNetworkError || error.response?.status === 429)) {
-          const delay = this.retryDelay * Math.pow(2, attempt - 1);
-          console.log(`⚠️  [BGG] ${context} falló (intento ${attempt}/${this.maxRetries}). Reintentando en ${delay}ms...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-        } else {
-          break;
-        }
-      }
-    }
-    throw lastError;
   }
 
   /**
@@ -96,6 +88,7 @@ if (false) {
    */
   async searchGames(query, exact = false) {
     try {
+      await this.initializeSession();
       await this.waitForRateLimit();
       
       const url = `${BGG_API_BASE}/search`;
@@ -106,34 +99,38 @@ if (false) {
       };
 
       console.log('🔍 [BGG] Buscando:', query);
+      console.log('🌐 [BGG] URL:', `${url}?query=${query}&type=boardgame&exact=${exact ? 1 : 0}`);
       
-      const response = await this.requestWithRetry(async () => {
-        return await this.client.get(url, { 
-          params,
-          ...this.axiosConfig,
-        });
-      }, `Búsqueda: ${query}`);
+      const response = await this.client.get(url, { 
+        params,
+        ...this.axiosConfig,
+      });
       
+      // Check for rate limiting or errors
       if (response.status === 429) {
+        console.warn('⚠️  [BGG] Rate limit alcanzado, esperando 2 segundos...');
         await new Promise(resolve => setTimeout(resolve, 2000));
-        throw new Error('API de BGG temporalmente no disponible (rate limit)');
+        throw new Error('API de BGG temporalmente no disponible (rate limit). Intenta de nuevo en un momento.');
       }
       
       if (response.status === 401 || response.status === 403) {
-        throw new Error('Acceso denegado a la API de BoardGameGeek');
+        console.error('🚫 [BGG] Acceso denegado. Status:', response.status);
+        throw new Error('No se pudo acceder a la API de BoardGameGeek. Verifica la conectividad.');
       }
       
       if (response.status !== 200) {
+        console.error('❌ [BGG] Status inesperado:', response.status);
         throw new Error(`Error en API de BGG (Status: ${response.status})`);
       }
       
       const result = await this.parser.parseStringPromise(response.data);
 
       if (!result.items || !result.items.item) {
-        console.log('📭 [BGG] Sin resultados');
+        console.log('📭 [BGG] Sin resultados para:', query);
         return [];
       }
 
+      // Normalizar respuesta (puede ser objeto único o array)
       const items = Array.isArray(result.items.item) 
         ? result.items.item 
         : [result.items.item];
@@ -147,8 +144,9 @@ if (false) {
       }));
     } catch (error) {
       console.error('❌ [BGG] Error buscando:', error.message);
-      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
-        throw new Error('No se pudo conectar con BoardGameGeek. Verifica tu conexión a Internet.');
+      if (error.response) {
+        console.error('Status:', error.response.status);
+        console.error('Data:', error.response.data);
       }
       throw new Error('Error al buscar juegos en BoardGameGeek');
     }
@@ -184,16 +182,12 @@ if (false) {
 
       await this.waitForRateLimit();
 
-      const response = await this.requestWithRetry(async () => {
-        return await this.client.get(url, { 
-          params,
-          ...this.axiosConfig,
-        });
-      }, `Detalles bggId: ${bggId}`);
-
-      if (response.status !== 200) {
-        throw new Error(`Error obteniendo detalles (Status: ${response.status})`);
-      }
+      // BGG puede tardar, damos más tiempo
+      const response = await this.client.get(url, { 
+        params,
+        timeout: 20000,
+        ...this.axiosConfig,
+      });
 
       const result = await this.parser.parseStringPromise(response.data);
 
@@ -257,12 +251,9 @@ if (false) {
 
       return gameData;
     } catch (error) {
-      console.error('❌ [BGG] Error obteniendo detalles:', error.message);
+      console.error('Error obteniendo detalles de BGG:', error.message);
       if (error.message.includes('no encontrado')) {
         throw error;
-      }
-      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
-        throw new Error('No se pudo conectar con BoardGameGeek. Verifica tu conexión a Internet.');
       }
       throw new Error('Error al obtener detalles del juego desde BoardGameGeek');
     }
@@ -314,17 +305,10 @@ if (false) {
 
       await this.waitForRateLimit();
 
-      const response = await this.requestWithRetry(async () => {
-        return await this.client.get(url, { 
-          params,
-          ...this.axiosConfig,
-        });
-      }, 'Hot games');
-      
-      if (response.status !== 200) {
-        return [];
-      }
-      
+      const response = await this.client.get(url, { 
+        params,
+        ...this.axiosConfig,
+      });
       const result = await this.parser.parseStringPromise(response.data);
 
       if (!result.items || !result.items.item) {
@@ -343,10 +327,7 @@ if (false) {
         thumbnail: item.thumbnail?.$.value || '',
       }));
     } catch (error) {
-      console.error('❌ [BGG] Error obteniendo Hot List:', error.message);
-      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
-        throw new Error('No se pudo conectar con BoardGameGeek');
-      }
+      console.error('Error obteniendo Hot List de BGG:', error.message);
       throw new Error('Error al obtener juegos populares desde BoardGameGeek');
     }
   }

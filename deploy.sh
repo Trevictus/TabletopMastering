@@ -91,17 +91,6 @@ check_dependencies() {
     log_success "Todas las dependencias están instaladas"
 }
 
-check_network() {
-    log_step "🌐 Verificando conectividad de red..."
-    
-    if timeout 5 curl -s -I https://www.google.com > /dev/null 2>&1; then
-        log_success "Conectividad verificada"
-    else
-        log_warning "No se pudo verificar la conectividad a Internet"
-        log_info "La aplicación funcionará normalmente con el mock de BGG"
-    fi
-}
-
 # ============================================
 # GESTIÓN DE VARIABLES DE ENTORNO
 # ============================================
@@ -152,9 +141,6 @@ create_env_file() {
     # Usar sed para reemplazar los placeholders
     sed -i "s|MONGO_PASSWORD=CAMBIA_ESTA_CONTRASENA_SEGURA_123!|MONGO_PASSWORD=${mongo_password}|g" "$ENV_FILE"
     sed -i "s|JWT_SECRET=CAMBIA_ESTO_POR_UNA_CLAVE_SECRETA_MUY_LARGA_Y_SEGURA|JWT_SECRET=${jwt_secret}|g" "$ENV_FILE"
-    
-    # BGG Mock siempre activo
-    sed -i "s|USE_BGG_MOCK=false|USE_BGG_MOCK=true|g" "$ENV_FILE"
     
     # Guardar credenciales en archivo separado (para referencia)
     save_credentials "$jwt_secret" "$mongo_password"

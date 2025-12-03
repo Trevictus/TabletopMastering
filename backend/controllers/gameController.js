@@ -2,7 +2,7 @@ const gameService = require('../services/gameService');
 const bggGameService = require('../services/bggGameService');
 
 /**
- * @desc    Buscar juegos en la base de datos de juegos de mesa
+ * @desc    Buscar juegos en BoardGameGeek (sin guardar)
  * @route   GET /api/games/search-bgg
  * @access  Private
  */
@@ -16,14 +16,16 @@ exports.searchBGG = async (req, res, next) => {
       success: true,
       count: results.length,
       data: results,
+      warning: results.length === 0 && query ? 'No se encontraron resultados. BGG API puede estar experimentando problemas.' : null,
     });
   } catch (error) {
-    console.error('[Controller] Error en búsqueda:', error.message);
+    // Si BGG no está disponible, devolver error amigable
+    console.error('[Controller] Error en búsqueda BGG:', error.message);
     
-    res.status(500).json({
+    res.status(503).json({
       success: false,
-      message: 'Error al buscar juegos. Por favor, intenta crear un juego personalizado.',
-      error: 'SEARCH_ERROR',
+      message: 'La API de BoardGameGeek no está disponible temporalmente. Por favor, intenta crear un juego personalizado o intenta de nuevo más tarde.',
+      error: 'BGG_UNAVAILABLE',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
