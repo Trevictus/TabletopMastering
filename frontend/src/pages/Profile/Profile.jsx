@@ -8,6 +8,7 @@ import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import Loading from '../../components/common/Loading';
 import gameService from '../../services/gameService';
+import { isValidAvatar } from '../../utils/validators';
 import styles from './Profile.module.css';
 
 /**
@@ -153,7 +154,7 @@ const Profile = () => {
         
         <div className={styles.profileContent}>
           <div className={styles.avatarContainer}>
-            {formData.avatar && formData.avatar.startsWith('data:image') ? (
+            {isValidAvatar(formData.avatar) ? (
               <img src={formData.avatar} alt={user.name} className={styles.avatar} />
             ) : (
               <FaUserCircle className={styles.avatar} />
@@ -220,7 +221,7 @@ const Profile = () => {
               <label>Foto de Perfil</label>
               <div className={styles.avatarUpload}>
                 <div className={styles.avatarPreview}>
-                  {formData.avatar && formData.avatar.startsWith('data:image') ? (
+                  {isValidAvatar(formData.avatar) ? (
                     <img src={formData.avatar} alt="Preview" className={styles.previewImage} />
                   ) : (
                     <FaUserCircle className={styles.previewIcon} />

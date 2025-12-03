@@ -149,16 +149,20 @@ const Games = () => {
               <h1>Catálogo de Juegos</h1>
               <p className={styles.subtitle}>
                 {totalGames} {totalGames === 1 ? 'juego' : 'juegos'}
+                {selectedGroup && ' (compartidos por miembros)'}
               </p>
             </div>
           </div>
-          <Button
-            variant="primary"
-            size="small"
-            onClick={() => setShowAddModal(true)}
-          >
-            <MdAdd /> Añadir Juego
-          </Button>
+          {/* Solo mostrar botón Añadir en "Mis Juegos" (sin grupo seleccionado) */}
+          {!selectedGroup && (
+            <Button
+              variant="primary"
+              size="small"
+              onClick={() => setShowAddModal(true)}
+            >
+              <MdAdd /> Añadir Juego
+            </Button>
+          )}
         </div>
       </div>
 
@@ -340,10 +344,10 @@ const Games = () => {
             {searchTerm || sourceFilter !== 'all'
               ? 'Intenta con otros términos de búsqueda o limpia los filtros'
               : selectedGroup 
-                ? 'Comienza añadiendo tu primer juego al grupo'
+                ? 'Los miembros del grupo aún no han añadido juegos a sus bibliotecas personales'
                 : 'Añade tu primer juego a tu colección personal'}
           </p>
-          {!searchTerm && sourceFilter === 'all' && (
+          {!searchTerm && sourceFilter === 'all' && !selectedGroup && (
             <Button
               variant="primary"
               onClick={() => setShowAddModal(true)}
@@ -355,12 +359,12 @@ const Games = () => {
         </Card>
       )}
 
-      {/* Modal de añadir juego */}
+      {/* Modal de añadir juego - siempre añade a biblioteca personal (sin groupId) */}
       <AddGameModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onGameAdded={handleGameAdded}
-        groupId={selectedGroup?._id || null}
+        groupId={null}
       />
     </div>
   );

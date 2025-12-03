@@ -56,6 +56,7 @@
   color: var(--text-secondary);
   font-size: var(--font-size-md);
   margin: var(--spacing-xs) 0 0 0;
+  font-style: italic;
 }
 
 .container {
@@ -182,6 +183,16 @@
   object-fit: cover;
   border: 3px solid white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.memberAvatarIcon {
+  width: 56px;
+  height: 56px;
+  color: var(--text-tertiary);
+}
+
+.memberAvatarIconAdmin {
+  color: var(--accent-color);
 }
 
 .adminCrown {
@@ -337,7 +348,62 @@
   letter-spacing: 0.2px;
 }
 
-/* Invite Code */
+/* Invite Code - Compact Sidebar Version */
+.inviteCodeCompact {
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: inherit;
+}
+
+.inviteCodeCompact:hover {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+}
+
+.inviteCodeCompact:hover .codeValue {
+  color: white;
+}
+
+.inviteCodeCompact:hover .copyIcon {
+  color: var(--accent-color);
+}
+
+.codeValue {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--primary-color);
+  font-family: 'Monaco', 'Courier New', monospace;
+  transition: color 0.2s ease;
+}
+
+.copyIcon {
+  font-size: 18px;
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.codeHint {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 8px 0 0 0;
+}
+
+/* Legacy - keeping for backwards compatibility */
 .inviteCodeButton {
   width: 100%;
   padding: 20px;
@@ -472,7 +538,19 @@
   transform: translateY(-2px);
 }
 
-/* Responsive */
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+/* Tablet - 1024px */
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr 280px;
+    gap: var(--spacing-lg);
+  }
+}
+
+/* Tablet pequeño - 768px */
 @media (max-width: 768px) {
   .groupDetailPage {
     padding: var(--spacing-md);
@@ -481,38 +559,126 @@
   .header {
     flex-direction: column;
     align-items: flex-start;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .headerContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .headerContent h1 {
+    font-size: var(--font-size-xl);
+  }
+
+  .headerIcon {
+    font-size: var(--font-size-2xl);
+  }
+
+  .subtitle {
+    font-size: var(--font-size-sm);
   }
 
   .container {
     grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
   }
 
   .sidebar {
+    order: -1;
     flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+  }
+
+  .sidebar > * {
+    flex: 1;
+    min-width: 200px;
   }
 
   .infoGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .section {
     padding: var(--spacing-md);
   }
 
+  .sectionTitle {
+    font-size: var(--font-size-md);
+    margin-bottom: var(--spacing-md);
+  }
+
   /* Member card responsive */
+  .memberCard {
+    padding: var(--spacing-md);
+  }
+
+  .memberInfo h4 {
+    font-size: 14px;
+  }
+
+  .memberAvatar,
+  .memberAvatarImg,
+  .memberAvatarIcon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .memberStats {
+    gap: var(--spacing-sm);
+  }
+
+  .memberStat {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+}
+
+/* Mobile - 480px */
+@media (max-width: 480px) {
+  .groupDetailPage {
+    padding: var(--spacing-sm);
+  }
+
+  .backNav {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .headerContent h1 {
+    font-size: var(--font-size-lg);
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .infoCard {
+    padding: 12px;
+  }
+
+  .infoValue {
+    font-size: var(--font-size-xl);
+  }
+
   .memberCard {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
   }
 
   .memberHeader {
     justify-content: center;
+    flex-direction: column;
   }
 
   .memberStats {
     justify-content: center;
+    flex-wrap: wrap;
   }
 
   .memberJoined {
@@ -520,8 +686,18 @@
   }
 
   .memberAvatar,
-  .memberAvatarImg {
-    width: 64px;
-    height: 64px;
+  .memberAvatarImg,
+  .memberAvatarIcon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .sidebar > * {
+    min-width: 100%;
+  }
+
+  .actionButton {
+    padding: 10px 16px;
+    font-size: 13px;
   }
 }

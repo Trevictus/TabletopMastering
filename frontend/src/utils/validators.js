@@ -44,3 +44,13 @@ export const validateInviteCode = (code) => {
   const re = /^[A-Z0-9]{8}$/;
   return re.test(code);
 };
+
+/**
+ * Valida si un avatar es una imagen real subida por el usuario
+ * Solo acepta imágenes en formato data:image (base64)
+ * @param {string} avatar - URL o data URI del avatar
+ * @returns {boolean} True si es un avatar válido subido
+ */
+export const isValidAvatar = (avatar) => {
+  return avatar && avatar.startsWith('data:image');
+};

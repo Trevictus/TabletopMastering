@@ -1,17 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MdArrowBack, MdPersonAdd, MdContentCopy, MdCheckCircle } from 'react-icons/md';
+import { FaUserCircle } from 'react-icons/fa';
 import { GiTeamIdea } from 'react-icons/gi';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import groupService from '../../services/groupService';
 import Loading from '../../components/common/Loading';
+import { isValidAvatar } from '../../utils/validators';
 import styles from './GroupDetail.module.css';
 
 /**
- * Componente de Avatar de Miembro con fallback a iniciales
+ * Componente de Avatar de Miembro con fallback a icono por defecto
  */
-const MemberAvatar = ({ member, isAdmin, getInitials, isValidAvatar, styles }) => {
+const MemberAvatar = ({ member, isAdmin }) => {
   const [imgError, setImgError] = useState(false);
   const memberUser = member.user;
   const hasValidAvatar = isValidAvatar(memberUser?.avatar) && !imgError;
@@ -26,9 +28,7 @@ const MemberAvatar = ({ member, isAdmin, getInitials, isValidAvatar, styles }) =
           onError={() => setImgError(true)}
         />
       ) : (
-        <div className={`${styles.memberAvatar} ${isAdmin ? styles.memberAvatarAdmin : ''}`}>
-          {getInitials(memberUser?.name)}
-        </div>
+        <FaUserCircle className={`${styles.memberAvatarIcon} ${isAdmin ? styles.memberAvatarIconAdmin : ''}`} />
       )}
       {isAdmin && (
         <span className={styles.adminCrown}>👑</span>
@@ -50,32 +50,32 @@ const GroupDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [copiedCode, setCopiedCode] = useState(false);
-  const isMountedRef = useRef(true);
+  const toastRef = useRef(toast);
+
+  // Mantener referencia actualizada de toast sin causar re-renders
+  useEffect(() => {
+    toastRef.current = toast;
+  }, [toast]);
 
   useEffect(() => {
-    isMountedRef.current = true;
+    let isMounted = true;
     
     const loadGroupDetail = async () => {
       setLoading(true);
       setError('');
       try {
         const response = await groupService.getGroupById(id);
-        // Solo actualizar estado si el componente sigue montado
-        if (isMountedRef.current) {
+        if (isMounted) {
           setGroup(response.data);
         }
       } catch (err) {
-        // Ignorar errores de cancelación (peticiones duplicadas o componente desmontado)
-        if (err.name === 'CanceledError' || err.message?.includes('cancelada') || err.message?.includes('canceled')) {
-          return;
-        }
-        if (isMountedRef.current) {
+        if (err.name === 'CanceledError') return;
+        if (isMounted) {
           const message = err.response?.data?.message || 'Error al cargar el grupo';
           setError(message);
-          toast.error(message);
         }
       } finally {
-        if (isMountedRef.current) {
+        if (isMounted) {
           setLoading(false);
         }
       }
@@ -84,18 +84,18 @@ const GroupDetail = () => {
     loadGroupDetail();
 
     return () => {
-      isMountedRef.current = false;
+      isMounted = false;
     };
-  }, [id, toast]);
+  }, [id]);
 
-  const handleCopyCode = () => {
+  const handleCopyCode = useCallback(() => {
     if (group?.inviteCode) {
       navigator.clipboard.writeText(group.inviteCode);
       setCopiedCode(true);
-      toast.success('Código copiado al portapapeles');
+      toastRef.current.success('Código copiado al portapapeles');
       setTimeout(() => setCopiedCode(false), 2000);
     }
-  };
+  }, [group?.inviteCode]);
 
   if (loading) {
     return <Loading message="Cargando grupo..." />;
@@ -130,26 +130,6 @@ const GroupDetail = () => {
     });
   };
 
-  // Función helper para obtener iniciales
-  const getInitials = (name) => {
-    if (!name) return '?';
-    const parts = name.trim().split(' ');
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-    return name.charAt(0).toUpperCase();
-  };
-
-  // Función helper para verificar si es una URL de avatar válida
-  const isValidAvatar = (avatar) => {
-    if (!avatar) return false;
-    // Aceptar data URLs (base64), URLs http/https, y excluir placeholders
-    const isDataUrl = avatar.startsWith('data:image');
-    const isHttpUrl = avatar.startsWith('http://') || avatar.startsWith('https://');
-    const isPlaceholder = avatar.includes('placeholder');
-    return (isDataUrl || isHttpUrl) && !isPlaceholder;
-  };
-
   return (
     <div className={styles.groupDetailPage}>
       {/* Header */}
@@ -161,7 +141,9 @@ const GroupDetail = () => {
           <GiTeamIdea className={styles.headerIcon} />
           <div>
             <h1>{group.name}</h1>
-            {group.description && <p className={styles.subtitle}>{group.description}</p>}
+            <p className={styles.subtitle}>
+              {group.description || 'Sin descripción'}
+            </p>
           </div>
         </div>
       </div>
@@ -210,9 +192,6 @@ const GroupDetail = () => {
                       <MemberAvatar 
                         member={member}
                         isAdmin={isMemberAdmin}
-                        getInitials={getInitials}
-                        isValidAvatar={isValidAvatar}
-                        styles={styles}
                       />
 
                       {/* Info del miembro */}
@@ -270,22 +249,9 @@ const GroupDetail = () => {
               )}
             </div>
           </section>
-
-          {/* Invite Code Section */}
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Código de Invitación</h2>
-            <button className={styles.inviteCodeButton} onClick={handleCopyCode}>
-              <div className={styles.codeContent}>
-                <span className={styles.codeLabel}>{group.inviteCode || 'N/A'}</span>
-                <span className={styles.copyHint}>
-                  {copiedCode ? '✓ Copiado' : '📋 Click para copiar'}
-                </span>
-              </div>
-            </button>
-          </section>
         </div>
 
-        {/* Sidebar (Optional) */}
+        {/* Sidebar */}
         <aside className={styles.sidebar}>
           <div className={styles.sidebarCard}>
             <h3>Acciones</h3>
@@ -297,6 +263,20 @@ const GroupDetail = () => {
             <button className={styles.actionButton} onClick={() => navigate('/rankings')}>
               👑 Ver Rankings
             </button>
+          </div>
+
+          {/* Código de Invitación en Sidebar */}
+          <div className={styles.sidebarCard}>
+            <h3>Código de Invitación</h3>
+            <button className={styles.inviteCodeCompact} onClick={handleCopyCode}>
+              <span className={styles.codeValue}>{group.inviteCode || 'N/A'}</span>
+              <span className={styles.copyIcon}>
+                {copiedCode ? <MdCheckCircle /> : <MdContentCopy />}
+              </span>
+            </button>
+            <p className={styles.codeHint}>
+              {copiedCode ? '¡Copiado!' : 'Click para copiar'}
+            </p>
           </div>
         </aside>
       </div>

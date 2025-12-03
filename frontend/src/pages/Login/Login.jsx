@@ -149,8 +149,6 @@ const Login = () => {
       
       navigate(from, { replace: true });
     } catch (error) {
-      console.error('Error en el login:', error);
-      
       // Mostrar toast de error
       toast.error(
         error.response?.data?.message || 'Email o contraseña incorrectos',

@@ -12,6 +12,22 @@ import './styles/components.css';
 import './styles/layout.css';
 import './App.css';
 
+/**
+ * Configuración de rutas protegidas
+ * Centraliza todas las rutas que requieren autenticación
+ */
+const protectedRoutes = [
+  { path: '/home', element: Dashboard },
+  { path: '/profile', element: Profile },
+  { path: '/games', element: Games },
+  { path: '/rankings', element: Rankings },
+  { path: '/groups', element: Groups },
+  { path: '/groups/new', element: CreateGroup },
+  { path: '/groups/:id', element: GroupDetail },
+  { path: '/calendar', element: Calendar },
+  { path: '/history', element: History },
+];
+
 function AppContent() {
   const location = useLocation();
   const showLogin = location.pathname === '/login';
@@ -23,89 +39,30 @@ function AppContent() {
         <Navbar />
         <main className="main-content">
           <Routes>
+            {/* Rutas públicas */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Home />} />
             <Route path="/register" element={<Home />} />
 
-            <Route 
-              path="/home" 
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/profile" 
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/games" 
-              element={
-                <ProtectedRoute>
-                  <Games />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/rankings" 
-              element={
-                <ProtectedRoute>
-                  <Rankings />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/groups" 
-              element={
-                <ProtectedRoute>
-                  <Groups />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/groups/new" 
-              element={
-                <ProtectedRoute>
-                  <CreateGroup />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/groups/:id" 
-              element={
-                <ProtectedRoute>
-                  <GroupDetail />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/calendar" 
-              element={
-                <ProtectedRoute>
-                  <Calendar />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/history" 
-              element={
-                <ProtectedRoute>
-                  <History />
-                </ProtectedRoute>
-              } 
-            />
+            {/* Rutas protegidas - generadas desde configuración */}
+            {protectedRoutes.map(({ path, element: Component }) => (
+              <Route
+                key={path}
+                path={path}
+                element={
+                  <ProtectedRoute>
+                    <Component />
+                  </ProtectedRoute>
+                }
+              />
+            ))}
 
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
       </div>
 
-      {/* Modals superpuestos */}
+      {/* Modals de autenticación superpuestos */}
       {showLogin && (
         <PublicRoute>
           <Login />

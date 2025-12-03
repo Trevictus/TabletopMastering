@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGroup } from '../../context/GroupContext';
-import { MdArrowBack } from 'react-icons/md';
+import { useAuth } from '../../context/AuthContext';
+import { MdArrowBack, MdInfo } from 'react-icons/md';
 import { GiTeamIdea } from 'react-icons/gi';
+import { FaUserCircle } from 'react-icons/fa';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import Input from '../../components/common/Input';
@@ -15,6 +17,7 @@ import groupService from '../../services/groupService';
 const CreateGroup = () => {
   const navigate = useNavigate();
   const { loadGroups } = useGroup();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -83,6 +86,14 @@ const CreateGroup = () => {
 
       {/* Formulario */}
       <Card variant="elevated" className={styles.formCard}>
+        {/* Indicador del usuario que crea el grupo */}
+        <div className={styles.creatorInfo}>
+          <MdInfo className={styles.infoIcon} />
+          <span>Creando como: </span>
+          <strong>{user?.name || 'Usuario'}</strong>
+          <span className={styles.creatorNote}>(Serás el administrador)</span>
+        </div>
+
         <form onSubmit={handleSubmit} className={styles.form}>
           {/* Error */}
           {error && (

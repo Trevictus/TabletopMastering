@@ -18,14 +18,11 @@ const getApiBaseURL = () => {
   const envApiUrl = import.meta.env.VITE_API_URL;
   
   if (envApiUrl) {
-    console.log('🌐 Usando API URL desde variable de entorno:', envApiUrl);
     return envApiUrl;
   }
   
   // Por defecto, usar localhost (desarrollo local con Docker)
-  const defaultUrl = 'http://localhost/api';
-  console.log('🌐 Usando API URL por defecto:', defaultUrl);
-  return defaultUrl;
+  return 'http://localhost/api';
 };
 
 // Configuración base de la API
@@ -103,8 +100,8 @@ const addPendingRequest = (config) => {
  */
 api.interceptors.request.use(
   (config) => {
-    // 1. Añadir token de autenticación si existe
-    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
+    // 1. Añadir token de autenticación si existe (sessionStorage para aislamiento por pestaña)
+    const token = sessionStorage.getItem(STORAGE_KEYS.TOKEN);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -118,20 +115,9 @@ api.interceptors.request.use(
     // 3. Añadir timestamp para métricas
     config.metadata = { startTime: new Date() };
 
-    // 4. Logging en desarrollo
-    if (import.meta.env.DEV) {
-      console.log(`🚀 [API Request] ${config.method?.toUpperCase()} ${config.url}`, {
-        params: config.params,
-        data: config.data,
-      });
-    }
-
     return config;
   },
   (error) => {
-    if (import.meta.env.DEV) {
-      console.error('❌ [API Request Error]', error);
-    }
     return Promise.reject(error);
   }
 );
@@ -155,18 +141,10 @@ api.interceptors.response.use(
     // 1. Remover de peticiones pendientes
     removePendingRequest(response.config);
 
-    // 2. Calcular tiempo de respuesta
+    // 2. Calcular tiempo de respuesta para métricas
     if (response.config.metadata?.startTime) {
       const duration = new Date() - response.config.metadata.startTime;
       response.duration = duration;
-      
-      if (import.meta.env.DEV) {
-        console.log(`✅ [API Response] ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-          status: response.status,
-          duration: `${duration}ms`,
-          data: response.data,
-        });
-      }
     }
 
     return response;
@@ -190,10 +168,6 @@ api.interceptors.response.use(
       
       if (originalRequest._retryCount < 2) {
         originalRequest._retryCount += 1;
-        
-        if (import.meta.env.DEV) {
-          console.log(`🔄 [API] Reintentando petición (${originalRequest._retryCount}/2)...`);
-        }
 
         // Esperar antes de reintentar (exponential backoff)
         await new Promise(resolve => 
@@ -213,13 +187,9 @@ api.interceptors.response.use(
       if (!isAuthRoute && !originalRequest._retry) {
         originalRequest._retry = true;
 
-        // Limpiar datos de autenticación
-        localStorage.removeItem(STORAGE_KEYS.TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.USER);
-        
-        if (import.meta.env.DEV) {
-          console.warn('⚠️ [API] Token expirado - Redirigiendo a login');
-        }
+        // Limpiar datos de autenticación (sessionStorage para aislamiento por pestaña)
+        sessionStorage.removeItem(STORAGE_KEYS.TOKEN);
+        sessionStorage.removeItem(STORAGE_KEYS.USER);
 
         // Redirigir a login
         if (currentPath !== AUTH_ROUTES.HOME) {
@@ -228,37 +198,9 @@ api.interceptors.response.use(
       }
     }
 
-    // 5. Error 403 - Prohibido
-    if (error.response?.status === 403) {
-      if (import.meta.env.DEV) {
-        console.error('🚫 [API] Acceso prohibido');
-      }
-    }
-
-    // 6. Error 404 - No encontrado
-    if (error.response?.status === 404) {
-      if (import.meta.env.DEV) {
-        console.error('🔍 [API] Recurso no encontrado');
-      }
-    }
-
-    // 7. Error 500 - Error del servidor
-    if (error.response?.status >= 500) {
-      if (import.meta.env.DEV) {
-        console.error('💥 [API] Error del servidor', error.response.data);
-      }
-    }
-
-    // 8. Logging detallado en desarrollo (solo si NO es cancelación)
-    if (import.meta.env.DEV && !axios.isCancel(error)) {
-      console.error('❌ [API Error]', {
-        url: originalRequest?.url,
-        method: originalRequest?.method,
-        status: error.response?.status,
-        message: error.response?.data?.message || error.message,
-        data: error.response?.data,
-      });
-    }
+    // 5. Error 403 - Prohibido (silencioso)
+    // 6. Error 404 - No encontrado (silencioso)
+    // 7. Error 500+ - Error del servidor (silencioso)
 
     // Retornar error para manejo en componentes
     return Promise.reject(error);
@@ -286,10 +228,10 @@ export const cancelAllPendingRequests = () => {
  */
 export const setAuthToken = (token) => {
   if (token) {
-    localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+    sessionStorage.setItem(STORAGE_KEYS.TOKEN, token);
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   } else {
-    localStorage.removeItem(STORAGE_KEYS.TOKEN);
+    sessionStorage.removeItem(STORAGE_KEYS.TOKEN);
     delete api.defaults.headers.common['Authorization'];
   }
 };
@@ -298,8 +240,9 @@ export const setAuthToken = (token) => {
  * Limpia la autenticación
  */
 export const clearAuth = () => {
-  localStorage.removeItem(STORAGE_KEYS.TOKEN);
-  localStorage.removeItem(STORAGE_KEYS.USER);
+  sessionStorage.removeItem(STORAGE_KEYS.TOKEN);
+  sessionStorage.removeItem(STORAGE_KEYS.USER);
+  sessionStorage.removeItem(STORAGE_KEYS.SELECTED_GROUP);
   delete api.defaults.headers.common['Authorization'];
   cancelAllPendingRequests();
 };
@@ -309,7 +252,7 @@ export const clearAuth = () => {
  * @returns {string|null}
  */
 export const getAuthToken = () => {
-  return localStorage.getItem(STORAGE_KEYS.TOKEN);
+  return sessionStorage.getItem(STORAGE_KEYS.TOKEN);
 };
 
 /**

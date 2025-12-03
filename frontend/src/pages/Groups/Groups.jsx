@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGroup } from '../../context/GroupContext';
-import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { MdAddCircle, MdPersonAdd, MdContentCopy, MdCheckCircle } from 'react-icons/md';
+import { FaUserCircle } from 'react-icons/fa';
 import { GiTeamIdea } from 'react-icons/gi';
 import groupService from '../../services/groupService';
 import Button from '../../components/common/Button';
 import Loading from '../../components/common/Loading';
+import { isValidAvatar } from '../../utils/validators';
 import styles from './Groups.module.css';
 
 /**
@@ -15,7 +16,6 @@ import styles from './Groups.module.css';
  */
 const Groups = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { groups, loadGroups, selectGroup } = useGroup();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
@@ -120,49 +120,30 @@ const Groups = () => {
               {/* Header con nombre y descripción */}
               <div className={styles.cardHeader}>
                 <h3 className={styles.groupName}>{group.name}</h3>
-                {group.description && (
-                  <p className={styles.groupDescription}>{group.description}</p>
-                )}
-                {group.inviteCode && (
-                  <div className={styles.inviteCodeDisplay}>
-                    <span className={styles.inviteCodeLabel}>Código de invitación:</span>
-                    <span className={styles.inviteCodeValue}>{group.inviteCode}</span>
-                  </div>
-                )}
+                <p className={styles.groupDescription}>
+                  {group.description || 'Sin descripción'}
+                </p>
               </div>
 
-              {/* Members Quick View */}
+              {/* Admin del grupo */}
               <div className={styles.cardBody}>
-                <div className={styles.membersList}>
-                  <div className={styles.membersHeader}>
-                    <span className={styles.membersLabel}>Integrantes ({(group.members?.length || 0) + 1})</span>
-                  </div>
-                  <div className={styles.memberItems}>
-                    {user && (
-                      <div className={styles.memberItem}>
-                        <div className={styles.memberAvatar}>
-                          {user.name?.charAt(0).toUpperCase() || '?'}
-                        </div>
-                        <div className={styles.memberInfo}>
-                          <p className={styles.memberName}>{user.name}</p>
-                          <p className={styles.memberRole}>Admin</p>
-                        </div>
-                      </div>
+                <div className={styles.adminSection}>
+                  <span className={styles.adminLabel}>Administrador</span>
+                  <div className={styles.adminInfo}>
+                    {isValidAvatar(group.admin?.avatar) ? (
+                      <img 
+                        src={group.admin.avatar} 
+                        alt={group.admin?.name} 
+                        className={styles.adminAvatarImg}
+                      />
+                    ) : (
+                      <FaUserCircle className={styles.adminAvatarIcon} />
                     )}
-                    {group.members && group.members.length > 0 && (
-                      group.members.map((member, idx) => (
-                        <div key={idx} className={styles.memberItem}>
-                          <div className={styles.memberAvatar}>
-                            {member.name?.charAt(0).toUpperCase() || member.email?.charAt(0).toUpperCase() || '?'}
-                          </div>
-                          <div className={styles.memberInfo}>
-                            <p className={styles.memberName}>{member.name || member.email}</p>
-                            <p className={styles.memberRole}>Miembro</p>
-                          </div>
-                        </div>
-                      ))
-                    )}
+                    <span className={styles.adminName}>{group.admin?.name || 'Sin admin'}</span>
                   </div>
+                  <span className={styles.membersCount}>
+                    {group.members?.length || 0} miembro{(group.members?.length || 0) !== 1 ? 's' : ''}
+                  </span>
                 </div>
               </div>
 

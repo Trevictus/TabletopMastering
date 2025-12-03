@@ -4,6 +4,9 @@ import { STORAGE_KEYS } from '../constants/auth';
 /**
  * Servicio de autenticación
  * Gestiona todas las operaciones relacionadas con autenticación y persistencia de usuario
+ * 
+ * IMPORTANTE: Usamos sessionStorage en lugar de localStorage para aislar sesiones por pestaña.
+ * Esto permite que diferentes usuarios inicien sesión en diferentes pestañas del mismo navegador.
  */
 const authService = {
   /**
@@ -14,8 +17,8 @@ const authService = {
   register: async (userData) => {
     const response = await api.post('/auth/register', userData);
     if (response.data.data?.token && response.data.data?.user) {
-      localStorage.setItem(STORAGE_KEYS.TOKEN, response.data.data.token);
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
+      sessionStorage.setItem(STORAGE_KEYS.TOKEN, response.data.data.token);
+      sessionStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
     }
     return response.data;
   },
@@ -28,19 +31,20 @@ const authService = {
   login: async (credentials) => {
     const response = await api.post('/auth/login', credentials);
     if (response.data.data?.token && response.data.data?.user) {
-      localStorage.setItem(STORAGE_KEYS.TOKEN, response.data.data.token);
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
+      sessionStorage.setItem(STORAGE_KEYS.TOKEN, response.data.data.token);
+      sessionStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
     }
     return response.data;
   },
 
   /**
    * Cierra sesión
-   * Limpia token y datos de usuario del localStorage
+   * Limpia token y datos de usuario del sessionStorage
    */
   logout: () => {
-    localStorage.removeItem(STORAGE_KEYS.TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.USER);
+    sessionStorage.removeItem(STORAGE_KEYS.TOKEN);
+    sessionStorage.removeItem(STORAGE_KEYS.USER);
+    sessionStorage.removeItem(STORAGE_KEYS.SELECTED_GROUP);
   },
 
   /**
@@ -50,9 +54,9 @@ const authService = {
    */
   getProfile: async () => {
     const response = await api.get('/auth/me');
-    // Actualizar datos en localStorage con la información más reciente
+    // Actualizar datos en sessionStorage con la información más reciente
     if (response.data.user) {
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.user));
+      sessionStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.user));
     }
     return response.data;
   },
@@ -66,19 +70,19 @@ const authService = {
     const response = await api.put('/auth/profile', profileData);
     // Backend devuelve { success, message, data: { user } }
     if (response.data.data?.user) {
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
+      sessionStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
       return response.data.data; // Devolver { user }
     }
     return response.data;
   },
 
   /**
-   * Sincroniza los datos del usuario en localStorage
+   * Sincroniza los datos del usuario en sessionStorage
    * @param {Object} userData - Datos actualizados del usuario
    */
   syncUserData: (userData) => {
     if (userData) {
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+      sessionStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
     }
   },
 
@@ -87,21 +91,21 @@ const authService = {
    * @returns {boolean} True si hay token
    */
   isAuthenticated: () => {
-    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
+    const token = sessionStorage.getItem(STORAGE_KEYS.TOKEN);
     return !!token;
   },
 
   /**
-   * Obtiene el usuario del localStorage
+   * Obtiene el usuario del sessionStorage
    * NOTA: Estos datos pueden estar desactualizados, usar getProfile() para datos frescos
    * @returns {Object|null} Usuario o null
    */
   getCurrentUser: () => {
     try {
-      const user = localStorage.getItem(STORAGE_KEYS.USER);
+      const user = sessionStorage.getItem(STORAGE_KEYS.USER);
       return user ? JSON.parse(user) : null;
     } catch (error) {
-      console.error('Error al parsear usuario de localStorage:', error);
+      console.error('Error al parsear usuario de sessionStorage:', error);
       return null;
     }
   },
@@ -111,7 +115,7 @@ const authService = {
    * @returns {string|null} Token de autenticación
    */
   getToken: () => {
-    return localStorage.getItem(STORAGE_KEYS.TOKEN);
+    return sessionStorage.getItem(STORAGE_KEYS.TOKEN);
   },
 };
 

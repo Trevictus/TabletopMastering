@@ -6,24 +6,22 @@ import Loading from '../common/Loading';
 /**
  * Componente ProtectedRoute
  * Protege rutas que requieren autenticación
+ * Muestra loading mientras se valida la sesión
  * Redirige a /login si el usuario no está autenticado
- * Guarda la URL de destino para redirigir después del login
  */
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, initializing } = useAuth();
   const location = useLocation();
 
-  // Mostrar loading mientras se verifica la autenticación
-  if (loading) {
-    return <Loading fullScreen message="Verificando sesión..." />;
+  // Mientras se valida el token, mostrar loading
+  if (initializing) {
+    return <Loading message="Verificando sesión..." />;
   }
 
-  // Si no está autenticado, redirigir a login con returnUrl
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  // Si está autenticado, mostrar el contenido
   return children;
 };
 

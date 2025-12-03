@@ -17,8 +17,8 @@ jest.mock('../services/authService');
 describe('AuthContext', () => {
 
   beforeEach(() => {
-    // Limpiar localStorage antes de cada test
-    localStorage.clear();
+    // Limpiar sessionStorage antes de cada test (usamos sessionStorage para aislamiento por pestaña)
+    sessionStorage.clear();
     // Limpiar mocks
     jest.clearAllMocks();
   });

@@ -150,50 +150,211 @@
 .logoutButton {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs) var(--spacing-xs);
-  min-width: auto;
+  justify-content: center;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--text-primary);
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
+.logoutButton:hover {
+  background: rgba(139, 69, 19, 0.1);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.linkText {
+  white-space: nowrap;
+}
+
+/* Auth buttons para usuarios no autenticados */
+.authButton {
+  padding: 8px 16px;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  background: transparent;
+}
+
+.authButton:hover {
+  background: rgba(139, 69, 19, 0.1);
+}
+
+.authButtonPrimary {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.authButtonPrimary:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+/* ========================================
+   RESPONSIVE - Navbar
+   ======================================== */
+
+/* Desktop pequeño - 1200px */
+@media (max-width: 1200px) {
   .nav {
-    gap: var(--spacing-lg);
-  }
-
-  .userName {
-    display: none;
-  }
-
-  .container {
-    padding: 0 var(--spacing-xl);
-  }
-}
-
-@media (max-width: 768px) {
-  .navbar {
-    padding: var(--spacing-md) 0;
+    gap: var(--spacing-md);
   }
 
   .container {
     padding: 0 var(--spacing-lg);
   }
+}
 
-  .brand {
-    font-size: var(--font-size-xl);
+/* Tablet - 1024px */
+@media (max-width: 1024px) {
+  .nav {
     gap: var(--spacing-sm);
   }
 
-  .brandIcon {
-    font-size: var(--font-size-2xl);
+  .container {
+    padding: 0 var(--spacing-md);
   }
 
-  .nav {
-    gap: var(--spacing-md);
+  .linkText {
+    display: none;
   }
 
   .navLink {
-    font-size: var(--font-size-md);
-    padding: var(--spacing-xs) var(--spacing-sm);
+    padding: var(--spacing-sm);
+  }
+
+  .linkIcon {
+    font-size: 1.25rem;
+  }
+}
+
+/* Tablet pequeño - 768px */
+@media (max-width: 768px) {
+  .navbar {
+    padding: var(--spacing-sm) 0;
+  }
+
+  .container {
+    padding: 0 var(--spacing-sm);
+  }
+
+  .brand {
+    gap: var(--spacing-sm);
+  }
+
+  .brand span {
+    display: none;
+  }
+
+  .brandIcon {
+    font-size: 1.5rem;
+  }
+
+  .nav {
+    gap: 4px;
+  }
+
+  .navLink {
+    padding: 8px;
+  }
+
+  .linkIcon {
+    font-size: 1.1rem;
+  }
+
+  .userAvatar {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .logoutButton {
+    padding: 8px;
+  }
+
+  .profileLink {
+    padding: 6px 8px;
+    border: none;
+    background: rgba(139, 69, 19, 0.08);
+  }
+}
+
+/* Mobile - 480px */
+@media (max-width: 480px) {
+  .navbar {
+    padding: 6px 0;
+  }
+
+  .container {
+    padding: 0 8px;
+  }
+
+  .brandIcon {
+    font-size: 1.25rem;
+  }
+
+  .nav {
+    gap: 2px;
+  }
+
+  .navLink {
+    padding: 6px;
+  }
+
+  .linkIcon {
+    font-size: 1rem;
+  }
+
+  .userAvatar {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .logoutButton {
+    padding: 6px;
+  }
+
+  .profileLink {
+    padding: 4px 6px;
+  }
+
+  .authButton {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Mobile muy pequeño - 360px */
+@media (max-width: 360px) {
+  .container {
+    padding: 0 4px;
+  }
+
+  .nav {
+    gap: 1px;
+  }
+
+  .navLink {
+    padding: 4px;
+  }
+
+  .linkIcon {
+    font-size: 0.9rem;
+  }
+
+  .logoutButton {
+    padding: 4px;
+  }
+
+  .authButton {
+    padding: 4px 8px;
+    font-size: 0.75rem;
   }
 }

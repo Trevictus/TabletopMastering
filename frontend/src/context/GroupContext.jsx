@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import groupService from '../services/groupService';
+import { STORAGE_KEYS } from '../constants/auth';
 
 const GroupContext = createContext(null);
 
@@ -37,8 +38,8 @@ export const GroupProvider = ({ children }) => {
       const response = await groupService.getMyGroups();
       setGroups(response.data || []);
       
-      // Si hay un grupo guardado en localStorage, intentar seleccionarlo
-      const savedGroupId = localStorage.getItem('selectedGroupId');
+      // Si hay un grupo guardado en sessionStorage, intentar seleccionarlo
+      const savedGroupId = sessionStorage.getItem(STORAGE_KEYS.SELECTED_GROUP);
       if (savedGroupId && response.data?.length > 0) {
         const savedGroup = response.data.find(g => g._id === savedGroupId);
         if (savedGroup) {
@@ -50,7 +51,6 @@ export const GroupProvider = ({ children }) => {
     } catch (err) {
       // Solo mostrar error si no es una petición cancelada
       if (err.name !== 'CanceledError') {
-        console.error('Error al cargar grupos:', err);
         setError(err.response?.data?.message || 'Error al cargar grupos');
       }
     } finally {
@@ -64,19 +64,19 @@ export const GroupProvider = ({ children }) => {
    */
   const selectGroup = useCallback((group) => {
     setSelectedGroup(group);
-    // Guardar en localStorage para persistencia
+    // Guardar en sessionStorage para persistencia en esta pestaña
     if (group) {
-      localStorage.setItem('selectedGroupId', group._id);
+      sessionStorage.setItem(STORAGE_KEYS.SELECTED_GROUP, group._id);
     } else {
-      localStorage.removeItem('selectedGroupId');
+      sessionStorage.removeItem(STORAGE_KEYS.SELECTED_GROUP);
     }
   }, []);
 
   /**
-   * Restaura el grupo seleccionado desde localStorage
+   * Restaura el grupo seleccionado desde sessionStorage
    */
   useEffect(() => {
-    const savedGroupId = localStorage.getItem('selectedGroupId');
+    const savedGroupId = sessionStorage.getItem(STORAGE_KEYS.SELECTED_GROUP);
     if (savedGroupId && groups.length > 0 && !selectedGroup) {
       const group = groups.find(g => g._id === savedGroupId);
       if (group) {

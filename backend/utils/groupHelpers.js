@@ -117,22 +117,23 @@ const removeMemberFromGroup = async (group, userId) => {
  * Opciones de populate estándar para grupos (incluye datos completos de miembros)
  */
 const groupPopulateOptions = [
-  { path: 'admin', select: 'name email avatar stats' },
-  { path: 'members.user', select: 'name email avatar stats' },
+  { path: 'admin', select: '_id name email avatar stats' },
+  { path: 'members.user', select: '_id name email avatar stats' },
 ];
 
 /**
- * Opciones de populate simplificadas (sin miembros completos)
+ * Opciones de populate simplificadas para listados (incluye _id para comparaciones)
  */
 const groupPopulateOptionsSimple = [
-  { path: 'admin', select: 'name avatar -_id' },
+  { path: 'admin', select: '_id name avatar' },
+  { path: 'members.user', select: '_id name avatar' },
 ];
 
 /**
  * Opciones de populate para listados (mínimo necesario)
  */
 const groupPopulateOptionsList = [
-  { path: 'admin', select: 'name -_id' },
+  { path: 'admin', select: '_id name' },
 ];
 
 module.exports = {

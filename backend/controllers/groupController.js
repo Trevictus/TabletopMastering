@@ -24,7 +24,7 @@ const createGroup = async (req, res, next) => {
     // Generar código de invitación único
     const inviteCode = await generateUniqueInviteCode();
 
-    // Crear el grupo
+    // Crear el grupo (el middleware pre-save añade automáticamente al admin como miembro)
     const group = await Group.create({
       name,
       description,
@@ -62,7 +62,6 @@ const getMyGroups = async (req, res, next) => {
       isActive: true,
     })
       .populate(groupPopulateOptionsSimple)
-      .select('-members') // No devolver lista completa de miembros en el listado
       .sort('-createdAt');
 
     res.status(200).json({

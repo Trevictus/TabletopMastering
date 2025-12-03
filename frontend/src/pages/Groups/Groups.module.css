@@ -123,6 +123,14 @@
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  font-style: italic;
+}
+
+.groupCard .cardHeader .groupDescription:empty::before,
+.groupCard .cardHeader .groupDescription[data-empty="true"] {
+  content: 'Sin descripción';
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 .groupCard .cardHeader .inviteCodeDisplay {
@@ -154,12 +162,72 @@
 
 .groupCard .cardBody {
   flex: 1;
-  padding: 24px;
+  padding: 20px 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
+/* Admin Section - Nueva estructura simplificada */
+.groupCard .adminSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+.groupCard .adminLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-right: auto;
+  display: none;
+}
+
+.groupCard .adminInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.groupCard .adminAvatarImg {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid var(--primary-color);
+}
+
+.groupCard .adminAvatarIcon {
+  width: 36px;
+  height: 36px;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.groupCard .adminName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.groupCard .membersCount {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* Mantener estilos de membersList por compatibilidad */
 .groupCard .membersList {
   display: flex;
   flex-direction: column;
@@ -217,6 +285,21 @@
   flex-shrink: 0;
 }
 
+.groupCard .memberAvatarImg {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.groupCard .memberAvatarIcon {
+  width: 40px;
+  height: 40px;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
 .groupCard .memberInfo {
   display: flex;
   flex-direction: column;
@@ -269,9 +352,9 @@
 }
 
 .groupCard .viewGroupButton:hover {
-  background: #5558e3;
+  background: var(--primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 8px 16px rgba(139, 69, 19, 0.3);
 }
 
 .groupCard .viewGroupButton:active {
@@ -497,44 +580,174 @@
   flex-wrap: wrap;
 }
 
-/* Responsive */
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+/* Tablet - 1024px */
+@media (max-width: 1024px) {
+  .groupsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+/* Tablet pequeño - 768px */
 @media (max-width: 768px) {
   .groupsPage {
     padding: var(--spacing-md);
+    gap: var(--spacing-lg);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+
+  .headerContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .headerContent h1 {
+    font-size: var(--font-size-xl);
+  }
+
+  .headerIcon {
+    font-size: var(--font-size-2xl);
+  }
+
+  .subtitle {
+    font-size: var(--font-size-sm);
+  }
+
+  .headerActions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .headerActions > a,
+  .headerActions > button {
+    flex: 1;
   }
 
   .groupsGrid {
     grid-template-columns: 1fr;
+    gap: var(--spacing-md);
   }
 
-  .cardHeader {
+  .groupCard .cardHeader {
     padding: 16px;
   }
 
-  .cardBody {
+  .groupCard .cardHeader .groupName {
+    font-size: 18px;
+  }
+
+  .groupCard .cardBody {
     padding: 16px;
-    gap: 12px;
   }
 
-  .cardFooter {
-    padding: 12px 16px;
+  .groupCard .adminSection {
+    padding: 10px 12px;
+    gap: 10px;
   }
 
-  .memberItems {
-    max-height: 180px;
+  .groupCard .adminAvatarImg,
+  .groupCard .adminAvatarIcon {
+    width: 32px;
+    height: 32px;
   }
 
-  .memberAvatar {
-    width: 36px;
-    height: 36px;
-    font-size: 12px;
-  }
-
-  .memberName {
+  .groupCard .adminName {
     font-size: 13px;
   }
 
-  .memberRole {
+  .groupCard .membersCount {
     font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  .groupCard .cardFooter {
+    padding: 12px 16px;
+  }
+
+  .groupCard .viewGroupButton {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+
+  /* Modal */
+  .modal {
+    width: 95%;
+    max-width: none;
+    margin: var(--spacing-md);
+  }
+
+  .modalHeader {
+    padding: 16px;
+  }
+
+  .modalHeader h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  .joinForm {
+    padding: 16px;
+  }
+
+  /* Empty state */
+  .emptyState {
+    padding: var(--spacing-xl);
+  }
+
+  .emptyIcon {
+    font-size: 4rem;
+  }
+
+  .emptyTitle {
+    font-size: var(--font-size-lg);
+  }
+
+  .emptyActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .emptyActions > a,
+  .emptyActions > button {
+    width: 100%;
+  }
+}
+
+/* Mobile - 480px */
+@media (max-width: 480px) {
+  .groupsPage {
+    padding: var(--spacing-sm);
+  }
+
+  .headerContent h1 {
+    font-size: var(--font-size-lg);
+  }
+
+  .headerIcon {
+    font-size: var(--font-size-xl);
+  }
+
+  .groupCard .cardHeader .groupName {
+    font-size: 16px;
+  }
+
+  .groupCard .cardHeader .groupDescription {
+    font-size: 13px;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .formActions button {
+    width: 100%;
   }
 }

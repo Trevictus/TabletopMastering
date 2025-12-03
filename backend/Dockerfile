@@ -32,6 +32,9 @@ FROM base AS development
 # Copiar dependencias desde el stage de dependencies
 COPY --from=dependencies /app/node_modules ./node_modules
 
+# Instalar nodemon globalmente para desarrollo
+RUN npm install -g nodemon
+
 # Copiar código fuente
 COPY . .
 

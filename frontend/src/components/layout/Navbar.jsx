@@ -3,7 +3,7 @@ import { GiPerspectiveDiceSixFacesRandom, GiCardPlay, GiTrophy, GiTeamIdea, GiSc
 import { MdPerson, MdExitToApp, MdHome, MdCalendarToday } from 'react-icons/md';
 import { FaUserCircle } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
-import Button from '../common/Button';
+import { isValidAvatar } from '../../utils/validators';
 import styles from './Navbar.module.css';
 
 /**
@@ -37,21 +37,17 @@ const Navbar = () => {
           <ul className={styles.nav}>
             <li>
               <Link to="/" className={`${styles.navLink} ${isActive('/')}`}>
-                Inicio
+                <span className={styles.linkText}>Inicio</span>
               </Link>
             </li>
             <li>
-              <Link to="/login">
-                <Button variant="outline" size="small">
-                  Iniciar Sesión
-                </Button>
+              <Link to="/login" className={styles.authButton}>
+                Iniciar Sesión
               </Link>
             </li>
             <li>
-              <Link to="/register">
-                <Button variant="primary" size="small">
-                  Registrarse
-                </Button>
+              <Link to="/register" className={`${styles.authButton} ${styles.authButtonPrimary}`}>
+                Registrarse
               </Link>
             </li>
           </ul>
@@ -61,62 +57,61 @@ const Navbar = () => {
         {isAuthenticated && (
           <ul className={styles.nav}>
             <li>
-              <Link to="/home" className={`${styles.navLink} ${isActive('/home')}`}>
+              <Link to="/home" className={`${styles.navLink} ${isActive('/home')}`} title="Inicio">
                 <MdHome className={styles.linkIcon} />
-                Inicio
+                <span className={styles.linkText}>Inicio</span>
               </Link>
             </li>
             <li>
-              <Link to="/groups" className={`${styles.navLink} ${isActive('/groups')}`}>
+              <Link to="/groups" className={`${styles.navLink} ${isActive('/groups')}`} title="Grupos">
                 <GiTeamIdea className={styles.linkIcon} />
-                Grupos
+                <span className={styles.linkText}>Grupos</span>
               </Link>
             </li>
             <li>
-              <Link to="/calendar" className={`${styles.navLink} ${isActive('/calendar')}`}>
+              <Link to="/calendar" className={`${styles.navLink} ${isActive('/calendar')}`} title="Calendario">
                 <MdCalendarToday className={styles.linkIcon} />
-                Calendario
+                <span className={styles.linkText}>Calendario</span>
               </Link>
             </li>
             <li>
-              <Link to="/games" className={`${styles.navLink} ${isActive('/games')}`}>
+              <Link to="/games" className={`${styles.navLink} ${isActive('/games')}`} title="Juegos">
                 <GiCardPlay className={styles.linkIcon} />
-                Juegos
+                <span className={styles.linkText}>Juegos</span>
               </Link>
             </li>
             <li>
-              <Link to="/rankings" className={`${styles.navLink} ${isActive('/rankings')}`}>
+              <Link to="/rankings" className={`${styles.navLink} ${isActive('/rankings')}`} title="Rankings">
                 <GiTrophy className={styles.linkIcon} />
-                Rankings
+                <span className={styles.linkText}>Rankings</span>
               </Link>
             </li>
             <li>
-              <Link to="/history" className={`${styles.navLink} ${isActive('/history')}`}>
+              <Link to="/history" className={`${styles.navLink} ${isActive('/history')}`} title="Historial">
                 <GiScrollUnfurled className={styles.linkIcon} />
-                Historial
+                <span className={styles.linkText}>Historial</span>
               </Link>
             </li>
             <li>
-              <Link to="/profile" className={`${styles.navLink} ${isActive('/profile')}`}>
-                {user?.avatar && user.avatar.startsWith('data:image') ? (
+              <Link to="/profile" className={`${styles.navLink} ${styles.profileLink} ${isActive('/profile')}`} title="Perfil">
+                {isValidAvatar(user?.avatar) ? (
                   <img src={user.avatar} alt={user.name} className={styles.userAvatar} />
                 ) : (
                   <FaUserCircle className={styles.linkIcon} />
                 )}
-                {user?.name || 'Perfil'}
+                <span className={styles.linkText}>{user?.name || 'Perfil'}</span>
               </Link>
             </li>
             
             {/* Logout Button */}
             <li>
-              <Button 
-                variant="outline" 
-                size="small"
+              <button 
                 onClick={handleLogout}
                 className={styles.logoutButton}
+                title="Cerrar sesión"
               >
                 <MdExitToApp className={styles.linkIcon} />
-              </Button>
+              </button>
             </li>
           </ul>
         )}

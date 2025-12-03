@@ -3,11 +3,14 @@
  */
 
 /**
- * Claves de localStorage para autenticación
+ * Claves de sessionStorage para autenticación
+ * IMPORTANTE: Usamos sessionStorage (no localStorage) para aislar sesiones por pestaña
+ * Esto permite que diferentes usuarios usen diferentes pestañas del mismo navegador
  */
 export const STORAGE_KEYS = {
   TOKEN: 'token',
   USER: 'user',
+  SELECTED_GROUP: 'selectedGroupId',
 };
 
 /**

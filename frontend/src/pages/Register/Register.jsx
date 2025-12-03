@@ -5,7 +5,6 @@ import { MdEmail, MdLock, MdPerson } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
-import authService from '../../services/authService';
 import styles from './Register.module.css';
 
 /**
@@ -14,7 +13,7 @@ import styles from './Register.module.css';
  */
 const Register = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
 
   // Cerrar modal al hacer clic fuera del formulario
   const handleOverlayClick = (e) => {
@@ -242,11 +241,10 @@ const Register = () => {
 
     try {
       const { name, email, password } = formData;
-      const response = await authService.register({ name, email, password });
+      const response = await register({ name, email, password });
 
-      // Login automático después del registro exitoso
-      if (response.data && response.data.token) {
-        login(response.data.user, response.data.token);
+      // Registro exitoso - el usuario ya está logueado en el contexto
+      if (response.data?.user) {
         navigate('/', { 
           state: { 
             message: `¡Bienvenido/a, ${response.data.user.name}! Tu cuenta ha sido creada exitosamente.` 
@@ -254,8 +252,6 @@ const Register = () => {
         });
       }
     } catch (error) {
-      console.error('Error en el registro:', error);
-      
       // Manejar errores del servidor
       if (error.response?.data?.message) {
         setServerError(error.response.data.message);

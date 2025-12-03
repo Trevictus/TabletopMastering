@@ -124,10 +124,10 @@ exports.createCustomGame = async (gameData, userId, groupId = null) => {
 
 /**
  * Obtener juegos (personales o por grupo sin duplicados)
- * Cuando se consulta por grupo, incluye:
- * - Juegos asignados directamente al grupo
- * - Juegos personales de todos los miembros del grupo
- * Optimizado con lean(), projection y consultas eficientes
+ * Cuando se consulta por grupo:
+ * - Obtiene los juegos personales de todos los miembros del grupo
+ * - Deduplica automáticamente por nombre/bggId
+ * Los juegos NO se asignan directamente a grupos, solo a usuarios
  */
 exports.getGames = async (userId, groupId = null, filters = {}) => {
   const { source, search, page = 1, limit = 20 } = filters;
@@ -135,7 +135,6 @@ exports.getGames = async (userId, groupId = null, filters = {}) => {
   let filter = { isActive: true };
   let needsDeduplication = false;
 
-  // Obtener juegos según contexto
   if (groupId) {
     // Obtener solo los IDs de miembros del grupo (optimizado)
     const group = await Group.findById(groupId)
@@ -149,14 +148,12 @@ exports.getGames = async (userId, groupId = null, filters = {}) => {
     // Obtener IDs de todos los miembros del grupo
     const memberIds = group.members.map(m => m.user);
 
-    // Incluir juegos del grupo Y juegos personales de los miembros
-    filter.$or = [
-      { group: groupId }, // Juegos asignados al grupo
-      { addedBy: { $in: memberIds }, group: null } // Juegos personales de miembros
-    ];
+    // Solo juegos personales de los miembros (group = null)
+    filter.addedBy = { $in: memberIds };
+    filter.group = null;
     needsDeduplication = true;
   } else {
-    // Juegos personales (sin grupo)
+    // Juegos personales del usuario (sin grupo)
     filter.addedBy = userId;
     filter.group = null;
   }
