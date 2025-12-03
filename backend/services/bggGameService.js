@@ -134,7 +134,7 @@ exports.addBGGGame = async (bggId, userId, groupId = null, customNotes = '') => 
 
   // Verificar que el juego se guardó y devolver con populate mínimo
   const savedGame = await Game.findById(game._id)
-    .select('name image thumbnail minPlayers maxPlayers source bggId addedBy group createdAt')
+    .select('name image thumbnail minPlayers maxPlayers playingTime categories rating source bggId addedBy group createdAt')
     .populate('addedBy', 'name -_id')
     .populate('group', 'name -_id')
     .lean();
