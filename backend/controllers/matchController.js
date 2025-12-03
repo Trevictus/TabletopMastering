@@ -195,6 +195,33 @@ exports.confirmAttendance = async (req, res, next) => {
 };
 
 /**
+ * @desc    Cancelar asistencia a partida
+ * @route   DELETE /api/matches/:id/confirm
+ * @access  Private
+ */
+exports.cancelAttendance = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const match = await matchService.cancelAttendance(id, req.user._id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Asistencia cancelada',
+      data: match,
+    });
+  } catch (error) {
+    if (error.status) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message,
+      });
+    }
+    next(error);
+  }
+};
+
+/**
  * @desc    Eliminar partida
  * @route   DELETE /api/matches/:id
  * @access  Private

@@ -102,9 +102,10 @@ matchSchema.index({ createdBy: 1, createdAt: -1 });  // Partidas creadas por usu
 matchSchema.index({ status: 1, scheduledDate: 1 });  // Próximas partidas programadas
 matchSchema.index({ winner: 1 }, { sparse: true });  // Consultas de ganadores (sparse para optimizar)
 
-// Validación: al menos 2 jugadores
+// Validación: al menos 2 jugadores (solo en creación o cuando players está definido)
 matchSchema.pre('save', function (next) {
-  if (this.players.length < 2) {
+  // Solo validar si players está presente (puede no estarlo en updates parciales)
+  if (this.players && this.players.length < 2) {
     next(new Error('Una partida debe tener al menos 2 jugadores'));
   } else {
     next();

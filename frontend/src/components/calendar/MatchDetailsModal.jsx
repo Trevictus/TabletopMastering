@@ -10,9 +10,11 @@ import {
   MdPlace,
   MdAccessTime,
   MdNotes,
-  MdEmojiEvents
+  MdEmojiEvents,
+  MdTimer,
+  MdLeaderboard
 } from 'react-icons/md';
-import { GiCardPlay } from 'react-icons/gi';
+import { GiCardPlay, GiTrophy } from 'react-icons/gi';
 import Modal from '../common/Modal';
 import Button from '../common/Button';
 import { useAuth } from '../../context/AuthContext';
@@ -266,6 +268,62 @@ const MatchDetailsModal = ({
             </div>
           )}
         </div>
+
+        {/* Resultados finales - Solo si la partida está finalizada */}
+        {match.status === 'finalizada' && (
+          <div className={styles.section}>
+            <h4 className={styles.sectionTitle}>
+              <MdLeaderboard className={styles.titleIcon} /> Resultados Finales
+            </h4>
+            
+            {/* Posiciones finales */}
+            <div className={styles.resultsGrid}>
+              {match.players
+                ?.filter(p => p.position)
+                .sort((a, b) => a.position - b.position)
+                .map((player, index) => {
+                  const playerName = player.user?.name || player.user?.email || 'Usuario';
+                  const isWinner = player.position === 1;
+                  const winnerId = match.winner?._id || match.winner;
+                  const isMatchWinner = winnerId && (player.user?._id || player.user) === winnerId;
+                  
+                  return (
+                    <div 
+                      key={player.user?._id || index} 
+                      className={`${styles.resultItem} ${isWinner ? styles.winner : ''}`}
+                    >
+                      <div className={styles.positionBadge}>
+                        {isWinner ? <GiTrophy className={styles.trophyIcon} /> : `#${player.position}`}
+                      </div>
+                      <div className={styles.resultPlayerInfo}>
+                        <span className={styles.resultPlayerName}>
+                          {playerName}
+                          {isMatchWinner && <span className={styles.winnerBadge}>Ganador</span>}
+                        </span>
+                        {player.score > 0 && (
+                          <span className={styles.resultScore}>{player.score} pts</span>
+                        )}
+                      </div>
+                      {player.pointsEarned > 0 && (
+                        <span className={styles.pointsEarned}>+{player.pointsEarned} ranking</span>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+
+            {/* Duración */}
+            {match.duration?.value && (
+              <div className={styles.durationInfo}>
+                <MdTimer className={styles.icon} />
+                <span className={styles.label}>Duración:</span>
+                <span className={styles.value}>
+                  {match.duration.value} {match.duration.unit || 'minutos'}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Lista de jugadores */}
         <div className={styles.section}>

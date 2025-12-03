@@ -7,20 +7,21 @@ const rankingService = require('./rankingService');
 
 /**
  * Constantes de populate optimizadas con proyecciones mínimas
+ * NOTA: Incluimos _id para que el frontend pueda hacer comparaciones correctas
  */
 const MATCH_POPULATE_OPTIONS = [
-  { path: 'game', select: 'name image thumbnail -_id', options: { lean: true } },
-  { path: 'group', select: 'name -_id', options: { lean: true } },
-  { path: 'players.user', select: 'name avatar -_id', options: { lean: true } },
-  { path: 'createdBy', select: 'name avatar -_id', options: { lean: true } },
-  { path: 'winner', select: 'name avatar -_id', options: { lean: true } },
+  { path: 'game', select: 'name image thumbnail', options: { lean: true } },
+  { path: 'group', select: 'name', options: { lean: true } },
+  { path: 'players.user', select: 'name avatar', options: { lean: true } },
+  { path: 'createdBy', select: 'name email avatar', options: { lean: true } },
+  { path: 'winner', select: 'name avatar', options: { lean: true } },
 ];
 
 const MATCH_POPULATE_LIST = [
-  { path: 'game', select: 'name image -_id', options: { lean: true } },
-  { path: 'group', select: 'name -_id', options: { lean: true } },
-  { path: 'players.user', select: 'name avatar -_id', options: { lean: true } },
-  { path: 'createdBy', select: 'name -_id', options: { lean: true } },
+  { path: 'game', select: 'name image', options: { lean: true } },
+  { path: 'group', select: 'name', options: { lean: true } },
+  { path: 'players.user', select: 'name avatar', options: { lean: true } },
+  { path: 'createdBy', select: 'name', options: { lean: true } },
 ];
 
 const MATCH_POPULATE_DETAILED = [
@@ -243,9 +244,8 @@ exports.getMatchById = async (matchId, userId) => {
  * Actualizar una partida (optimizado)
  */
 exports.updateMatch = async (matchId, updates, userId) => {
-  // Solo obtener los campos necesarios para validación
-  const match = await Match.findById(matchId)
-    .select('createdBy group status scheduledDate location notes');
+  // Obtener el documento completo para evitar problemas con validaciones de Mongoose
+  const match = await Match.findById(matchId);
     
   if (!match) {
     throw { status: 404, message: 'Partida no encontrada' };
@@ -276,6 +276,20 @@ exports.updateMatch = async (matchId, updates, userId) => {
   const { scheduledDate, location, notes } = updates;
   if (scheduledDate && new Date(scheduledDate) < new Date()) {
     throw new Error('La fecha de la partida no puede ser en el pasado');
+  }
+
+  // Si se cambia la fecha, resetear las confirmaciones de los demás jugadores (excepto el creador)
+  const oldScheduledDate = match.scheduledDate;
+  const newScheduledDate = scheduledDate ? new Date(scheduledDate) : null;
+  const dateChanged = newScheduledDate && oldScheduledDate.getTime() !== newScheduledDate.getTime();
+
+  if (dateChanged) {
+    match.players.forEach(player => {
+      // Mantener la confirmación del creador, resetear las demás
+      if (player.user.toString() !== userId.toString()) {
+        player.confirmed = false;
+      }
+    });
   }
 
   // Actualizar campos permitidos
@@ -400,8 +414,8 @@ exports.finishMatch = async (matchId, userId, winnerId = null, results = [], dur
  * Confirmar asistencia a partida (optimizado)
  */
 exports.confirmAttendance = async (matchId, userId) => {
-  const match = await Match.findById(matchId)
-    .select('players status');
+  // No usamos select() para obtener todos los campos y poder devolverlos completos
+  const match = await Match.findById(matchId);
     
   if (!match) {
     throw { status: 404, message: 'Partida no encontrada' };
@@ -425,7 +439,46 @@ exports.confirmAttendance = async (matchId, userId) => {
   match.players[playerIndex].confirmed = true;
 
   await match.save();
-  await match.populate(MATCH_POPULATE_OPTIONS);
+  await match.populate(MATCH_POPULATE_DETAILED);
+
+  return match;
+};
+
+/**
+ * Cancelar asistencia a partida
+ */
+exports.cancelAttendance = async (matchId, userId) => {
+  // No usamos select() para obtener todos los campos y poder devolverlos completos
+  const match = await Match.findById(matchId);
+    
+  if (!match) {
+    throw { status: 404, message: 'Partida no encontrada' };
+  }
+
+  // El usuario debe ser uno de los jugadores
+  const playerIndex = match.players.findIndex(
+    p => p.user.toString() === userId.toString()
+  );
+
+  if (playerIndex === -1) {
+    throw { status: 403, message: 'No estás invitado a esta partida' };
+  }
+
+  // No cancelar si la partida ya finalizó o está cancelada
+  if (match.status === 'finalizada' || match.status === 'cancelada') {
+    throw new Error(`No puedes cancelar asistencia a una partida ${match.status}`);
+  }
+
+  // El creador de la partida no puede cancelar su asistencia
+  if (match.createdBy.toString() === userId.toString()) {
+    throw { status: 400, message: 'El creador de la partida no puede cancelar su asistencia' };
+  }
+
+  // Cancelar asistencia
+  match.players[playerIndex].confirmed = false;
+
+  await match.save();
+  await match.populate(MATCH_POPULATE_DETAILED);
 
   return match;
 };

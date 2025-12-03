@@ -166,11 +166,26 @@ const Calendar = () => {
   };
 
   const handleDayClick = (date) => {
-    // Filtrar partidas del día seleccionado
-    const dateStr = date.toISOString().split('T')[0];
+    // Función para formatear fecha a YYYY-MM-DD
+    // Para fechas de la base de datos (strings ISO), extrae directamente la parte de la fecha
+    // para evitar problemas de conversión de zona horaria
+    const formatDateLocal = (d) => {
+      // Si es un string ISO (de la base de datos), extraer la fecha directamente
+      if (typeof d === 'string' && d.includes('T')) {
+        return d.split('T')[0];
+      }
+      
+      const dateObj = new Date(d);
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    // Filtrar partidas del día seleccionado usando hora local
+    const dateStr = formatDateLocal(date);
     const dayMatches = matches.filter(match => {
-      const matchDate = new Date(match.scheduledDate);
-      return matchDate.toISOString().split('T')[0] === dateStr;
+      return formatDateLocal(match.scheduledDate) === dateStr;
     });
 
     if (dayMatches.length === 1) {

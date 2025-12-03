@@ -7,6 +7,7 @@ const {
   updateMatch,
   finishMatch,
   confirmAttendance,
+  cancelAttendance,
   deleteMatch,
   getGlobalRanking,
   getGroupRanking,
@@ -25,6 +26,7 @@ router.get('/:id', protect, getMatch);
 router.put('/:id', protect, updateMatch);
 router.post('/:id/finish', protect, finishMatch);
 router.post('/:id/confirm', protect, confirmAttendance);
+router.delete('/:id/confirm', protect, cancelAttendance);
 router.delete('/:id', protect, deleteMatch);
 
 module.exports = router;

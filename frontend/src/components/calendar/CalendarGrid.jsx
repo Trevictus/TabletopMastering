@@ -17,8 +17,16 @@ const getFirstDayOfMonth = (year, month) => {
 
 /**
  * Formatea una fecha a YYYY-MM-DD en hora local (sin problemas de zona horaria)
+ * Para fechas de la base de datos (strings ISO), extrae directamente la parte de la fecha
+ * para evitar problemas de conversión de zona horaria
  */
 const formatDateLocal = (date) => {
+  // Si es un string ISO (de la base de datos), extraer la fecha directamente
+  // para evitar que la conversión a hora local cambie el día
+  if (typeof date === 'string' && date.includes('T')) {
+    return date.split('T')[0];
+  }
+  
   const d = new Date(date);
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');

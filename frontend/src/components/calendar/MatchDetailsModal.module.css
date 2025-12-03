@@ -256,6 +256,113 @@
   font-weight: 600;
 }
 
+/* Resultados finales */
+.titleIcon {
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+.resultsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.resultItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  border-left: 3px solid var(--border-color);
+  transition: all var(--transition-fast);
+}
+
+.resultItem.winner {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);
+  border-left-color: #ffc107;
+}
+
+.positionBadge {
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-tertiary);
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+}
+
+.resultItem.winner .positionBadge {
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+  color: white;
+}
+
+.trophyIcon {
+  font-size: 1.25rem;
+}
+
+.resultPlayerInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.resultPlayerName {
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.resultScore {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.winnerBadge {
+  padding: 0.15rem 0.5rem;
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+  color: white;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.pointsEarned {
+  padding: 0.25rem 0.5rem;
+  background-color: var(--success-color);
+  color: white;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.durationInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  margin-top: 0.5rem;
+}
+
+.durationInfo .label {
+  margin-bottom: 0;
+}
+
+.durationInfo .value {
+  font-weight: 600;
+}
+
 /* Footer con acciones */
 .footerActions {
   display: flex;
