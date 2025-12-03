@@ -53,7 +53,6 @@ services:
       CLIENT_URL: ${CLIENT_URL}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRE: ${JWT_EXPIRE:-7d}
-      USE_BGG_MOCK: "false"
     volumes:
       - game_uploads:/app/uploads/games
     networks:

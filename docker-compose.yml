@@ -47,7 +47,6 @@ services:
       CLIENT_URL: ${CLIENT_URL:-http://localhost}
       JWT_SECRET: ${JWT_SECRET:-tu-super-secret-key-change-in-production}
       JWT_EXPIRE: ${JWT_EXPIRE:-7d}
-      USE_BGG_MOCK: ${USE_BGG_MOCK:-true}
     volumes:
       # Bind mount para desarrollo con hot-reload
       - ./backend:/app:cached
