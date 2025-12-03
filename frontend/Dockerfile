@@ -38,9 +38,9 @@ USER nodejs
 
 EXPOSE 5173
 
-# Health check para desarrollo
-HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:5173 || exit 1
+# Health check para desarrollo (usar 127.0.0.1 para evitar IPv6)
+HEALTHCHECK --interval=10s --timeout=5s --start-period=40s --retries=5 \
+    CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:5173 || exit 1
 
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 
