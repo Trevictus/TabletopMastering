@@ -76,10 +76,23 @@ const Rankings = () => {
     return sorted;
   }, [ranking, sortBy]);
 
+  // Top 20 + usuario actual si está fuera del top
+  const { displayRanking, currentUserEntry } = useMemo(() => {
+    const top20 = sortedRanking.slice(0, 20);
+    const userIndex = sortedRanking.findIndex(p => p.id && user?._id && String(p.id) === String(user._id));
+    const isUserOutsideTop = userIndex >= 20;
+    
+    return {
+      displayRanking: top20,
+      currentUserEntry: isUserOutsideTop ? { ...sortedRanking[userIndex], position: userIndex + 1 } : null
+    };
+  }, [sortedRanking, user?._id]);
+
   // Info de vista actual
   const groupName = selectedGroupId 
     ? groups.find(g => g._id === selectedGroupId)?.name || 'Grupo'
     : 'Global';
+  const totalPlayers = sortedRanking.length;
 
   return (
     <div className={styles.rankingsPage}>
@@ -89,7 +102,7 @@ const Rankings = () => {
           <GiTrophy className={styles.headerIcon} />
           <div>
             <h1>Ranking {groupName}</h1>
-            <p className={styles.subtitle}>{sortedRanking.length} jugadores</p>
+            <p className={styles.subtitle}>{totalPlayers} jugadores</p>
           </div>
         </div>
         <Button variant="outline" size="small" onClick={loadRanking} disabled={loading}>
@@ -151,33 +164,61 @@ const Rankings = () => {
                 </tr>
               ))
             ) : sortedRanking.length > 0 ? (
-              sortedRanking.map((p, i) => {
-                const isMe = p.id && user?._id && String(p.id) === String(user._id);
-                const pos = i + 1;
-                return (
-                  <tr key={p.id || i} className={`${isMe ? styles.me : ''} ${pos <= 3 ? styles[`top${pos}`] : ''}`}>
-                    <td className={styles.pos}>
-                      {pos <= 3 ? <span className={styles[`medal${pos}`]}>{pos}</span> : `#${pos}`}
-                    </td>
-                    <td>
-                      <div className={styles.player}>
-                        <div className={styles.avatar}>
-                          {isValidAvatar(p.avatar) ? (
-                            <img src={p.avatar} alt="" />
-                          ) : (
-                            <span>{p.name?.charAt(0).toUpperCase() || '?'}</span>
-                          )}
+              <>
+                {displayRanking.map((p, i) => {
+                  const isMe = p.id && user?._id && String(p.id) === String(user._id);
+                  const pos = i + 1;
+                  return (
+                    <tr key={p.id || i} className={`${isMe ? styles.me : ''} ${pos <= 3 ? styles[`top${pos}`] : ''}`}>
+                      <td className={styles.pos}>
+                        {pos <= 3 ? <span className={styles[`medal${pos}`]}>{pos}</span> : `#${pos}`}
+                      </td>
+                      <td>
+                        <div className={styles.player}>
+                          <div className={styles.avatar}>
+                            {isValidAvatar(p.avatar) ? (
+                              <img src={p.avatar} alt="" />
+                            ) : (
+                              <span>{p.name?.charAt(0).toUpperCase() || '?'}</span>
+                            )}
+                          </div>
+                          <span className={styles.name}>{p.name}</span>
+                          {isMe && <span className={styles.badge}>Tú</span>}
                         </div>
-                        <span className={styles.name}>{p.name}</span>
-                        {isMe && <span className={styles.badge}>Tú</span>}
-                      </div>
-                    </td>
-                    <td className={styles.points}>{p.totalPoints || 0}</td>
-                    <td className={styles.wins}>{p.totalWins || 0}</td>
-                    <td>{p.totalMatches || 0}</td>
-                  </tr>
-                );
-              })
+                      </td>
+                      <td className={styles.points}>{p.totalPoints || 0}</td>
+                      <td className={styles.wins}>{p.totalWins || 0}</td>
+                      <td>{p.totalMatches || 0}</td>
+                    </tr>
+                  );
+                })}
+                {currentUserEntry && (
+                  <>
+                    <tr className={styles.separator}>
+                      <td colSpan={5}><div className={styles.separatorLine}><span>···</span></div></td>
+                    </tr>
+                    <tr className={styles.me}>
+                      <td className={styles.pos}>#{currentUserEntry.position}</td>
+                      <td>
+                        <div className={styles.player}>
+                          <div className={styles.avatar}>
+                            {isValidAvatar(currentUserEntry.avatar) ? (
+                              <img src={currentUserEntry.avatar} alt="" />
+                            ) : (
+                              <span>{currentUserEntry.name?.charAt(0).toUpperCase() || '?'}</span>
+                            )}
+                          </div>
+                          <span className={styles.name}>{currentUserEntry.name}</span>
+                          <span className={styles.badge}>Tú</span>
+                        </div>
+                      </td>
+                      <td className={styles.points}>{currentUserEntry.totalPoints || 0}</td>
+                      <td className={styles.wins}>{currentUserEntry.totalWins || 0}</td>
+                      <td>{currentUserEntry.totalMatches || 0}</td>
+                    </tr>
+                  </>
+                )}
+              </>
             ) : (
               <tr>
                 <td colSpan={5} className={styles.empty}>

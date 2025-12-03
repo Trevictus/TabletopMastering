@@ -178,6 +178,18 @@
 .points { font-weight: 700; color: var(--primary-color); }
 .wins { font-weight: 700; color: #d4af37; }
 
+/* Separator for current user outside top 20 */
+.separator td { padding: 0 !important; border: none !important; }
+.separatorLine {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm) 0;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-lg);
+  letter-spacing: 4px;
+}
+
 /* Skeleton */
 .skeleton td { padding: var(--spacing-md); }
 .skelBox {
