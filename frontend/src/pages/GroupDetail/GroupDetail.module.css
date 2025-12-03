@@ -2,6 +2,19 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--spacing-lg);
+  min-height: calc(100vh - 80px);
+  animation: pageEnter 0.2s ease-out;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0.8;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .header {

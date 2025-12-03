@@ -12,6 +12,9 @@ const {
   groupPopulateOptionsSimple,
 } = require('../utils/groupHelpers');
 
+// Límite máximo de grupos por usuario
+const MAX_GROUPS_PER_USER = 7;
+
 /**
  * @desc    Crear un nuevo grupo
  * @route   POST /api/groups
@@ -20,6 +23,19 @@ const {
 const createGroup = async (req, res, next) => {
   try {
     const { name, description, avatar, settings } = req.body;
+
+    // Verificar límite de grupos del usuario
+    const userGroupCount = await Group.countDocuments({
+      'members.user': req.user._id,
+      isActive: true
+    });
+
+    if (userGroupCount >= MAX_GROUPS_PER_USER) {
+      return res.status(400).json({
+        success: false,
+        message: `Has alcanzado el límite máximo de ${MAX_GROUPS_PER_USER} grupos`,
+      });
+    }
 
     // Generar código de invitación único
     const inviteCode = await generateUniqueInviteCode();
@@ -117,6 +133,19 @@ const joinGroup = async (req, res, next) => {
       return res.status(400).json({
         success: false,
         message: 'Ya eres miembro de este grupo',
+      });
+    }
+
+    // Verificar límite de grupos del usuario
+    const userGroupCount = await Group.countDocuments({
+      'members.user': req.user._id,
+      isActive: true
+    });
+
+    if (userGroupCount >= MAX_GROUPS_PER_USER) {
+      return res.status(400).json({
+        success: false,
+        message: `Has alcanzado el límite máximo de ${MAX_GROUPS_PER_USER} grupos`,
       });
     }
 

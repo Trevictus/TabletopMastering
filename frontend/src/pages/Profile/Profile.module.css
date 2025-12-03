@@ -1,6 +1,18 @@
 .profilePage {
   min-height: calc(100vh - 80px);
   background: linear-gradient(135deg, #f5f3ef 0%, #faf8f3 100%);
+  animation: pageEnter 0.2s ease-out;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0.8;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Profile Header */

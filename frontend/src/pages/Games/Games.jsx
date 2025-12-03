@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   MdAdd, 
@@ -9,14 +9,12 @@ import {
   MdArrowForward
 } from 'react-icons/md';
 import { GiDiceFire, GiCardPlay } from 'react-icons/gi';
-import { useAuth } from '../../context/AuthContext';
 import { useGroup } from '../../context/GroupContext';
 import GameCard from '../../components/games/GameCard';
 import AddGameModal from '../../components/games/AddGameModal';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Card from '../../components/common/Card';
-import Loading from '../../components/common/Loading';
 import gameService from '../../services/gameService';
 import styles from './Games.module.css';
 
@@ -26,15 +24,16 @@ import styles from './Games.module.css';
  */
 const Games = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { selectedGroup, groups, loadGroups, selectGroup } = useGroup();
   const [games, setGames] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Empezar en true para carga inicial
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [error, setError] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
 
   // Filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [sourceFilter, setSourceFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
 
@@ -42,6 +41,16 @@ const Games = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalGames, setTotalGames] = useState(0);
+  
+  // Ref para evitar doble carga
+  const loadingRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  // Cleanup al desmontar
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   // Cargar grupos al montar (solo si no hay grupos cargados)
   useEffect(() => {
@@ -50,56 +59,71 @@ const Games = () => {
     }
   }, []); // Sin dependencias - solo se ejecuta al montar
 
-  // Cargar juegos (memoizado)
-  const loadGames = useCallback(async () => {
-    setLoading(true);
-    setError('');
-
-    try {
-      const params = {
-        page: currentPage,
-        limit: 12,
-        search: searchTerm || undefined,
-        source: sourceFilter !== 'all' ? sourceFilter : undefined,
-        groupId: selectedGroup?._id || undefined // undefined = juegos personales
-      };
-
-      const response = await gameService.getGames(params);
-      setGames(response.data || []);
-      setTotalPages(response.pages || 1);
-      setTotalGames(response.total || 0);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error al cargar los juegos');
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedGroup, currentPage, sourceFilter, searchTerm]);
-
-  // Cargar juegos siempre (con o sin grupo)
-  useEffect(() => {
-    loadGames();
-  }, [selectedGroup, currentPage, sourceFilter]);
-
-  // Búsqueda con debounce
+  // Debounce para búsqueda - SOLO actualiza debouncedSearch
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (currentPage === 1) {
-        loadGames();
-      } else {
-        setCurrentPage(1);
-      }
-    }, 500);
-
+      setDebouncedSearch(searchTerm);
+    }, 400);
     return () => clearTimeout(timer);
-  }, [searchTerm, currentPage, loadGames]);
+  }, [searchTerm]);
 
-  // Handlers
-  const handleGameAdded = (newGame) => {
+  // Reset página cuando cambia búsqueda o filtro
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch, sourceFilter, selectedGroup]);
+
+  // Cargar juegos - ÚNICO efecto para cargar datos
+  useEffect(() => {
+    const loadGames = async () => {
+      // Evitar cargas duplicadas
+      if (loadingRef.current) return;
+      loadingRef.current = true;
+
+      // Solo mostrar loading en primera carga o cambio de grupo
+      if (isFirstLoad) {
+        setLoading(true);
+      }
+      setError('');
+
+      try {
+        const params = {
+          page: currentPage,
+          limit: 12,
+          search: debouncedSearch || undefined,
+          source: sourceFilter !== 'all' ? sourceFilter : undefined,
+          groupId: selectedGroup?._id || undefined
+        };
+
+        const response = await gameService.getGames(params);
+        
+        if (mountedRef.current) {
+          setGames(response.data || []);
+          setTotalPages(response.pages || 1);
+          setTotalGames(response.total || 0);
+          setIsFirstLoad(false);
+        }
+      } catch (err) {
+        if (mountedRef.current) {
+          setError(err.response?.data?.message || 'Error al cargar los juegos');
+        }
+      } finally {
+        if (mountedRef.current) {
+          setLoading(false);
+        }
+        loadingRef.current = false;
+      }
+    };
+
+    loadGames();
+  }, [selectedGroup?._id, currentPage, sourceFilter, debouncedSearch, isFirstLoad]);
+
+  // Handlers - definidos antes del useMemo para poder usarlos
+  const handleGameAdded = useCallback((newGame) => {
     setGames(prev => [newGame, ...prev]);
     setTotalGames(prev => prev + 1);
-  };
+  }, []);
 
-  const handleDelete = async (game) => {
+  const handleDelete = useCallback(async (game) => {
     if (!window.confirm(`¿Estás seguro de que quieres eliminar "${game.name}"?`)) {
       return;
     }
@@ -111,32 +135,39 @@ const Games = () => {
     } catch (err) {
       alert(err.response?.data?.message || 'Error al eliminar el juego');
     }
-  };
+  }, []);
 
-  const handlePreviousPage = () => {
+  const handlePreviousPage = useCallback(() => {
     if (currentPage > 1) {
       setCurrentPage(prev => prev - 1);
     }
-  };
+  }, [currentPage]);
 
-  const handleNextPage = () => {
+  const handleNextPage = useCallback(() => {
     if (currentPage < totalPages) {
       setCurrentPage(prev => prev + 1);
     }
-  };
+  }, [currentPage, totalPages]);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchTerm('');
+    setDebouncedSearch('');
     setSourceFilter('all');
     setCurrentPage(1);
-  };
+  }, []);
 
-  // Verificar permisos
-  const canDelete = (game) => {
-    if (!selectedGroup) return false;
-    const userMember = selectedGroup.members?.find(m => m.user === user?._id);
-    return userMember?.role === 'admin' || game.addedBy?._id === user?._id;
-  };
+  // Memoizar la lista de juegos para evitar re-renders innecesarios
+  const renderedGames = useMemo(() => (
+    games.map((game) => (
+      <GameCard
+        key={game._id}
+        game={game}
+        onDelete={handleDelete}
+        canDelete={!selectedGroup}
+        showOwners={!!selectedGroup}
+      />
+    ))
+  ), [games, selectedGroup, handleDelete]);
 
   return (
     <div className={styles.gamesPage}>
@@ -189,12 +220,7 @@ const Games = () => {
         </div>
       )}
 
-      {/* Loading inicial */}
-      {!selectedGroup && loading && (
-        <Card variant="elevated" className={styles.loadingCard}>
-          <Loading message="Cargando grupos..." />
-        </Card>
-      )}
+
 
       {/* No hay grupos */}
       {!loading && groups.length === 0 && (
@@ -286,53 +312,52 @@ const Games = () => {
         </div>
       )}
 
-      {/* Loading */}
-      {loading && <Loading message="Cargando juegos..." />}
+      {/* Grid de juegos - siempre visible para evitar parpadeo */}
+      <div className={`${styles.gamesGrid} ${loading && isFirstLoad ? styles.loading : ''}`}>
+        {loading && isFirstLoad ? (
+          // Skeleton cards durante la primera carga
+          [...Array(6)].map((_, i) => (
+            <div key={i} className={styles.skeletonCard}>
+              <div className={styles.skeletonImage} />
+              <div className={styles.skeletonContent}>
+                <div className={styles.skeletonTitle} />
+                <div className={styles.skeletonText} />
+                <div className={styles.skeletonText} style={{ width: '60%' }} />
+              </div>
+            </div>
+          ))
+        ) : games.length > 0 ? (
+          renderedGames
+        ) : null}
+      </div>
 
-      {/* Grid de juegos */}
-      {!loading && games.length > 0 && (
-        <>
-          <div className={styles.gamesGrid}>
-            {games.map((game) => (
-              <GameCard
-                key={game._id}
-                game={game}
-                onDelete={handleDelete}
-                canDelete={canDelete(game)}
-                showOwners={!!selectedGroup} // Solo mostrar propietarios cuando hay grupo seleccionado
-              />
-            ))}
+      {/* Paginación - solo si hay juegos y más de una página */}
+      {!loading && games.length > 0 && totalPages > 1 && (
+        <div className={styles.pagination}>
+          <Button
+            variant="outline"
+            onClick={handlePreviousPage}
+            disabled={currentPage === 1 || loading}
+          >
+            <MdArrowBack /> Anterior
+          </Button>
+
+          <div className={styles.pageInfo}>
+            Página {currentPage} de {totalPages}
           </div>
 
-          {/* Paginación */}
-          {totalPages > 1 && (
-            <div className={styles.pagination}>
-              <Button
-                variant="outline"
-                onClick={handlePreviousPage}
-                disabled={currentPage === 1}
-              >
-                <MdArrowBack /> Anterior
-              </Button>
-
-              <div className={styles.pageInfo}>
-                Página {currentPage} de {totalPages}
-              </div>
-
-              <Button
-                variant="outline"
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-              >
-                Siguiente <MdArrowForward />
-              </Button>
-            </div>
-          )}
-        </>
+          <Button
+            variant="outline"
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages || loading}
+          >
+            Siguiente <MdArrowForward />
+          </Button>
+        </div>
       )}
 
-      {/* Empty state */}
-      {!loading && games.length === 0 && (
+      {/* Empty state - solo mostrar si no está cargando y no hay juegos */}
+      {!loading && !isFirstLoad && games.length === 0 && (
         <Card variant="elevated" className={styles.emptyState}>
           <GiCardPlay className={styles.emptyIcon} />
           <h2 className={styles.emptyTitle}>

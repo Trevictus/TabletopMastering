@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { MdAdd, MdCalendarToday } from 'react-icons/md';
 import { GiDiceFire } from 'react-icons/gi';
 import CalendarGrid from '../../components/calendar/CalendarGrid';
@@ -17,6 +18,7 @@ import styles from './Calendar.module.css';
  */
 const Calendar = () => {
   const toast = useToast();
+  const location = useLocation();
   
   // Estado del calendario
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -30,6 +32,15 @@ const Calendar = () => {
   const [showResultsModal, setShowResultsModal] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [editingMatch, setEditingMatch] = useState(null);
+
+  // Abrir modal si viene del Dashboard con state
+  useEffect(() => {
+    if (location.state?.openCreateModal) {
+      setShowCreateModal(true);
+      // Limpiar el state para que no se abra de nuevo al navegar
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // Cargar partidas
   const loadMatches = useCallback(async () => {

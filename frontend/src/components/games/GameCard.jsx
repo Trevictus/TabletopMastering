@@ -1,3 +1,4 @@
+import { memo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { 
   MdPeople, 
@@ -44,6 +45,7 @@ const GameCard = ({
     (thumbnail || image).trim() !== '';
   
   const imageUrl = hasValidImage ? (thumbnail || image) : null;
+  const [imageLoaded, setImageLoaded] = useState(false);
   const players = minPlayers === maxPlayers 
     ? `${minPlayers}` 
     : `${minPlayers}-${maxPlayers}`;
@@ -80,12 +82,19 @@ const GameCard = ({
     <Card variant="elevated" noPadding className={styles.gameCard}>
       <div className={styles.imageContainer}>
         {hasValidImage ? (
-          <img 
-            src={imageUrl} 
-            alt={name}
-            className={styles.gameImage}
-            loading="lazy"
-          />
+          <>
+            {!imageLoaded && (
+              <div className={styles.imageSkeleton} />
+            )}
+            <img 
+              src={imageUrl} 
+              alt={name}
+              className={`${styles.gameImage} ${imageLoaded ? styles.imageLoaded : styles.imageLoading}`}
+              loading="lazy"
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageLoaded(true)} // Mostrar placeholder si falla
+            />
+          </>
         ) : (
           <div className={styles.placeholderImage}>
             <GiPerspectiveDiceSixFacesRandom className={styles.placeholderDice} />
@@ -204,4 +213,4 @@ GameCard.propTypes = {
   showOwners: PropTypes.bool
 };
 
-export default GameCard;
+export default memo(GameCard);

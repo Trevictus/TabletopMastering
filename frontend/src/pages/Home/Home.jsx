@@ -1,119 +1,101 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  GiPerspectiveDiceSixFacesRandom, 
-  GiCardPlay, 
-  GiTrophy,
-  GiTeamIdea 
-} from 'react-icons/gi';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { GiPerspectiveDiceSixFacesRandom, GiCardPlay, GiTrophy, GiTeamIdea, GiDiceSixFacesFive, GiDiceSixFacesSix } from 'react-icons/gi';
+import { FiUsers, FiCalendar, FiBarChart2 } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/common/Button';
-import Card from '../../components/common/Card';
 import styles from './Home.module.css';
 
-/**
- * Página de inicio (Home)
- * Muestra landing page para no autenticados
- * Redirige a Inicio si está autenticado
- */
 const Home = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, loading } = useAuth();
-  const [welcomeMessage, setWelcomeMessage] = useState('');
 
   useEffect(() => {
-    // Si está autenticado y entra directamente a /, redirigir a inicio
     if (!loading && isAuthenticated) {
-      const currentPath = location.pathname;
-      // Solo redirigir si está en /, /login o /register
-      if (currentPath === '/' || currentPath === '/login' || currentPath === '/register') {
-        navigate('/home', { replace: true });
-        return;
-      }
-      
-      // Si viene de una ruta protegida, también redirigir
-      const from = location.state?.from;
-      if (from && from !== '/' && from !== '/login' && from !== '/register') {
-        navigate('/home', { replace: true });
-      }
+      navigate('/home', { replace: true });
     }
-
-    // Mostrar mensaje de bienvenida si viene del registro o login
-    if (location.state?.message) {
-      setWelcomeMessage(location.state.message);
-      
-      // Limpiar el mensaje después de 5 segundos
-      const timer = setTimeout(() => {
-        setWelcomeMessage('');
-      }, 5000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [location, isAuthenticated, loading, navigate]);
+  }, [isAuthenticated, loading, navigate]);
 
   return (
-    <div className={styles.homePage}>
-      {/* Mensaje de bienvenida */}
-      {welcomeMessage && (
-        <div className={styles.welcomeAlert}>
-          <span>🎲</span>
-          <span>{welcomeMessage}</span>
-        </div>
-      )}
-
-      {/* Hero Section */}
+    <div className={styles.page}>
+      {/* Hero */}
       <section className={styles.hero}>
         <GiPerspectiveDiceSixFacesRandom className={styles.heroIcon} />
-        <h1 className={styles.heroTitle}>
-          Bienvenido a Tabletop Mastering
-        </h1>
-        <p className={styles.heroDescription}>
-          La plataforma definitiva para gestionar tus partidas de juegos de mesa.
-          Organiza grupos, registra partidas, consulta estadísticas y mucho más.
-        </p>
-        <div className={styles.ctaButtons}>
+        <h1>Tabletop Mastering</h1>
+        <p>Gestiona tus partidas de juegos de mesa, organiza grupos y lleva el control de tus estadísticas</p>
+        <div className={styles.cta}>
           <Link to="/login">
-            <Button variant="primary" size="large" className={styles.ctaButton}>
-              Iniciar Sesión
-            </Button>
+            <Button variant="primary" size="large">Iniciar Sesión</Button>
           </Link>
           <Link to="/register">
-            <Button variant="outline" size="large" className={styles.ctaButton}>
-              Crear Cuenta
-            </Button>
+            <Button variant="outline" size="large">Crear Cuenta</Button>
           </Link>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features */}
       <section className={styles.features}>
-        <Card variant="elevated" className={styles.featureCard}>
+        <div className={styles.feature}>
           <GiCardPlay className={styles.featureIcon} />
-          <h3 className={styles.featureTitle}>Descubre Juegos</h3>
-          <p className={styles.featureDescription}>
-            Explora miles de juegos de mesa, añade tus favoritos a tu colección
-            y descubre nuevas experiencias para tus partidas.
-          </p>
-        </Card>
+          <div>
+            <h3>Explora Juegos</h3>
+            <p>Miles de juegos de mesa con info de BGG</p>
+          </div>
+        </div>
+        <div className={styles.feature}>
+          <FiUsers className={styles.featureIcon} />
+          <div>
+            <h3>Crea Grupos</h3>
+            <p>Organiza grupos privados con códigos únicos</p>
+          </div>
+        </div>
+        <div className={styles.feature}>
+          <FiCalendar className={styles.featureIcon} />
+          <div>
+            <h3>Programa Partidas</h3>
+            <p>Calendario visual para tus sesiones</p>
+          </div>
+        </div>
+        <div className={styles.feature}>
+          <FiBarChart2 className={styles.featureIcon} />
+          <div>
+            <h3>Rankings</h3>
+            <p>Estadísticas y clasificaciones</p>
+          </div>
+        </div>
+      </section>
 
-        <Card variant="elevated" className={styles.featureCard}>
-          <GiTeamIdea className={styles.featureIcon} />
-          <h3 className={styles.featureTitle}>Organiza Grupos</h3>
-          <p className={styles.featureDescription}>
-            Crea grupos privados, invita a tus amigos con códigos únicos
-            y coordina partidas de forma sencilla.
-          </p>
-        </Card>
-
-        <Card variant="elevated" className={styles.featureCard}>
-          <GiTrophy className={styles.featureIcon} />
-          <h3 className={styles.featureTitle}>Estadísticas y Rankings</h3>
-          <p className={styles.featureDescription}>
-            Registra resultados, consulta estadísticas detalladas
-            y compite sanamente con tu grupo de jugadores.
-          </p>
-        </Card>
+      {/* Cómo funciona - Sección diferente */}
+      <section className={styles.howItWorks}>
+        <h2>Así de fácil</h2>
+        <div className={styles.steps}>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>1</div>
+            <h4>Crea tu grupo</h4>
+            <p>Invita a tus amigos con un código único</p>
+          </div>
+          <div className={styles.stepArrow}>
+            <GiDiceSixFacesFive />
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>2</div>
+            <h4>Programa partidas</h4>
+            <p>Elige juego, fecha y jugadores</p>
+          </div>
+          <div className={styles.stepArrow}>
+            <GiDiceSixFacesSix />
+          </div>
+          <div className={styles.step}>
+            <div className={styles.stepNumber}>3</div>
+            <h4>Registra resultados</h4>
+            <p>El sistema calcula puntos y rankings</p>
+          </div>
+        </div>
+        <div className={styles.ctaFinal}>
+          <Link to="/register">
+            <Button variant="accent" size="large">Empezar Gratis</Button>
+          </Link>
+        </div>
       </section>
     </div>
   );

@@ -1,266 +1,186 @@
-import { useState, useEffect, useCallback } from 'react';
-import { MdFilterList, MdRefresh } from 'react-icons/md';
-import { GiTrophy } from 'react-icons/gi';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { MdRefresh } from 'react-icons/md';
+import { GiTrophy, GiPodium } from 'react-icons/gi';
 import { useAuth } from '../../context/AuthContext';
 import { useGroup } from '../../context/GroupContext';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
-import Loading from '../../components/common/Loading';
 import rankingService from '../../services/rankingService';
+import { isValidAvatar } from '../../utils/validators';
 import styles from './Rankings.module.css';
 
 /**
- * Página de Rankings
- * Muestra ranking general de TODOS los grupos combinados
+ * Página de Rankings - Global y por grupo
  */
 const Rankings = () => {
   const { user } = useAuth();
   const { groups, loadGroups } = useGroup();
   const [ranking, setRanking] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [sortBy, setSortBy] = useState('points'); // 'points' o 'wins'
+  const [selectedGroupId, setSelectedGroupId] = useState(null);
+  const [sortBy, setSortBy] = useState('points');
 
   // Cargar grupos al montar
   useEffect(() => {
-    loadGroups();
-  }, [loadGroups]);
+    if (groups.length === 0) loadGroups();
+  }, []);
 
-  // Cargar ranking general (memoizado)
-  const loadGeneralRanking = useCallback(async () => {
-    if (!groups || groups.length === 0) {
-      setRanking([]);
-      return;
-    }
-
+  // Cargar ranking
+  const loadRanking = useCallback(async () => {
     setLoading(true);
     setError('');
 
     try {
-      // Cargar rankings de todos los grupos
-      const allRankingsPromises = groups.map(group => 
-        rankingService.getGroupRanking(group._id, { sortBy })
-          .catch(err => {
-            console.error(`Error loading ranking for group ${group._id}:`, err);
-            return { data: [] };
-          })
-      );
-
-      const allRankingsResponses = await Promise.all(allRankingsPromises);
-      
-      // Combinar todos los rankings
-      const playerMap = new Map();
-      
-      allRankingsResponses.forEach(response => {
-        const rankingData = Array.isArray(response.data) ? response.data : response.data?.ranking || [];
-        
-        rankingData.forEach(playerData => {
-          const userId = playerData.user._id;
-          
-          if (playerMap.has(userId)) {
-            // Sumar estadísticas si el jugador ya existe
-            const existing = playerMap.get(userId);
-            existing.totalPoints = (existing.totalPoints || 0) + (playerData.totalPoints || 0);
-            existing.totalWins = (existing.totalWins || 0) + (playerData.totalWins || 0);
-            existing.totalMatches = (existing.totalMatches || 0) + (playerData.totalMatches || 0);
-          } else {
-            // Agregar nuevo jugador
-            playerMap.set(userId, {
-              user: playerData.user,
-              totalPoints: playerData.totalPoints || 0,
-              totalWins: playerData.totalWins || 0,
-              totalMatches: playerData.totalMatches || 0
-            });
-          }
-        });
-      });
-
-      // Convertir a array y ordenar
-      let rankingArray = Array.from(playerMap.values());
-      
-      if (sortBy === 'points') {
-        rankingArray.sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0));
+      let response;
+      if (selectedGroupId) {
+        response = await rankingService.getGroupRanking(selectedGroupId);
+        const data = response.data?.ranking || response.data || [];
+        setRanking(data.map(item => ({
+          _id: item.user?._id || item.userId,
+          name: item.user?.name || item.name,
+          avatar: item.user?.avatar || item.avatar,
+          totalPoints: item.totalPoints || 0,
+          totalWins: item.totalWins || 0,
+          totalMatches: item.totalMatches || 0,
+        })));
       } else {
-        rankingArray.sort((a, b) => (b.totalWins || 0) - (a.totalWins || 0));
+        response = await rankingService.getGlobalRanking();
+        setRanking(response.data || []);
       }
-
-      setRanking(rankingArray);
     } catch (err) {
-      console.error('Error cargando ranking general:', err);
-      setError('Error al cargar el ranking general');
+      setError('Error al cargar el ranking');
       setRanking([]);
     } finally {
       setLoading(false);
     }
-  }, [groups, sortBy]);
+  }, [selectedGroupId]);
 
-  // Cargar ranking cuando cambian los grupos o el filtro
-  useEffect(() => {
-    loadGeneralRanking();
-  }, [groups, sortBy, loadGeneralRanking]);
+  useEffect(() => { loadRanking(); }, [loadRanking]);
 
-  // Handlers
-  const handleRefresh = () => {
-    loadGeneralRanking();
-  };
+  // Ordenar ranking
+  const sortedRanking = useMemo(() => {
+    const sorted = [...ranking];
+    if (sortBy === 'points') sorted.sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0));
+    else if (sortBy === 'wins') sorted.sort((a, b) => (b.totalWins || 0) - (a.totalWins || 0));
+    return sorted;
+  }, [ranking, sortBy]);
+
+  // Info de vista actual
+  const groupName = selectedGroupId 
+    ? groups.find(g => g._id === selectedGroupId)?.name || 'Grupo'
+    : 'Global';
 
   return (
     <div className={styles.rankingsPage}>
       {/* Header */}
       <div className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.headerTitle}>
-            <GiTrophy className={styles.headerIcon} />
-            <div>
-              <h1>Ranking General</h1>
-              <p className={styles.subtitle}>
-                {ranking.length} {ranking.length === 1 ? 'jugador' : 'jugadores'} en total
-              </p>
-            </div>
+        <div className={styles.headerTitle}>
+          <GiTrophy className={styles.headerIcon} />
+          <div>
+            <h1>Ranking {groupName}</h1>
+            <p className={styles.subtitle}>{sortedRanking.length} jugadores</p>
           </div>
         </div>
+        <Button variant="outline" size="small" onClick={loadRanking} disabled={loading}>
+          <MdRefresh className={loading ? styles.spinning : ''} />
+        </Button>
       </div>
 
-      {/* Loading inicial */}
-      {loading && groups.length === 0 && (
-        <Card variant="elevated" className={styles.loadingCard}>
-          <Loading message="Cargando ranking..." />
-        </Card>
-      )}
-
-      {/* No hay grupos */}
-      {!loading && groups.length === 0 && (
-        <Card variant="elevated" className={styles.infoCard}>
-          <p className={styles.infoText}>
-            💡 <strong>Tip:</strong> Únete a un grupo para aparecer en el ranking.
-          </p>
-          <Button
-            variant="outline"
-            size="small"
-            onClick={() => window.location.href = '/groups'}
+      {/* Nav de grupos */}
+      <div className={styles.groupNav}>
+        <button
+          className={`${styles.navBtn} ${!selectedGroupId ? styles.active : ''}`}
+          onClick={() => setSelectedGroupId(null)}
+        >
+          🌍 Global
+        </button>
+        {groups.map(g => (
+          <button
+            key={g._id}
+            className={`${styles.navBtn} ${selectedGroupId === g._id ? styles.active : ''}`}
+            onClick={() => setSelectedGroupId(g._id)}
           >
-            Ir a Grupos
-          </Button>
-        </Card>
-      )}
+            🎲 {g.name}
+          </button>
+        ))}
+      </div>
 
-      {/* Mostrar contenido si hay grupos */}
-      {groups.length > 0 && (
-        <>
-          {/* Botones de control rápido */}
-          <div className={styles.controlBar}>
-            <div className={styles.sortButtons}>
-              <Button
-                variant={sortBy === 'points' ? 'primary' : 'outline'}
-                size="small"
-                onClick={() => setSortBy('points')}
-              >
-                Puntos
-              </Button>
-              <Button
-                variant={sortBy === 'wins' ? 'primary' : 'outline'}
-                size="small"
-                onClick={() => setSortBy('wins')}
-              >
-                Victorias
-              </Button>
-            </div>
-            <Button
-              variant="outline"
-              size="small"
-              onClick={handleRefresh}
-            >
-              <MdRefresh /> Actualizar
-            </Button>
-          </div>
+      {/* Ordenación */}
+      <div className={styles.sortBar}>
+        <span>Ordenar:</span>
+        <Button variant={sortBy === 'points' ? 'primary' : 'outline'} size="small" onClick={() => setSortBy('points')}>
+          Puntos
+        </Button>
+        <Button variant={sortBy === 'wins' ? 'primary' : 'outline'} size="small" onClick={() => setSortBy('wins')}>
+          Victorias
+        </Button>
+      </div>
 
-          {/* Mensajes de error */}
-          {error && (
-            <div className={styles.error}>
-              <span>⚠️</span>
-              <span>{error}</span>
-            </div>
-          )}
+      {error && <div className={styles.error}>⚠️ {error}</div>}
 
-          {/* Loading */}
-          {loading && <Loading message="Cargando ranking..." />}
-
-          {/* Tabla de ranking */}
-          {!loading && ranking.length > 0 && (
-            <Card variant="elevated" className={styles.rankingCard}>
-              <table className={styles.rankingTable}>
-                <thead>
-                  <tr>
-                    <th className={styles.positionCol}>Posición</th>
-                    <th className={styles.playerCol}>Jugador</th>
-                    <th className={styles.pointsCol}>Puntos</th>
-                    <th className={styles.winsCol}>Victorias</th>
-                    <th className={styles.matchesCol}>Partidas</th>
+      {/* Tabla */}
+      <Card variant="elevated" className={styles.tableCard}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Jugador</th>
+              <th>Puntos</th>
+              <th>Victorias</th>
+              <th>Partidas</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              [...Array(5)].map((_, i) => (
+                <tr key={i} className={styles.skeleton}>
+                  <td><div className={styles.skelBox} /></td>
+                  <td><div className={styles.skelPlayer}><div className={styles.skelAvatar} /><div className={styles.skelName} /></div></td>
+                  <td><div className={styles.skelBox} /></td>
+                  <td><div className={styles.skelBox} /></td>
+                  <td><div className={styles.skelBox} /></td>
+                </tr>
+              ))
+            ) : sortedRanking.length > 0 ? (
+              sortedRanking.map((p, i) => {
+                const isMe = p._id === user?._id || p.userId === user?._id;
+                const pos = i + 1;
+                return (
+                  <tr key={p._id || i} className={`${isMe ? styles.me : ''} ${pos <= 3 ? styles[`top${pos}`] : ''}`}>
+                    <td className={styles.pos}>
+                      {pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : `#${pos}`}
+                    </td>
+                    <td>
+                      <div className={styles.player}>
+                        <div className={styles.avatar}>
+                          {isValidAvatar(p.avatar) ? (
+                            <img src={p.avatar} alt="" />
+                          ) : (
+                            <span>{p.name?.charAt(0).toUpperCase() || '?'}</span>
+                          )}
+                        </div>
+                        <span className={styles.name}>{p.name}</span>
+                        {isMe && <span className={styles.badge}>Tú</span>}
+                      </div>
+                    </td>
+                    <td className={styles.points}>{p.totalPoints || 0}</td>
+                    <td className={styles.wins}>{p.totalWins || 0}</td>
+                    <td>{p.totalMatches || 0}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {ranking.map((player, index) => (
-                    <tr
-                      key={player.user._id}
-                      className={`${styles.tableRow} ${
-                        player.user._id === user?._id ? styles.currentUser : ''
-                      }`}
-                    >
-                      <td className={styles.positionCell}>
-                        <div className={styles.position}>
-                          {index === 0 && <span className={styles.medal}>🥇</span>}
-                          {index === 1 && <span className={styles.medal}>🥈</span>}
-                          {index === 2 && <span className={styles.medal}>🥉</span>}
-                          {index > 2 && <span className={styles.positionNumber}>#{index + 1}</span>}
-                        </div>
-                      </td>
-                      <td className={styles.playerCell}>
-                        <div className={styles.playerInfo}>
-                          <div className={styles.avatar}>
-                            {player.user.avatar ? (
-                              <img src={player.user.avatar} alt={player.user.name} />
-                            ) : (
-                              <div className={styles.avatarPlaceholder}>
-                                {player.user.name.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                          </div>
-                          <div className={styles.playerDetails}>
-                            <span className={styles.playerName}>{player.user.name}</span>
-                            {player.user._id === user?._id && (
-                              <span className={styles.youBadge}>(Tú)</span>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      <td className={styles.pointsCell}>
-                        <span className={styles.points}>{player.totalPoints || 0}</span>
-                      </td>
-                      <td className={styles.winsCell}>
-                        <span className={styles.wins}>{player.totalWins || 0}</span>
-                      </td>
-                      <td className={styles.matchesCell}>
-                        <span className={styles.matches}>{player.totalMatches || 0}</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Card>
-          )}
-
-          {/* Empty state */}
-          {!loading && ranking.length === 0 && (
-            <Card variant="elevated" className={styles.emptyState}>
-              <GiTrophy className={styles.emptyIcon} />
-              <h2 className={styles.emptyTitle}>No hay datos de ranking</h2>
-              <p className={styles.emptyDescription}>
-                Aún no hay partidas registradas en tus grupos. Comienza a registrar partidas para ver el ranking.
-              </p>
-            </Card>
-          )}
-        </>
-      )}
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={5} className={styles.empty}>
+                  <GiPodium className={styles.emptyIcon} />
+                  <p>No hay datos de ranking</p>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </Card>
     </div>
   );
 };

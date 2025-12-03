@@ -3,7 +3,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-3xl);
+  padding: var(--spacing-2xl);
+  animation: fadeIn 0.15s ease-out;
 }
 
 .fullScreen {
@@ -13,6 +14,25 @@
   justify-content: center;
   min-height: 100vh;
   background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  animation: fadeIn 0.15s ease-out;
+}
+
+/* Versión compacta/inline para usar dentro de componentes */
+.inline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+}
+
+.inline .icon {
+  font-size: 1.5rem;
+  animation: spin 1.5s linear infinite;
+}
+
+.inline .message {
+  margin: 0;
+  font-size: var(--font-size-sm);
 }
 
 .spinner {
@@ -20,9 +40,9 @@
 }
 
 .icon {
-  font-size: 6rem;
+  font-size: 4rem;
   color: var(--accent-color);
-  animation: spin 2s linear infinite, pulse 1s ease-in-out infinite alternate;
+  animation: spin 1.5s linear infinite;
 }
 
 @keyframes spin {
@@ -34,20 +54,18 @@
   }
 }
 
-@keyframes pulse {
+@keyframes fadeIn {
   from {
-    opacity: 0.6;
-    transform: scale(0.95);
+    opacity: 0;
   }
   to {
     opacity: 1;
-    transform: scale(1.05);
   }
 }
 
 .message {
-  margin-top: var(--spacing-lg);
-  font-size: var(--font-size-lg);
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-md);
   color: var(--text-secondary);
-  font-weight: 600;
+  font-weight: 500;
 }

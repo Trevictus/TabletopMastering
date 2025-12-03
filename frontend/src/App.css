@@ -1,4 +1,6 @@
 /* App.css - Estilos del contenedor principal */
+
+/* Contenedor de la aplicación */
 .page-container {
   width: 100%;
   min-height: 100vh;
@@ -6,7 +8,51 @@
   flex-direction: column;
 }
 
+/* Contenido principal con transición suave */
 .main-content {
   flex: 1;
   width: 100%;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Animación de entrada para páginas */
+@keyframes fadeIn {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Evitar saltos de scroll durante navegación */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevenir CLS (Cumulative Layout Shift) */
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Skeleton loading base */
+.skeleton {
+  background: linear-gradient(90deg, 
+    var(--bg-secondary) 25%, 
+    var(--bg-tertiary) 50%, 
+    var(--bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: var(--border-radius);
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }

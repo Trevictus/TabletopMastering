@@ -11,6 +11,9 @@ import Loading from '../../components/common/Loading';
 import { isValidAvatar } from '../../utils/validators';
 import styles from './Groups.module.css';
 
+// Límite máximo de grupos por usuario (debe coincidir con el backend)
+const MAX_GROUPS = 7;
+
 /**
  * Página de Grupos - Lista y gestión de grupos
  */
@@ -81,23 +84,31 @@ const Groups = () => {
           <div>
             <h1>Mis Grupos</h1>
             <p className={styles.subtitle}>
-              Gestiona tus grupos de juego y participa en partidas
+              {groups.length}/{MAX_GROUPS} grupos
             </p>
           </div>
         </div>
         <div className={styles.headerActions}>
-          <Link to="/groups/new">
-            <Button variant="primary" size="small">
-              <MdAddCircle /> Crear Grupo
-            </Button>
-          </Link>
-          <Button 
-            variant="secondary"
-            size="small"
-            onClick={() => setShowJoinModal(true)}
-          >
-            <MdPersonAdd /> Unirse
-          </Button>
+          {groups.length < MAX_GROUPS ? (
+            <>
+              <Link to="/groups/new">
+                <Button variant="primary" size="small">
+                  <MdAddCircle /> Crear Grupo
+                </Button>
+              </Link>
+              <Button 
+                variant="secondary"
+                size="small"
+                onClick={() => setShowJoinModal(true)}
+              >
+                <MdPersonAdd /> Unirse
+              </Button>
+            </>
+          ) : (
+            <span className={styles.limitReached}>
+              Límite de grupos alcanzado
+            </span>
+          )}
         </div>
       </div>
 

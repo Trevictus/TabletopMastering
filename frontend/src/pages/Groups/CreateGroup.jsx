@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGroup } from '../../context/GroupContext';
 import { useAuth } from '../../context/AuthContext';
@@ -11,12 +11,15 @@ import Input from '../../components/common/Input';
 import styles from './CreateGroup.module.css';
 import groupService from '../../services/groupService';
 
+// Límite máximo de grupos por usuario
+const MAX_GROUPS = 7;
+
 /**
  * Página para crear un nuevo grupo
  */
 const CreateGroup = () => {
   const navigate = useNavigate();
-  const { loadGroups } = useGroup();
+  const { groups, loadGroups } = useGroup();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -24,6 +27,15 @@ const CreateGroup = () => {
     name: '',
     description: '',
   });
+
+  // Verificar límite de grupos al cargar
+  useEffect(() => {
+    if (groups.length >= MAX_GROUPS) {
+      navigate('/groups', { 
+        state: { message: `Has alcanzado el límite de ${MAX_GROUPS} grupos` } 
+      });
+    }
+  }, [groups.length, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

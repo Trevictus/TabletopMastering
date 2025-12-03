@@ -2,6 +2,68 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--spacing-lg);
+  min-height: calc(100vh - 80px); /* Evita saltos de layout - altura del navbar */
+}
+
+/* Animación suave de contenido sin afectar layout */
+.gamesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  align-items: stretch;
+  min-height: 400px; /* Altura mínima para evitar saltos */
+}
+
+.gamesGrid.loading {
+  pointer-events: none;
+}
+
+/* Skeleton Cards */
+.skeletonCard {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  height: 340px;
+}
+
+.skeletonImage {
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonContent {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.skeletonTitle {
+  height: 1.5rem;
+  width: 80%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeletonText {
+  height: 1rem;
+  width: 100%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .header {
@@ -268,13 +330,7 @@
   white-space: nowrap;
 }
 
-.gamesGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
-  align-items: stretch; /* Asegura que todas las tarjetas tengan la misma altura */
-}
+/* Grid está definido arriba, aquí solo override para responsive si necesario */
 
 .pagination {
   display: flex;
