@@ -61,16 +61,6 @@ const MatchDetailsModal = ({
   const canEdit = isCreator;
   const canDelete = isCreator;
 
-  // Debug - puedes quitar estos logs después
-  console.log('Match Debug:', {
-    userObject: user,
-    creatorId,
-    currentUserId,
-    isCreator,
-    status: match.status,
-    hasConfirmedPlayers: match.players?.some(p => p.confirmed)
-  });
-
   // Verificar si la partida está próxima (en las próximas 24h)
   const isUpcoming = () => {
     const matchDate = new Date(match.scheduledDate);

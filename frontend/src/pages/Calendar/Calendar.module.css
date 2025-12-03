@@ -64,7 +64,7 @@
 .statItem {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
 }
 
 .statItem.warning {
@@ -72,8 +72,8 @@
 }
 
 .statIcon {
-  font-size: var(--font-size-lg);
-  line-height: 1;
+  font-size: 1.1rem;
+  color: var(--primary-color);
 }
 
 .statValue {
@@ -81,6 +81,7 @@
   font-weight: 700;
   color: var(--primary-color);
   line-height: 1;
+  margin-right: 0.25rem;
 }
 
 .statItem.warning .statValue {

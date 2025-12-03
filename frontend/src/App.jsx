@@ -45,13 +45,14 @@ function AppContent() {
             <Route path="/register" element={<Home />} />
 
             {/* Rutas protegidas - generadas desde configuración */}
-            {protectedRoutes.map(({ path, element: Component }) => (
+            {/* eslint-disable-next-line no-unused-vars */}
+            {protectedRoutes.map(({ path, element: RouteComponent }) => (
               <Route
                 key={path}
                 path={path}
                 element={
                   <ProtectedRoute>
-                    <Component />
+                    <RouteComponent />
                   </ProtectedRoute>
                 }
               />

@@ -1,38 +1,11 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 /**
  * Hook personalizado para validaciones de autenticación
- * Útil para redirigir o verificar acceso en componentes
+ * Útil para verificar acceso y roles en componentes
  */
 export const useAuthValidation = () => {
   const { isAuthenticated, loading, user } = useAuth();
-  const navigate = useNavigate();
-
-  /**
-   * Requiere que el usuario esté autenticado
-   * Redirige a login si no lo está
-   */
-  const requireAuth = (redirectTo = '/login') => {
-    useEffect(() => {
-      if (!loading && !isAuthenticated) {
-        navigate(redirectTo, { replace: true });
-      }
-    }, [loading, isAuthenticated, navigate, redirectTo]);
-  };
-
-  /**
-   * Requiere que el usuario NO esté autenticado
-   * Redirige a inicio si ya lo está
-   */
-  const requireGuest = (redirectTo = '/home') => {
-    useEffect(() => {
-      if (!loading && isAuthenticated) {
-        navigate(redirectTo, { replace: true });
-      }
-    }, [loading, isAuthenticated, navigate, redirectTo]);
-  };
 
   /**
    * Verifica si el usuario tiene un rol específico
@@ -53,8 +26,6 @@ export const useAuthValidation = () => {
   };
 
   return {
-    requireAuth,
-    requireGuest,
     hasRole,
     belongsToGroup,
     isAuthenticated,
@@ -64,4 +35,3 @@ export const useAuthValidation = () => {
 };
 
 export default useAuthValidation;
-

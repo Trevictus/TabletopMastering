@@ -97,6 +97,7 @@
   height: 100%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .groupCard:hover {
@@ -104,27 +105,60 @@
   transform: translateY(-4px);
 }
 
-.groupCard {
+.leaveBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  cursor: pointer;
   display: flex;
-  flex-direction: column;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  overflow: hidden;
-  height: 100%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all 0.2s;
+  z-index: 2;
 }
 
-.groupCard:hover {
-  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.12);
-  transform: translateY(-4px);
+.leaveBtn:hover {
+  background: #dc2626;
+  color: white;
 }
 
 .groupCard .cardHeader {
   padding: 24px;
   border-bottom: 1px solid #f3f4f6;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%);
+}
+
+.groupHeaderRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.groupAvatarImg {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary-color);
+  flex-shrink: 0;
+}
+
+.groupAvatarIcon {
+  font-size: 48px;
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.groupHeaderText {
+  flex: 1;
+  min-width: 0;
 }
 
 .groupCard .cardHeader .groupName {

@@ -111,7 +111,7 @@ describe('AuthContext', () => {
             email: 'wrong@example.com',
             password: 'wrongpass'
           });
-        } catch (err) {
+        } catch {
           // Esperamos que lance error
         }
       });
@@ -274,7 +274,7 @@ describe('AuthContext', () => {
       await act(async () => {
         try {
           await result.current.login({ email: 'test', password: 'test' });
-        } catch (err) {
+        } catch {
           // Esperado
         }
       });

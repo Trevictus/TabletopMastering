@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { GiPerspectiveDiceSixFacesRandom, GiCardPlay, GiTrophy, GiTeamIdea, GiDiceSixFacesFive, GiDiceSixFacesSix } from 'react-icons/gi';
+import { GiPerspectiveDiceSixFacesRandom, GiCardPlay, GiDiceSixFacesFive, GiDiceSixFacesSix } from 'react-icons/gi';
 import { FiUsers, FiCalendar, FiBarChart2 } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/common/Button';
@@ -22,15 +22,7 @@ const Home = () => {
       <section className={styles.hero}>
         <GiPerspectiveDiceSixFacesRandom className={styles.heroIcon} />
         <h1>Tabletop Mastering</h1>
-        <p>Gestiona tus partidas de juegos de mesa, organiza grupos y lleva el control de tus estadísticas</p>
-        <div className={styles.cta}>
-          <Link to="/login">
-            <Button variant="primary" size="large">Iniciar Sesión</Button>
-          </Link>
-          <Link to="/register">
-            <Button variant="outline" size="large">Crear Cuenta</Button>
-          </Link>
-        </div>
+        <p>Organiza tus partidas, grupos y estadísticas de juegos de mesa de forma sencilla y divertida.</p>
       </section>
 
       {/* Features */}
@@ -39,7 +31,7 @@ const Home = () => {
           <GiCardPlay className={styles.featureIcon} />
           <div>
             <h3>Explora Juegos</h3>
-            <p>Miles de juegos de mesa con info de BGG</p>
+            <p>Descubre nuevos juegos y añádelos a tu colección</p>
           </div>
         </div>
         <div className={styles.feature}>
@@ -65,7 +57,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Cómo funciona - Sección diferente */}
+      {/* Cómo funciona */}
       <section className={styles.howItWorks}>
         <h2>Así de fácil</h2>
         <div className={styles.steps}>
@@ -93,7 +85,7 @@ const Home = () => {
         </div>
         <div className={styles.ctaFinal}>
           <Link to="/register">
-            <Button variant="accent" size="large">Empezar Gratis</Button>
+            <Button variant="accent" size="large">¡Empieza a jugar!</Button>
           </Link>
         </div>
       </section>

@@ -1,132 +1,66 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useGroup } from '../../context/GroupContext';
-import { FiEdit2, FiSave, FiCalendar, FiCamera, FiAward } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { FiEdit2, FiSave, FiX, FiCamera, FiAward, FiUsers, FiTarget, FiTrendingUp } from 'react-icons/fi';
+import { GiTrophy, GiDiceFire, GiPerspectiveDiceSixFacesRandom } from 'react-icons/gi';
 import { FaUserCircle } from 'react-icons/fa';
-import { GiTrophy } from 'react-icons/gi';
 import Button from '../../components/common/Button';
-import Card from '../../components/common/Card';
 import Loading from '../../components/common/Loading';
 import gameService from '../../services/gameService';
 import { isValidAvatar } from '../../utils/validators';
 import styles from './Profile.module.css';
 
-/**
- * Página Profile - Perfil elegante del usuario
- * Muestra información del usuario, edición de perfil y estadísticas
- */
+const compressImage = (file, maxSize = 400, quality = 0.8) => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = (e) => {
+    const img = new Image();
+    img.src = e.target.result;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let { width, height } = img;
+      if (width > height) {
+        if (width > maxSize) { height = Math.round((height * maxSize) / width); width = maxSize; }
+      } else {
+        if (height > maxSize) { width = Math.round((width * maxSize) / height); height = maxSize; }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = reject;
+  };
+  reader.onerror = reject;
+});
+
 const Profile = () => {
   const { user, updateProfile } = useAuth();
   const { groups } = useGroup();
+  const navigate = useNavigate();
+  const fileInputRef = useRef(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [gamesCount, setGamesCount] = useState(0);
-  const fileInputRef = useRef(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    avatar: ''
-  });
+  const [formData, setFormData] = useState({ name: '', avatar: '' });
 
   useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name || '',
-        email: user.email || '',
-        avatar: user.avatar || ''
-      });
-    }
+    if (user) setFormData({ name: user.name || '', avatar: user.avatar || '' });
   }, [user]);
 
-  // Cargar contador de juegos personales
   useEffect(() => {
-    const loadGamesCount = async () => {
-      try {
-        const response = await gameService.getGames({ 
-          groupId: undefined, // Solo juegos personales
-          limit: 1 
-        });
-        setGamesCount(response.total || 0);
-      } catch (error) {
-        // Solo mostrar error si no es una petición cancelada
-        if (error.name !== 'CanceledError') {
-          console.error('Error loading games count:', error);
-        }
-      }
-    };
-
-    if (user) {
-      loadGamesCount();
-    }
+    if (!user) return;
+    gameService.getGames({ limit: 1 }).then(r => setGamesCount(r.total || 0)).catch(() => {});
   }, [user]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  // Función para comprimir imagen
-  const compressImage = (file, maxWidth = 400, maxHeight = 400, quality = 0.8) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-
-          // Calcular nuevas dimensiones manteniendo aspect ratio
-          if (width > height) {
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-          } else {
-            if (height > maxHeight) {
-              width = Math.round((width * maxHeight) / height);
-              height = maxHeight;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-
-          // Convertir a base64 con compresión
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-          resolve(compressedDataUrl);
-        };
-        img.onerror = reject;
-      };
-      reader.onerror = reject;
-    });
-  };
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (file) {
       try {
-        // Comprimir la imagen antes de guardarla
-        const compressedImage = await compressImage(file, 400, 400, 0.8);
-        setFormData(prev => ({
-          ...prev,
-          avatar: compressedImage
-        }));
-      } catch (error) {
-        console.error('Error comprimiendo imagen:', error);
-      }
+        const compressed = await compressImage(file);
+        setFormData(prev => ({ ...prev, avatar: compressed }));
+      } catch { /* silencioso */ }
     }
   };
 
@@ -135,209 +69,134 @@ const Profile = () => {
     try {
       await updateProfile(formData);
       setIsEditing(false);
-    } catch (error) {
-      console.error('Error actualizando perfil:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!user) {
-    return <Loading message="Cargando perfil..." />;
-  }
+  const handleCancel = () => {
+    setFormData({ name: user.name || '', avatar: user.avatar || '' });
+    setIsEditing(false);
+  };
+
+  if (!user) return <Loading message="Cargando perfil..." />;
+
+  const stats = {
+    matches: user.stats?.totalMatches || 0,
+    wins: user.stats?.totalWins || 0,
+    points: user.stats?.totalPoints || 0,
+  };
+  const winRate = stats.matches > 0 ? Math.round((stats.wins / stats.matches) * 100) : 0;
+  
+  const achievements = [
+    stats.matches >= 10 && { icon: '🎲', label: 'Jugador Veterano' },
+    stats.wins >= 5 && { icon: '🏆', label: 'Campeón' },
+    groups.length >= 3 && { icon: '👥', label: 'Social' },
+    gamesCount >= 5 && { icon: '📚', label: 'Coleccionista' },
+    winRate >= 50 && stats.matches >= 5 && { icon: '⭐', label: 'Estratega' },
+  ].filter(Boolean);
 
   return (
     <div className={styles.profilePage}>
-      {/* Header de Perfil */}
-      <div className={styles.profileHeader}>
-        <div className={styles.profileHeaderBg}></div>
-        
-        <div className={styles.profileContent}>
-          <div className={styles.avatarContainer}>
-            {isValidAvatar(formData.avatar) ? (
-              <img src={formData.avatar} alt={user.name} className={styles.avatar} />
-            ) : (
-              <FaUserCircle className={styles.avatar} />
-            )}
+      <div className={styles.header}>
+        <div className={styles.headerBg} />
+        <div className={styles.headerContent}>
+          <div className={styles.avatarSection}>
+            <div className={styles.avatarWrapper}>
+              {isValidAvatar(formData.avatar) ? (
+                <img src={formData.avatar} alt={user.name} className={styles.avatar} />
+              ) : (
+                <FaUserCircle className={styles.avatarIcon} />
+              )}
+              {isEditing && (
+                <button className={styles.changeAvatarBtn} onClick={() => fileInputRef.current?.click()}>
+                  <FiCamera />
+                </button>
+              )}
+            </div>
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className={styles.fileInput} />
           </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className={styles.fileInput}
-          />
 
-          <div className={styles.profileInfo}>
-            <h1>{user.name}</h1>
-            <p className={styles.userEmail}>{user.email}</p>
+          <div className={styles.userInfo}>
+            {isEditing ? (
+              <input type="text" name="name" value={formData.name} onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))} className={styles.nameInput} placeholder="Tu nombre" />
+            ) : (
+              <h1>{user.name}</h1>
+            )}
             <div className={styles.memberBadge}>
-              <FiCalendar className={styles.badgeIcon} />
+              <GiPerspectiveDiceSixFacesRandom />
               <span>
-                {user.createdAt && !isNaN(new Date(user.createdAt).getTime()) 
-                  ? `Miembro desde ${new Date(user.createdAt).toLocaleDateString('es-ES', {
-                      year: 'numeric',
-                      month: 'long'
-                    })}`
-                  : 'Nuevo miembro'
-                }
+                {user.createdAt && !isNaN(new Date(user.createdAt).getTime())
+                  ? `Miembro desde ${new Date(user.createdAt).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}`
+                  : 'Nuevo jugador'}
               </span>
             </div>
           </div>
 
           <div className={styles.headerActions}>
-            {!isEditing ? (
-              <Button
-                variant="primary"
-                size="small"
-                onClick={() => setIsEditing(true)}
-              >
-                <FiEdit2 />
-                <span>Editar Perfil</span>
-              </Button>
+            {isEditing ? (
+              <>
+                <Button variant="primary" size="small" onClick={handleSave} disabled={loading}><FiSave /> Guardar</Button>
+                <Button variant="outline" size="small" onClick={handleCancel}><FiX /> Cancelar</Button>
+              </>
             ) : (
-              <Button
-                variant="primary"
-                size="small"
-                onClick={handleSave}
-                disabled={loading}
-              >
-                <FiSave />
-                <span>Guardar Cambios</span>
-              </Button>
+              <Button variant="outline" size="small" onClick={() => setIsEditing(true)}><FiEdit2 /> Editar</Button>
             )}
           </div>
         </div>
       </div>
 
-      <div className={styles.profileContainer}>
-        {/* Sección de Edición - Solo visible cuando isEditing es true */}
-        {isEditing && (
-          <Card variant="elevated" className={styles.editCard}>
-            <h2>Configuración del Perfil</h2>
-            
-            {/* Cambiar Avatar */}
-            <div className={styles.formGroup}>
-              <label>Foto de Perfil</label>
-              <div className={styles.avatarUpload}>
-                <div className={styles.avatarPreview}>
-                  {isValidAvatar(formData.avatar) ? (
-                    <img src={formData.avatar} alt="Preview" className={styles.previewImage} />
-                  ) : (
-                    <FaUserCircle className={styles.previewIcon} />
-                  )}
-                </div>
-                <Button
-                  variant="outline"
-                  size="small"
-                  onClick={handleAvatarClick}
-                >
-                  <FiCamera />
-                  Cambiar Foto
-                </Button>
-              </div>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="name">Nombre</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className={styles.input}
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="email">Email</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className={styles.input}
-              />
-            </div>
-          </Card>
-        )}
-
-        {/* Estadísticas */}
-        <Card variant="elevated" className={styles.statsCard}>
-          <h2>Estadísticas</h2>
-          <div className={styles.statsList}>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Grupos</span>
-              <span className={styles.statValue}>{groups.length}</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Juegos Personales</span>
-              <span className={styles.statValue}>{gamesCount}</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Partidas Jugadas</span>
-              <span className={styles.statValue}>{user.stats?.totalMatches || 0}</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Victorias</span>
-              <span className={styles.statValue}>{user.stats?.totalWins || 0}</span>
-            </div>
+      <div className={styles.content}>
+        <section className={styles.statsSection}>
+          <div className={styles.statCard}>
+            <div className={styles.statIcon}><GiDiceFire /></div>
+            <div className={styles.statInfo}><span className={styles.statValue}>{stats.matches}</span><span className={styles.statLabel}>Partidas</span></div>
           </div>
-        </Card>
-
-        {/* Destacados y Progreso */}
-        <Card variant="elevated" className={styles.highlightsCard}>
-          <h2>
-            <FiAward className={styles.sectionIcon} />
-            <span>Destacados</span>
-          </h2>
-          <div className={styles.highlightsList}>
-            <div className={styles.highlightItem}>
-              <div className={styles.highlightIcon}>
-                <GiTrophy />
-              </div>
-              <div className={styles.highlightContent}>
-                <h4>Ratio de Victoria</h4>
-                <div className={styles.progressBarContainer}>
-                  <div 
-                    className={styles.progressBarFill} 
-                    style={{
-                      width: `${user.stats?.totalMatches > 0 
-                        ? ((user.stats?.totalWins || 0) / user.stats.totalMatches * 100).toFixed(0) 
-                        : 0}%`
-                    }}
-                  />
-                </div>
-                <p className={styles.highlightStats}>
-                  {user.stats?.totalMatches > 0 
-                    ? `${((user.stats?.totalWins || 0) / user.stats.totalMatches * 100).toFixed(1)}% de victorias`
-                    : 'A\u00fan no has jugado partidas'}
-                </p>
-              </div>
-            </div>
-
-            <div className={styles.highlightItem}>
-              <div className={styles.highlightIcon}>
-                <FiCalendar />
-              </div>
-              <div className={styles.highlightContent}>
-                <h4>Actividad</h4>
-                <p className={styles.highlightDescription}>
-                  {groups.length > 0 
-                    ? `Participas en ${groups.length} grupo${groups.length > 1 ? 's' : ''}`
-                    : 'A\u00fan no est\u00e1s en ning\u00fan grupo'}
-                </p>
-                <p className={styles.highlightStats}>
-                  {gamesCount > 0 
-                    ? `${gamesCount} juego${gamesCount > 1 ? 's' : ''} en tu colecci\u00f3n`
-                    : 'Empieza a a\u00f1adir juegos'}
-                </p>
-              </div>
-            </div>
+          <div className={styles.statCard}>
+            <div className={`${styles.statIcon} ${styles.gold}`}><GiTrophy /></div>
+            <div className={styles.statInfo}><span className={styles.statValue}>{stats.wins}</span><span className={styles.statLabel}>Victorias</span></div>
           </div>
-        </Card>
+          <div className={styles.statCard}>
+            <div className={`${styles.statIcon} ${styles.green}`}><FiTarget /></div>
+            <div className={styles.statInfo}><span className={styles.statValue}>{winRate}%</span><span className={styles.statLabel}>Win Rate</span></div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={`${styles.statIcon} ${styles.purple}`}><FiTrendingUp /></div>
+            <div className={styles.statInfo}><span className={styles.statValue}>{stats.points}</span><span className={styles.statLabel}>Puntos</span></div>
+          </div>
+        </section>
+
+        <div className={styles.cardsGrid}>
+          <div className={styles.card} onClick={() => navigate('/groups')}>
+            <div className={styles.cardHeader}><FiUsers className={styles.cardIcon} /><h3>Mis Grupos</h3></div>
+            <div className={styles.cardValue}>{groups.length}</div>
+            <p className={styles.cardDesc}>{groups.length > 0 ? `Activo en ${groups.length} grupo${groups.length > 1 ? 's' : ''}` : 'Únete a un grupo'}</p>
+          </div>
+          <div className={styles.card} onClick={() => navigate('/games')}>
+            <div className={styles.cardHeader}><GiPerspectiveDiceSixFacesRandom className={styles.cardIcon} /><h3>Mi Colección</h3></div>
+            <div className={styles.cardValue}>{gamesCount}</div>
+            <p className={styles.cardDesc}>{gamesCount > 0 ? `${gamesCount} juego${gamesCount > 1 ? 's' : ''} en tu colección` : 'Añade juegos'}</p>
+          </div>
+          <div className={`${styles.card} ${styles.progressCard}`}>
+            <div className={styles.cardHeader}><FiAward className={styles.cardIcon} /><h3>Progreso</h3></div>
+            <div className={styles.progressBar}><div className={styles.progressFill} style={{ width: `${winRate}%` }} /></div>
+            <p className={styles.cardDesc}>{stats.matches > 0 ? `${stats.wins} de ${stats.matches} partidas ganadas` : 'Juega tu primera partida'}</p>
+          </div>
+        </div>
+
+        <section className={styles.achievementsSection}>
+          <h2><FiAward /> Destacados</h2>
+          <div className={styles.achievementsList}>
+            {achievements.length > 0 ? achievements.map((a, i) => (
+              <div key={i} className={styles.achievement}>
+                <span className={styles.achievementIcon}>{a.icon}</span>
+                <span>{a.label}</span>
+              </div>
+            )) : (
+              <p className={styles.noAchievements}>¡Juega partidas para desbloquear logros!</p>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );

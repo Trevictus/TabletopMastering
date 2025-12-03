@@ -32,7 +32,7 @@ const createGroupValidation = [
     .optional()
     .isLength({ max: 500 })
     .withMessage('La descripción no puede exceder 500 caracteres'),
-  body('avatar').optional().isURL().withMessage('El avatar debe ser una URL válida'),
+  body('avatar').optional(),
 ];
 
 const updateGroupValidation = [
@@ -46,7 +46,7 @@ const updateGroupValidation = [
     .optional()
     .isLength({ max: 500 })
     .withMessage('La descripción no puede exceder 500 caracteres'),
-  body('avatar').optional().isURL().withMessage('El avatar debe ser una URL válida'),
+  body('avatar').optional(),
   body('settings.isPrivate').optional().isBoolean().withMessage('isPrivate debe ser booleano'),
   body('settings.maxMembers')
     .optional()

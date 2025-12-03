@@ -180,6 +180,7 @@ const useApi = (apiFunction, options = {}) => {
     if (immediate) {
       execute();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Solo al montar
 
   return {

@@ -1,53 +1,25 @@
 import api from './api';
 
 const groupService = {
-  // Obtener todos los grupos del usuario
-  getMyGroups: async () => {
-    const response = await api.get('/groups');
-    return response.data;
-  },
-
-  // Obtener detalles de un grupo específico (pública, sin requerir ser miembro)
-  getGroupById: async (groupId) => {
-    const response = await api.get(`/groups/public/${groupId}`);
-    return response.data;
-  },
-
-  // Crear un nuevo grupo
-  createGroup: async (groupData) => {
-    const response = await api.post('/groups', groupData);
-    return response.data;
-  },
-
-  // Unirse a un grupo usando código de invitación
-  joinGroup: async (inviteCode) => {
-    const response = await api.post('/groups/join', { inviteCode });
-    return response.data;
-  },
-
-  // Obtener miembros de un grupo
-  getGroupMembers: async (groupId) => {
-    const response = await api.get(`/groups/${groupId}/members`);
-    return response.data;
-  },
-
-  // Actualizar grupo (solo admin)
-  updateGroup: async (groupId, groupData) => {
-    const response = await api.put(`/groups/${groupId}`, groupData);
-    return response.data;
-  },
-
-  // Eliminar grupo (solo admin)
-  deleteGroup: async (groupId) => {
-    const response = await api.delete(`/groups/${groupId}`);
-    return response.data;
-  },
-
-  // Invitar usuario a un grupo por email
-  inviteUserToGroup: async (groupId, email) => {
-    const response = await api.post(`/groups/${groupId}/invite`, { email });
-    return response.data;
-  },
+  getMyGroups: () => api.get('/groups').then(r => r.data),
+  
+  getGroupById: (groupId) => api.get(`/groups/public/${groupId}`).then(r => r.data),
+  
+  createGroup: (groupData) => api.post('/groups', groupData).then(r => r.data),
+  
+  joinGroup: (inviteCode) => api.post('/groups/join', { inviteCode }).then(r => r.data),
+  
+  getGroupMembers: (groupId) => api.get(`/groups/${groupId}/members`).then(r => r.data),
+  
+  updateGroup: (groupId, groupData) => api.put(`/groups/${groupId}`, groupData).then(r => r.data),
+  
+  deleteGroup: (groupId) => api.delete(`/groups/${groupId}`).then(r => r.data),
+  
+  leaveGroup: (groupId) => api.delete(`/groups/${groupId}/leave`).then(r => r.data),
+  
+  removeMember: (groupId, userId) => api.delete(`/groups/${groupId}/members/${userId}`).then(r => r.data),
+  
+  inviteUserToGroup: (groupId, email) => api.post(`/groups/${groupId}/invite`, { email }).then(r => r.data),
 };
 
 export default groupService;

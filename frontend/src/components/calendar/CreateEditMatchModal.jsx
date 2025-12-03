@@ -140,33 +140,7 @@ const CreateEditMatchModal = ({ isOpen, onClose, onSave, match = null }) => {
     });
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.groupId) {
-      newErrors.groupId = 'Debes seleccionar un grupo';
-    }
-
-    if (!formData.gameId) {
-      newErrors.gameId = 'Debes seleccionar un juego';
-    }
-
-    if (!formData.scheduledDate) {
-      newErrors.scheduledDate = 'La fecha es obligatoria';
-    }
-
-    if (formData.playerIds.length < 2) {
-      newErrors.playerIds = 'Debes seleccionar al menos 2 jugadores';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async () => {
-    console.log('handleSubmit llamado');
-    console.log('formData:', formData);
-
     // Validar formulario
     const newErrors = {};
 
@@ -196,7 +170,6 @@ const CreateEditMatchModal = ({ isOpen, onClose, onSave, match = null }) => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      console.log('Validación falló:', newErrors);
       return;
     }
 
@@ -216,14 +189,11 @@ const CreateEditMatchModal = ({ isOpen, onClose, onSave, match = null }) => {
         playerIds: finalPlayerIds
       };
 
-      console.log('Enviando matchData:', matchData);
-
       await onSave(matchData, match?._id);
       
       // Solo cerrar si no hay error
       onClose();
     } catch (err) {
-      console.error('Error al guardar partida:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Error al guardar la partida';
       setErrors({ submit: errorMessage });
     } finally {

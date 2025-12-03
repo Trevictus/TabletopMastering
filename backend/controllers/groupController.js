@@ -188,7 +188,7 @@ const updateGroup = async (req, res, next) => {
     // Actualizar campos
     if (name) group.name = name;
     if (description !== undefined) group.description = description;
-    if (avatar) group.avatar = avatar;
+    if (avatar !== undefined) group.avatar = avatar;
     if (settings) {
       if (settings.isPrivate !== undefined) group.settings.isPrivate = settings.isPrivate;
       if (settings.maxMembers !== undefined) {
@@ -310,20 +310,12 @@ const removeMember = async (req, res, next) => {
  */
 const leaveGroup = async (req, res, next) => {
   try {
-    const group = await Group.findById(req.params.id);
+    const group = await Group.findById(req.params.id).populate('members.user', 'name');
 
     if (!group || !group.isActive) {
       return res.status(404).json({
         success: false,
         message: 'Grupo no encontrado',
-      });
-    }
-
-    // El admin no puede salir del grupo
-    if (group.isAdmin(req.user._id)) {
-      return res.status(400).json({
-        success: false,
-        message: 'El administrador no puede salir del grupo. Debe transferir la administración o eliminar el grupo',
       });
     }
 
@@ -333,6 +325,24 @@ const leaveGroup = async (req, res, next) => {
         success: false,
         message: 'No eres miembro de este grupo',
       });
+    }
+
+    // Si es admin y hay más miembros, transferir admin al miembro más antiguo
+    if (group.isAdmin(req.user._id)) {
+      const otherMembers = group.members.filter(
+        m => m.user._id.toString() !== req.user._id.toString()
+      );
+      
+      if (otherMembers.length > 0) {
+        // Ordenar por fecha de unión y asignar al más antiguo
+        otherMembers.sort((a, b) => new Date(a.joinedAt) - new Date(b.joinedAt));
+        const newAdmin = otherMembers[0];
+        
+        group.admin = newAdmin.user._id;
+        newAdmin.role = 'admin';
+        await group.save();
+      }
+      // Si no hay otros miembros, el grupo quedará sin admin (o se podría eliminar)
     }
 
     // Eliminar miembro

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { 
   MdCheckCircle, 
@@ -18,12 +18,12 @@ const Toast = ({ id, type, title, message, action, onClose }) => {
   const [isExiting, setIsExiting] = useState(false);
 
   // Manejar cierre con animación
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsExiting(true);
     setTimeout(() => {
       onClose(id);
     }, 300); // Duración de la animación de salida
-  };
+  }, [id, onClose]);
 
   // Auto-remover al presionar Escape
   useEffect(() => {
@@ -35,7 +35,7 @@ const Toast = ({ id, type, title, message, action, onClose }) => {
 
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
-  }, []);
+  }, [handleClose]);
 
   // Iconos según el tipo
   const icons = {

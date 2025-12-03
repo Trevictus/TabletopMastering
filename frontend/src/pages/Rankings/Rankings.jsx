@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { MdRefresh } from 'react-icons/md';
 import { GiTrophy, GiPodium } from 'react-icons/gi';
 import { useAuth } from '../../context/AuthContext';
@@ -13,18 +14,19 @@ import styles from './Rankings.module.css';
  * Página de Rankings - Global y por grupo
  */
 const Rankings = () => {
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { groups, loadGroups } = useGroup();
   const [ranking, setRanking] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedGroupId, setSelectedGroupId] = useState(null);
+  const [selectedGroupId, setSelectedGroupId] = useState(searchParams.get('group') || null);
   const [sortBy, setSortBy] = useState('points');
 
   // Cargar grupos al montar
   useEffect(() => {
     if (groups.length === 0) loadGroups();
-  }, []);
+  }, [groups.length, loadGroups]);
 
   // Cargar ranking
   const loadRanking = useCallback(async () => {
@@ -37,7 +39,7 @@ const Rankings = () => {
         response = await rankingService.getGroupRanking(selectedGroupId);
         const data = response.data?.ranking || response.data || [];
         setRanking(data.map(item => ({
-          _id: item.user?._id || item.userId,
+          id: item.user?._id || item.userId,
           name: item.user?.name || item.name,
           avatar: item.user?.avatar || item.avatar,
           totalPoints: item.totalPoints || 0,
@@ -46,9 +48,17 @@ const Rankings = () => {
         })));
       } else {
         response = await rankingService.getGlobalRanking();
-        setRanking(response.data || []);
+        const data = response.data || [];
+        setRanking(data.map(item => ({
+          id: item.userId || item._id,
+          name: item.name,
+          avatar: item.avatar,
+          totalPoints: item.totalPoints || 0,
+          totalWins: item.totalWins || 0,
+          totalMatches: item.totalMatches || 0,
+        })));
       }
-    } catch (err) {
+    } catch {
       setError('Error al cargar el ranking');
       setRanking([]);
     } finally {
@@ -93,7 +103,7 @@ const Rankings = () => {
           className={`${styles.navBtn} ${!selectedGroupId ? styles.active : ''}`}
           onClick={() => setSelectedGroupId(null)}
         >
-          🌍 Global
+          Global
         </button>
         {groups.map(g => (
           <button
@@ -101,12 +111,10 @@ const Rankings = () => {
             className={`${styles.navBtn} ${selectedGroupId === g._id ? styles.active : ''}`}
             onClick={() => setSelectedGroupId(g._id)}
           >
-            🎲 {g.name}
+            {g.name}
           </button>
         ))}
-      </div>
-
-      {/* Ordenación */}
+      </div>      {/* Ordenación */}
       <div className={styles.sortBar}>
         <span>Ordenar:</span>
         <Button variant={sortBy === 'points' ? 'primary' : 'outline'} size="small" onClick={() => setSortBy('points')}>
@@ -144,12 +152,12 @@ const Rankings = () => {
               ))
             ) : sortedRanking.length > 0 ? (
               sortedRanking.map((p, i) => {
-                const isMe = p._id === user?._id || p.userId === user?._id;
+                const isMe = p.id && user?._id && String(p.id) === String(user._id);
                 const pos = i + 1;
                 return (
-                  <tr key={p._id || i} className={`${isMe ? styles.me : ''} ${pos <= 3 ? styles[`top${pos}`] : ''}`}>
+                  <tr key={p.id || i} className={`${isMe ? styles.me : ''} ${pos <= 3 ? styles[`top${pos}`] : ''}`}>
                     <td className={styles.pos}>
-                      {pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : `#${pos}`}
+                      {pos <= 3 ? <span className={styles[`medal${pos}`]}>{pos}</span> : `#${pos}`}
                     </td>
                     <td>
                       <div className={styles.player}>

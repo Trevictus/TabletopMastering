@@ -117,9 +117,25 @@
 .top1 { background: rgba(255, 215, 0, 0.08); }
 .top2 { background: rgba(192, 192, 192, 0.08); }
 .top3 { background: rgba(205, 127, 50, 0.08); }
-.me { background: rgba(99, 102, 241, 0.1); border-left: 3px solid var(--primary-color); }
+.me { background: rgba(139, 69, 19, 0.08); border-left: 3px solid var(--primary-color); }
 
 .pos { text-align: center; font-weight: 700; }
+
+/* Custom medals */
+.medal1, .medal2, .medal3 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.medal1 { background: linear-gradient(135deg, #ffd700, #b8860b); color: #5c2e0a; }
+.medal2 { background: linear-gradient(135deg, #e8e8e8, #a0a0a0); color: #333; }
+.medal3 { background: linear-gradient(135deg, #cd7f32, #8b4513); color: #fff; }
 
 /* Player Cell */
 .player {

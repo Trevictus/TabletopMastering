@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGroup } from '../../context/GroupContext';
 import { useToast } from '../../context/ToastContext';
-import { MdAddCircle, MdPersonAdd, MdContentCopy, MdCheckCircle } from 'react-icons/md';
+import { useAuth } from '../../context/AuthContext';
+import { MdAddCircle, MdPersonAdd, MdExitToApp } from 'react-icons/md';
 import { FaUserCircle } from 'react-icons/fa';
 import { GiTeamIdea } from 'react-icons/gi';
 import groupService from '../../services/groupService';
@@ -19,7 +20,8 @@ const MAX_GROUPS = 7;
  */
 const Groups = () => {
   const navigate = useNavigate();
-  const { groups, loadGroups, selectGroup } = useGroup();
+  const { user } = useAuth();
+  const { groups, loadGroups } = useGroup();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -32,7 +34,7 @@ const Groups = () => {
       setLoading(true);
       try {
         await loadGroups();
-      } catch (err) {
+      } catch {
         setError('Error al cargar los grupos');
       } finally {
         setLoading(false);
@@ -40,11 +42,24 @@ const Groups = () => {
     };
 
     loadInitialGroups();
-  }, []);
+  }, [loadGroups]);
 
-  const handleSelectGroup = (group) => {
-    selectGroup(group);
-    navigate(`/groups/${group._id}`);
+  const handleLeaveGroup = async (e, group) => {
+    e.stopPropagation();
+    const isAdmin = user?._id === group.admin?._id;
+    const message = isAdmin 
+      ? `Eres admin de "${group.name}". Si sales, el miembro más antiguo será el nuevo admin. ¿Continuar?`
+      : `¿Seguro que quieres salir del grupo "${group.name}"?`;
+    
+    if (!window.confirm(message)) return;
+    
+    try {
+      await groupService.leaveGroup(group._id);
+      toast.success('Has salido del grupo');
+      await loadGroups();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error al salir del grupo');
+    }
   };
 
   const handleJoinGroup = async (e) => {
@@ -128,12 +143,34 @@ const Groups = () => {
         <div className={styles.groupsGrid}>
           {groups.map(group => (
             <div key={group._id} className={styles.groupCard}>
-              {/* Header con nombre y descripción */}
+              {/* Botón salir */}
+              <button 
+                className={styles.leaveBtn}
+                onClick={(e) => handleLeaveGroup(e, group)}
+                title="Salir del grupo"
+              >
+                <MdExitToApp />
+              </button>
+              
+              {/* Header con avatar, nombre y descripción */}
               <div className={styles.cardHeader}>
-                <h3 className={styles.groupName}>{group.name}</h3>
-                <p className={styles.groupDescription}>
-                  {group.description || 'Sin descripción'}
-                </p>
+                <div className={styles.groupHeaderRow}>
+                  {isValidAvatar(group.avatar) ? (
+                    <img 
+                      src={group.avatar} 
+                      alt={group.name} 
+                      className={styles.groupAvatarImg}
+                    />
+                  ) : (
+                    <GiTeamIdea className={styles.groupAvatarIcon} />
+                  )}
+                  <div className={styles.groupHeaderText}>
+                    <h3 className={styles.groupName}>{group.name}</h3>
+                    <p className={styles.groupDescription}>
+                      {group.description || 'Sin descripción'}
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Admin del grupo */}

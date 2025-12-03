@@ -1,5 +1,4 @@
 import { useAuth } from '../../context/AuthContext';
-import { AUTH_SUCCESS } from '../../constants/auth';
 import './UserInfo.css';
 
 /**
@@ -11,8 +10,6 @@ const UserInfo = () => {
 
   const handleLogout = () => {
     logout();
-    // Opcional: mostrar notificación
-    console.log(AUTH_SUCCESS.LOGOUT);
   };
 
   if (loading) {

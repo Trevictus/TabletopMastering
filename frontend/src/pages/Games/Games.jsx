@@ -8,7 +8,8 @@ import {
   MdArrowBack,
   MdArrowForward
 } from 'react-icons/md';
-import { GiDiceFire, GiCardPlay } from 'react-icons/gi';
+import { GiCardPlay } from 'react-icons/gi';
+import { FiBox, FiUsers } from 'react-icons/fi';
 import { useGroup } from '../../context/GroupContext';
 import GameCard from '../../components/games/GameCard';
 import AddGameModal from '../../components/games/AddGameModal';
@@ -57,7 +58,7 @@ const Games = () => {
     if (groups.length === 0) {
       loadGroups();
     }
-  }, []); // Sin dependencias - solo se ejecuta al montar
+  }, [groups.length, loadGroups]);
 
   // Debounce para búsqueda - SOLO actualiza debouncedSearch
   useEffect(() => {
@@ -197,7 +198,7 @@ const Games = () => {
         </div>
       </div>
 
-      {/* Nav de Grupos - Horizontal sin scroll */}
+      {/* Nav de Grupos */}
       {(groups.length > 0 || selectedGroup) && (
         <div className={styles.groupNav}>
           <div className={styles.groupNavContent}>
@@ -205,7 +206,7 @@ const Games = () => {
               className={`${styles.groupNavButton} ${!selectedGroup ? styles.active : ''}`}
               onClick={() => selectGroup(null)}
             >
-              📚 Mis Juegos
+              <FiBox className={styles.navIcon} /> Mis Juegos
             </button>
             {groups.map(group => (
               <button
@@ -213,7 +214,7 @@ const Games = () => {
                 className={`${styles.groupNavButton} ${selectedGroup?._id === group._id ? styles.active : ''}`}
                 onClick={() => selectGroup(group)}
               >
-                🎲 {group.name}
+                <FiUsers className={styles.navIcon} /> {group.name}
               </button>
             ))}
           </div>
@@ -280,7 +281,7 @@ const Games = () => {
                     size="small"
                     onClick={() => setSourceFilter('bgg')}
                   >
-                    <GiDiceFire /> BGG
+                    <GiCardPlay /> BGG
                   </Button>
                   <Button
                     variant={sourceFilter === 'custom' ? 'primary' : 'outline'}

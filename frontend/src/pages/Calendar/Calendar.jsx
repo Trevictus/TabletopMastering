@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { MdAdd, MdCalendarToday } from 'react-icons/md';
-import { GiDiceFire } from 'react-icons/gi';
+import { GiSandsOfTime } from 'react-icons/gi';
+import { FiClock, FiLayers } from 'react-icons/fi';
 import CalendarGrid from '../../components/calendar/CalendarGrid';
 import CreateEditMatchModal from '../../components/calendar/CreateEditMatchModal';
 import MatchDetailsModal from '../../components/calendar/MatchDetailsModal';
@@ -24,6 +25,7 @@ const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState('');
 
   // Modales
@@ -293,13 +295,13 @@ const Calendar = () => {
       {/* Estadísticas compactas */}
       <div className={styles.statsBar}>
         <div className={styles.statItem}>
-          <span className={styles.statIcon}>📅</span>
+          <FiLayers className={styles.statIcon} />
           <span className={styles.statValue}>{matches.length}</span>
           <span className={styles.statLabel}>Total</span>
         </div>
         <div className={styles.statDivider}></div>
         <div className={styles.statItem}>
-          <span className={styles.statIcon}>🎯</span>
+          <GiSandsOfTime className={styles.statIcon} />
           <span className={styles.statValue}>{upcomingMatches}</span>
           <span className={styles.statLabel}>Próximas</span>
         </div>
@@ -307,7 +309,7 @@ const Calendar = () => {
           <>
             <div className={styles.statDivider}></div>
             <div className={`${styles.statItem} ${styles.warning}`}>
-              <span className={styles.statIcon}>⏰</span>
+              <FiClock className={styles.statIcon} />
               <span className={styles.statValue}>{pendingConfirmations}</span>
               <span className={styles.statLabel}>Pendientes</span>
             </div>

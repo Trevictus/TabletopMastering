@@ -1,14 +1,121 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MdArrowBack, MdPersonAdd, MdContentCopy, MdCheckCircle } from 'react-icons/md';
+import { MdArrowBack, MdContentCopy, MdCheckCircle, MdExitToApp, MdDelete, MdCameraAlt } from 'react-icons/md';
 import { FaUserCircle } from 'react-icons/fa';
-import { GiTeamIdea } from 'react-icons/gi';
+import { GiTeamIdea, GiTrophy } from 'react-icons/gi';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import groupService from '../../services/groupService';
 import Loading from '../../components/common/Loading';
 import { isValidAvatar } from '../../utils/validators';
 import styles from './GroupDetail.module.css';
+
+/**
+ * Función para comprimir imagen
+ */
+const compressImage = (file, maxWidth = 300, maxHeight = 300, quality = 0.8) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+    };
+    reader.onerror = reject;
+  });
+};
+
+/**
+ * Componente de Avatar de Grupo con carga de archivo para admin
+ */
+const GroupAvatar = ({ group, isAdmin, onAvatarChange }) => {
+  const [imgError, setImgError] = useState(false);
+  const fileInputRef = useRef(null);
+  const hasValidAvatar = isValidAvatar(group?.avatar) && !imgError;
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const compressedImage = await compressImage(file);
+        onAvatarChange(compressedImage);
+      } catch {
+        // Error silencioso
+      }
+    }
+  };
+
+  const handleRemove = (e) => {
+    e.stopPropagation();
+    onAvatarChange('');
+  };
+
+  return (
+    <div className={styles.groupAvatarContainer}>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className={styles.fileInput}
+      />
+      {hasValidAvatar ? (
+        <img 
+          src={group.avatar} 
+          alt={group.name} 
+          className={styles.groupAvatarImg}
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <GiTeamIdea className={styles.groupAvatarIcon} />
+      )}
+      {isAdmin && (
+        <div className={styles.avatarActions}>
+          <button 
+            className={styles.editAvatarBtn} 
+            onClick={() => fileInputRef.current?.click()}
+            title="Cambiar imagen del grupo"
+          >
+            <MdCameraAlt />
+          </button>
+          {hasValidAvatar && (
+            <button 
+              className={styles.removeAvatarBtn} 
+              onClick={handleRemove}
+              title="Quitar imagen"
+            >
+              <MdDelete />
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 /**
  * Componente de Avatar de Miembro con fallback a icono por defecto
@@ -97,6 +204,45 @@ const GroupDetail = () => {
     }
   }, [group?.inviteCode]);
 
+  const handleLeaveGroup = async () => {
+    const message = isAdmin 
+      ? 'Eres admin. Si sales, el miembro más antiguo será el nuevo admin. ¿Continuar?'
+      : '¿Seguro que quieres salir de este grupo?';
+    if (!window.confirm(message)) return;
+    
+    try {
+      await groupService.leaveGroup(id);
+      toastRef.current.success('Has salido del grupo');
+      navigate('/groups');
+    } catch (err) {
+      toastRef.current.error(err.response?.data?.message || 'Error al salir');
+    }
+  };
+
+  const handleRemoveMember = async (memberId, memberName) => {
+    if (!window.confirm(`¿Eliminar a ${memberName} del grupo?`)) return;
+    
+    try {
+      await groupService.removeMember(id, memberId);
+      toastRef.current.success(`${memberName} eliminado del grupo`);
+      // Recargar grupo
+      const response = await groupService.getGroupById(id);
+      setGroup(response.data);
+    } catch (err) {
+      toastRef.current.error(err.response?.data?.message || 'Error al eliminar miembro');
+    }
+  };
+
+  const handleAvatarChange = async (newAvatarUrl) => {
+    try {
+      await groupService.updateGroup(id, { avatar: newAvatarUrl });
+      setGroup(prev => ({ ...prev, avatar: newAvatarUrl }));
+      toastRef.current.success(newAvatarUrl ? 'Imagen del grupo actualizada' : 'Imagen del grupo eliminada');
+    } catch (err) {
+      toastRef.current.error(err.response?.data?.message || 'Error al actualizar imagen');
+    }
+  };
+
   if (loading) {
     return <Loading message="Cargando grupo..." />;
   }
@@ -138,7 +284,11 @@ const GroupDetail = () => {
           <MdArrowBack /> Volver
         </button>
         <div className={styles.headerContent}>
-          <GiTeamIdea className={styles.headerIcon} />
+          <GroupAvatar 
+            group={group} 
+            isAdmin={isAdmin} 
+            onAvatarChange={handleAvatarChange}
+          />
           <div>
             <h1>{group.name}</h1>
             <p className={styles.subtitle}>
@@ -188,6 +338,17 @@ const GroupDetail = () => {
                       key={member._id} 
                       className={`${styles.memberCard} ${isMemberAdmin ? styles.memberCardAdmin : ''}`}
                     >
+                      {/* Botón eliminar miembro (solo admin y no a sí mismo) */}
+                      {isAdmin && !isCurrentUser && !isMemberAdmin && (
+                        <button 
+                          className={styles.removeMemberBtn}
+                          onClick={() => handleRemoveMember(memberUser?._id, memberUser?.name)}
+                          title="Eliminar del grupo"
+                        >
+                          <MdDelete />
+                        </button>
+                      )}
+                      
                       {/* Avatar con fallback */}
                       <MemberAvatar 
                         member={member}
@@ -255,13 +416,17 @@ const GroupDetail = () => {
         <aside className={styles.sidebar}>
           <div className={styles.sidebarCard}>
             <h3>Acciones</h3>
-            {isAdmin && (
-              <button className={styles.actionButton}>
-                <MdPersonAdd /> Gestionar Miembros
-              </button>
-            )}
-            <button className={styles.actionButton} onClick={() => navigate('/rankings')}>
-              👑 Ver Rankings
+            <button 
+              className={styles.actionButton} 
+              onClick={() => navigate(`/rankings?group=${id}`)}
+            >
+              <GiTrophy /> Ver Rankings
+            </button>
+            <button 
+              className={`${styles.actionButton} ${styles.dangerButton}`}
+              onClick={handleLeaveGroup}
+            >
+              <MdExitToApp /> Salir del Grupo
             </button>
           </div>
 

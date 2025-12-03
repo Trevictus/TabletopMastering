@@ -157,9 +157,15 @@
   white-space: nowrap;
   font-family: inherit;
   text-decoration: none;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   line-height: 1;
   box-shadow: none;
+}
+
+.navIcon {
+  font-size: 1rem;
 }
 
 .groupNavButton:hover {
