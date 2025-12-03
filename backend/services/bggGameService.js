@@ -3,7 +3,12 @@ const Group = require('../models/Group');
 const bggService = require('./bggService');
 
 /**
- * Validar y obtener acceso al grupo para operaciones BGG (optimizado)
+ * Servicio de gestión de juegos de mesa
+ * Utiliza datos simulados (mock) para búsquedas y detalles de juegos
+ */
+
+/**
+ * Validar y obtener acceso al grupo para operaciones (optimizado)
  */
 exports.validateGroupAccess = async (groupId, userId) => {
   if (!groupId) {
@@ -31,7 +36,7 @@ exports.validateGroupAccess = async (groupId, userId) => {
 };
 
 /**
- * Buscar juegos en BoardGameGeek (sin guardar)
+ * Buscar juegos en la base de datos simulada (sin guardar)
  */
 exports.searchBGGGames = async (name, exact = false) => {
   if (!name) {
@@ -44,11 +49,11 @@ exports.searchBGGGames = async (name, exact = false) => {
 };
 
 /**
- * Obtener detalles de un juego de BGG por ID
+ * Obtener detalles de un juego por ID
  */
 exports.getBGGGameDetails = async (bggId) => {
   if (!bggId || isNaN(bggId)) {
-    throw new Error('ID de BGG inválido');
+    throw new Error('ID de juego inválido');
   }
 
   const gameDetails = await bggService.getGameDetails(parseInt(bggId));
@@ -57,12 +62,12 @@ exports.getBGGGameDetails = async (bggId) => {
 };
 
 /**
- * Añadir un juego de BGG (optimizado)
+ * Añadir un juego desde la base de datos (optimizado)
  */
 exports.addBGGGame = async (bggId, userId, groupId = null, customNotes = '') => {
   // Validaciones
   if (!bggId) {
-    throw new Error('El ID de BGG es obligatorio');
+    throw new Error('El ID del juego es obligatorio');
   }
 
   // Verificar que el grupo existe y el usuario es miembro o admin (si se proporciona)
