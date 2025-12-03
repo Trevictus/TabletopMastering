@@ -195,13 +195,27 @@ const GroupDetail = () => {
     };
   }, [id]);
 
-  const handleCopyCode = useCallback(() => {
-    if (group?.inviteCode) {
-      navigator.clipboard.writeText(group.inviteCode);
+  const handleCopyCode = useCallback(async () => {
+    if (!group?.inviteCode) return;
+    
+    try {
+      await navigator.clipboard.writeText(group.inviteCode);
       setCopiedCode(true);
       toastRef.current.success('Código copiado al portapapeles');
-      setTimeout(() => setCopiedCode(false), 2000);
+    } catch {
+      // Fallback para navegadores sin soporte de clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = group.inviteCode;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopiedCode(true);
+      toastRef.current.success('Código copiado al portapapeles');
     }
+    setTimeout(() => setCopiedCode(false), 2000);
   }, [group?.inviteCode]);
 
   const handleLeaveGroup = async () => {
