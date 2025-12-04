@@ -63,7 +63,7 @@ La **curva de aprendizaje** de World Anvil es abrumadoramente complejo para prin
 
 Muchos usuarios buscan opciones de **pago único** en lugar de suscripciones eternas.
 
-La mayoría de estas herramientas (excepto Notion) tienen una **experiencia en móvil muy pobre.**
+La mayoría de estas herramientas tienen una **experiencia en móvil muy pobre.**
 
 ## Estructura organizativa de la empresa
 
@@ -73,3 +73,30 @@ En fases temrpanas tendriamos que adaptarnos como una Startup **Indie Hackers**,
 Nos organizariamos por roles trabajando con el modelo **Triangulo de hierro** cubriendo todas los tres pilares fundamentales: tecnología, producto y negocio. Además en caso de decisiones tres personas nunca quedaran en empate.
 
 ### Identificación de departamentos y funciones
+
+#### --- 1. Dirección / Gerencia (El Núcleo del Triángulo) ---
+* **Board de Fundadores:** Los 3 líderes toman decisiones críticas por consenso. Equilibrio entre Tech, Producto y Negocio.
+
+#### --- 2. Departamento de Desarrollo ("The Hacker") ---
+* **CTO / Lead Dev:** Arquitectura de la plataforma.
+
+* **Full Stack & DevOps:** Desarrollo de funcionalidades y automatización de despliegues.
+
+#### --- 3. Departamento de Producto ("The Hipster") ---
+* **CPO / Product Designer:** Diseño de mecánicas y experiencia de usuario (UX/UI).
+
+* **Content & Audio Lead:** Supervisión de la calidad del contenido, assets sonoros y curaduría de la biblioteca de mastering.
+
+#### --- 4. Departamento de Marketing y Ventas ("The Hustler") ---
+* **CMO / Growth Lead:** Estrategias de adquisición de usuarios, monetización y alianzas con creadores de contenido TTRPG.
+
+* **Community Manager:** Gestión de la comunidad (Discord, Redes).
+
+#### --- 5. Departamentos de Soporte y Administración (Responsabilidad Compartida) ---
+* **Customer Support:** Atención con escalado directo para bugs críticos.
+
+* **Ops & Finance:** Gestión de recursos, suscripciones, legal y facturación, gestionada por el líder de Negocio.
+
+
+### Organigrama estructural de la empresa
+![organigrama](docs/diagramas/organigrama.png)
