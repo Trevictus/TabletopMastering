@@ -14,15 +14,23 @@ readonly ENV_FILE="${SCRIPT_DIR}/.env"
 readonly ENV_EXAMPLE="${SCRIPT_DIR}/.env.example.prod"
 readonly COMPOSE_FILE="${SCRIPT_DIR}/docker-compose-prod.yml"
 readonly CREDENTIALS_FILE="${SCRIPT_DIR}/.credentials"
-readonly SSL_CERT_PATH="/etc/letsencrypt/live/tabletopmastering.games"
-readonly DOMAIN="tabletopmastering.games"
 
-# Colores para output
+# Cargar configuración SSL si existe
+if [ -f "${SCRIPT_DIR}/scripts/config.sh" ]; then
+    source "${SCRIPT_DIR}/scripts/config.sh"
+else
+    # Valores por defecto si no existe config.sh
+    DOMAIN="tabletopmastering.games"
+    SSL_CERT_PATH="/etc/letsencrypt/live/${DOMAIN}"
+    SSL_DHPARAMS="/etc/letsencrypt/ssl-dhparams.pem"
+fi
+
+# Colores
 readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'
 readonly YELLOW='\033[1;33m'
 readonly CYAN='\033[0;36m'
-readonly NC='\033[0m' # No Color
+readonly NC='\033[0m'
 
 # Flags
 MONGO_CREDENTIALS_CHANGED=false
@@ -70,60 +78,42 @@ command_exists() {
 check_ssl_certificates() {
     log_step "🔒 Verificando certificados SSL..."
     
-    # Verificar si existen los certificados
-    if [ -f "${SSL_CERT_PATH}/fullchain.pem" ] && [ -f "${SSL_CERT_PATH}/privkey.pem" ]; then
-        # Verificar que el certificado no haya expirado
-        local expiry_date
-        expiry_date=$(openssl x509 -enddate -noout -in "${SSL_CERT_PATH}/fullchain.pem" 2>/dev/null | cut -d= -f2)
-        
-        if [ -n "$expiry_date" ]; then
-            local expiry_epoch
-            expiry_epoch=$(date -d "$expiry_date" +%s 2>/dev/null || echo "0")
-            local now_epoch
-            now_epoch=$(date +%s)
-            local days_left=$(( (expiry_epoch - now_epoch) / 86400 ))
-            
-            if [ "$days_left" -gt 0 ]; then
-                SSL_ENABLED=true
-                log_success "Certificados SSL válidos (expiran en ${days_left} días)"
-                
-                if [ "$days_left" -lt 14 ]; then
-                    log_warning "⚠️  El certificado expira pronto. Considera renovarlo."
-                fi
-            else
-                log_warning "El certificado SSL ha expirado"
-                SSL_ENABLED=false
-            fi
-        else
-            log_warning "No se pudo verificar la fecha de expiración del certificado"
-            SSL_ENABLED=true  # Asumir válido si existe
-        fi
-    else
+    local cert_file="${SSL_CERT_PATH}/fullchain.pem"
+    local key_file="${SSL_CERT_PATH}/privkey.pem"
+    
+    # Verificar existencia de certificados y DH params
+    if [ ! -f "$cert_file" ] || [ ! -f "$key_file" ]; then
         log_warning "No se encontraron certificados SSL"
-        log_info "Para configurar HTTPS, ejecuta: ${CYAN}sudo ./scripts/setup-ssl.sh${NC}"
+        log_info "Para configurar HTTPS: ${CYAN}sudo ./scripts/setup-ssl.sh${NC}"
         SSL_ENABLED=false
-    fi
-    
-    # Verificar parámetros DH
-    if [ "$SSL_ENABLED" = true ] && [ ! -f "/etc/letsencrypt/ssl-dhparams.pem" ]; then
+    elif [ ! -f "$SSL_DHPARAMS" ]; then
         log_warning "Faltan parámetros Diffie-Hellman"
-        log_info "Ejecuta: ${CYAN}sudo openssl dhparam -out /etc/letsencrypt/ssl-dhparams.pem 2048${NC}"
         SSL_ENABLED=false
+    else
+        # Verificar expiración
+        local days_left
+        days_left=$(( ( $(date -d "$(openssl x509 -enddate -noout -in "$cert_file" 2>/dev/null | cut -d= -f2)" +%s) - $(date +%s) ) / 86400 ))
+        
+        if [ "$days_left" -gt 0 ]; then
+            SSL_ENABLED=true
+            log_success "Certificados SSL válidos (expiran en ${days_left} días)"
+            [ "$days_left" -lt 14 ] && log_warning "El certificado expira pronto"
+        else
+            log_warning "El certificado SSL ha expirado"
+            SSL_ENABLED=false
+        fi
     fi
     
-    # Seleccionar configuración de nginx según SSL
+    # Configurar nginx según SSL
+    local nginx_conf="nginx.ssl.conf"
+    [ "$SSL_ENABLED" = false ] && nginx_conf="nginx.prod.conf"
+    
+    sed -i "s|./nginx\.[a-z]*\.conf:/etc/nginx/nginx.conf:ro|./${nginx_conf}:/etc/nginx/nginx.conf:ro|g" "$COMPOSE_FILE"
+    
     if [ "$SSL_ENABLED" = true ]; then
-        log_success "HTTPS habilitado - usando nginx.ssl.conf"
-        # Asegurar que se usa nginx.ssl.conf
-        if grep -q "nginx.prod.conf" "$COMPOSE_FILE"; then
-            sed -i 's|./nginx.prod.conf:/etc/nginx/nginx.conf:ro|./nginx.ssl.conf:/etc/nginx/nginx.conf:ro|g' "$COMPOSE_FILE"
-        fi
+        log_success "HTTPS habilitado"
     else
         log_info "HTTP only - usando nginx.prod.conf"
-        # Usar la config sin SSL si no hay certificados
-        if grep -q "nginx.ssl.conf" "$COMPOSE_FILE"; then
-            sed -i 's|./nginx.ssl.conf:/etc/nginx/nginx.conf:ro|./nginx.prod.conf:/etc/nginx/nginx.conf:ro|g' "$COMPOSE_FILE"
-        fi
     fi
 }
 
@@ -218,19 +208,14 @@ create_env_file() {
     log_success "Archivo .env creado con claves seguras"
 }
 
-# Actualiza CLIENT_URL en .env según el estado de SSL
+# Actualiza CLIENT_URL en .env según SSL
 update_client_url() {
-    if [ -f "$ENV_FILE" ]; then
-        local current_url
-        current_url=$(grep "^CLIENT_URL=" "$ENV_FILE" | cut -d'=' -f2)
-        
-        if [ "$SSL_ENABLED" = true ]; then
-            local https_url="https://${DOMAIN}"
-            if [ "$current_url" != "$https_url" ]; then
-                sed -i "s|^CLIENT_URL=.*|CLIENT_URL=${https_url}|g" "$ENV_FILE"
-                log_info "CLIENT_URL actualizado a HTTPS"
-            fi
-        fi
+    [ "$SSL_ENABLED" != true ] || [ ! -f "$ENV_FILE" ] && return
+    
+    local https_url="https://${DOMAIN}"
+    if ! grep -q "^CLIENT_URL=${https_url}" "$ENV_FILE"; then
+        sed -i "s|^CLIENT_URL=.*|CLIENT_URL=${https_url}|g" "$ENV_FILE"
+        log_info "CLIENT_URL actualizado a HTTPS"
     fi
 }
 
