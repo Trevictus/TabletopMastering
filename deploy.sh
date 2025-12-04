@@ -114,12 +114,15 @@ check_ssl_certificates() {
     # Seleccionar configuración de nginx según SSL
     if [ "$SSL_ENABLED" = true ]; then
         log_success "HTTPS habilitado - usando nginx.ssl.conf"
+        # Asegurar que se usa nginx.ssl.conf
+        if grep -q "nginx.prod.conf" "$COMPOSE_FILE"; then
+            sed -i 's|./nginx.prod.conf:/etc/nginx/nginx.conf:ro|./nginx.ssl.conf:/etc/nginx/nginx.conf:ro|g' "$COMPOSE_FILE"
+        fi
     else
         log_info "HTTP only - usando nginx.prod.conf"
-        # Actualizar docker-compose para usar config sin SSL si no hay certificados
-        if [ -f "${SCRIPT_DIR}/nginx.prod.conf" ]; then
-            # Temporalmente usar la config sin SSL
-            sed -i 's|./nginx.ssl.conf:/etc/nginx/nginx.conf:ro|./nginx.prod.conf:/etc/nginx/nginx.conf:ro|g' "$COMPOSE_FILE" 2>/dev/null || true
+        # Usar la config sin SSL si no hay certificados
+        if grep -q "nginx.ssl.conf" "$COMPOSE_FILE"; then
+            sed -i 's|./nginx.ssl.conf:/etc/nginx/nginx.conf:ro|./nginx.prod.conf:/etc/nginx/nginx.conf:ro|g' "$COMPOSE_FILE"
         fi
     fi
 }
