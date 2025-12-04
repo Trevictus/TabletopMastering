@@ -121,21 +121,29 @@
 
 .pos { text-align: center; font-weight: 700; }
 
-/* Custom medals */
-.medal1, .medal2, .medal3 {
+/* Position number for players outside top 3 */
+.posNumber {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  font-weight: 700;
-  font-size: 0.85rem;
+  min-width: 28px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
-.medal1 { background: linear-gradient(135deg, #ffd700, #b8860b); color: #5c2e0a; }
-.medal2 { background: linear-gradient(135deg, #e8e8e8, #a0a0a0); color: #333; }
-.medal3 { background: linear-gradient(135deg, #cd7f32, #8b4513); color: #fff; }
+/* Medal emoji styles */
+.medal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.medal1 { filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.4)); }
+.medal2 { filter: drop-shadow(0 2px 4px rgba(192, 192, 192, 0.4)); }
+.medal3 { filter: drop-shadow(0 2px 4px rgba(205, 127, 50, 0.4)); }
 
 /* Player Cell */
 .player {
@@ -149,12 +157,9 @@
   height: 36px;
   border-radius: 50%;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-weight: 700;
   flex-shrink: 0;
 }
 
@@ -162,6 +167,13 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
+}
+
+.avatarFallback {
+  width: 100%;
+  height: 100%;
+  color: var(--accent-color);
 }
 
 .name { font-weight: 600; }

@@ -54,3 +54,13 @@ export const validateInviteCode = (code) => {
 export const isValidAvatar = (avatar) => {
   return avatar && avatar.startsWith('data:image');
 };
+
+/**
+ * Capitaliza la primera letra de un string
+ * @param {string} str - String a capitalizar
+ * @returns {string} String con la primera letra en mayúscula
+ */
+export const capitalize = (str) => {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};

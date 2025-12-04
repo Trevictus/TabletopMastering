@@ -1,6 +1,6 @@
 .page {
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -37,6 +37,14 @@
 .heroIcon {
   font-size: 4rem;
   opacity: 0.9;
+  animation: diceRoll 3s ease-in-out infinite;
+}
+
+@keyframes diceRoll {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(15deg) scale(1.05); }
+  50% { transform: rotate(-10deg) scale(1); }
+  75% { transform: rotate(5deg) scale(1.02); }
 }
 
 .hero h1 {

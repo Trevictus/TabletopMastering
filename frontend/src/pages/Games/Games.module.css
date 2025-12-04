@@ -1,5 +1,5 @@
 .gamesPage {
-  max-width: 1400px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: var(--spacing-lg);
   min-height: calc(100vh - 80px); /* Evita saltos de layout - altura del navbar */
@@ -12,11 +12,15 @@
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
   align-items: stretch;
-  min-height: 400px; /* Altura mínima para evitar saltos */
+}
+
+.gamesGrid:empty {
+  display: none;
 }
 
 .gamesGrid.loading {
   pointer-events: none;
+  min-height: 400px;
 }
 
 /* Skeleton Cards */

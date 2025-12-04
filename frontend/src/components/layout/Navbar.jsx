@@ -3,13 +3,14 @@ import { GiPerspectiveDiceSixFacesRandom, GiCardPlay, GiTrophy, GiTeamIdea, GiSc
 import { MdPerson, MdExitToApp, MdHome, MdCalendarToday } from 'react-icons/md';
 import { FaUserCircle } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
-import { isValidAvatar } from '../../utils/validators';
+import { isValidAvatar, capitalize } from '../../utils/validators';
 import styles from './Navbar.module.css';
 
 /**
  * Componente Navbar - Barra de navegación principal
  * Muestra diferentes opciones según el estado de autenticación
  */
+
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -95,11 +96,11 @@ const Navbar = () => {
             <li>
               <Link to="/profile" className={`${styles.navLink} ${styles.profileLink} ${isActive('/profile')}`} title="Perfil">
                 {isValidAvatar(user?.avatar) ? (
-                  <img src={user.avatar} alt={user.name} className={styles.userAvatar} />
+                  <img src={user.avatar} alt={user.nickname || user.name} className={styles.userAvatar} />
                 ) : (
                   <FaUserCircle className={styles.linkIcon} />
                 )}
-                <span className={styles.linkText}>{user?.name || 'Perfil'}</span>
+                <span className={styles.linkText}>{capitalize(user?.nickname) || user?.name || 'Perfil'}</span>
               </Link>
             </li>
             

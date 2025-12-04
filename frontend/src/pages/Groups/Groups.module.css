@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: var(--spacing-xl);
   padding: var(--spacing-lg);
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
   min-height: calc(100vh - 80px);
   animation: pageEnter 0.2s ease-out;
@@ -264,7 +264,7 @@
 .groupCard .adminAvatarIcon {
   width: 36px;
   height: 36px;
-  color: var(--text-tertiary);
+  color: var(--accent-color);
   flex-shrink: 0;
 }
 
@@ -352,7 +352,7 @@
 .groupCard .memberAvatarIcon {
   width: 40px;
   height: 40px;
-  color: var(--text-tertiary);
+  color: var(--accent-color);
   flex-shrink: 0;
 }
 
@@ -791,6 +791,10 @@
     font-size: var(--font-size-xl);
   }
 
+  .groupCard .cardHeader {
+    padding: 14px;
+  }
+
   .groupCard .cardHeader .groupName {
     font-size: 16px;
   }
@@ -799,11 +803,66 @@
     font-size: 13px;
   }
 
-  .formActions {
-    flex-direction: column;
+  .groupCard .cardBody {
+    padding: 14px;
   }
 
-  .formActions button {
+  .groupCard .cardFooter {
+    padding: 12px 14px;
+  }
+
+  /* Modal improvements */
+  .modalOverlay {
+    padding: 0.75rem;
+    margin-top: 60px;
+    align-items: flex-start;
+  }
+
+  .modal {
+    border-radius: 16px;
+    max-height: calc(100vh - 80px);
+  }
+
+  .modalHeader {
+    padding: 14px 16px;
+  }
+
+  .modalHeader h2 {
+    font-size: var(--font-size-md);
+  }
+
+  .closeButton {
+    font-size: 20px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .joinForm {
+    padding: 14px 16px;
+    gap: 16px;
+  }
+
+  .formGroup label {
+    font-size: 13px;
+  }
+
+  .input {
+    padding: 10px 14px;
+    font-size: 15px;
+  }
+
+  .hint {
+    font-size: 12px;
+  }
+
+  .formActions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .formActions button,
+  .cancelButton {
     width: 100%;
+    padding: 10px 16px;
   }
 }

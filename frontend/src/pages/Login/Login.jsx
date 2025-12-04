@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { GiPerspectiveDiceSixFacesRandom } from 'react-icons/gi';
-import { MdEmail, MdLock } from 'react-icons/md';
+import { MdPerson, MdLock } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import Button from '../../components/common/Button';
@@ -25,32 +25,31 @@ const Login = () => {
   };
 
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '',
     password: '',
     rememberMe: false
   });
 
   const [errors, setErrors] = useState({
-    email: '',
+    identifier: '',
     password: ''
   });
 
   const [touched, setTouched] = useState({
-    email: false,
+    identifier: false,
     password: false
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState('');
 
-  // Validación de email
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim()) {
-      return 'El email es obligatorio';
+  // Validación de identifier (email o nombre de jugador)
+  const validateIdentifier = (identifier) => {
+    if (!identifier.trim()) {
+      return 'El email o nombre de jugador es obligatorio';
     }
-    if (!emailRegex.test(email)) {
-      return 'El formato del email no es válido';
+    if (identifier.trim().length < 3) {
+      return 'Debe tener al menos 3 caracteres';
     }
     return '';
   };
@@ -83,8 +82,8 @@ const Login = () => {
 
     // Validar en tiempo real si el campo ya fue tocado
     if (touched[name]) {
-      if (name === 'email') {
-        setErrors((prev) => ({ ...prev, email: validateEmail(value) }));
+      if (name === 'identifier') {
+        setErrors((prev) => ({ ...prev, identifier: validateIdentifier(value) }));
       } else if (name === 'password') {
         setErrors((prev) => ({ ...prev, password: validatePassword(value) }));
       }
@@ -101,8 +100,8 @@ const Login = () => {
     }));
 
     // Validar el campo
-    if (name === 'email') {
-      setErrors((prev) => ({ ...prev, email: validateEmail(value) }));
+    if (name === 'identifier') {
+      setErrors((prev) => ({ ...prev, identifier: validateIdentifier(value) }));
     } else if (name === 'password') {
       setErrors((prev) => ({ ...prev, password: validatePassword(value) }));
     }
@@ -114,21 +113,21 @@ const Login = () => {
 
     // Marcar todos los campos como tocados
     setTouched({
-      email: true,
+      identifier: true,
       password: true
     });
 
     // Validar todos los campos
-    const emailError = validateEmail(formData.email);
+    const identifierError = validateIdentifier(formData.identifier);
     const passwordError = validatePassword(formData.password);
 
     setErrors({
-      email: emailError,
+      identifier: identifierError,
       password: passwordError
     });
 
     // Si hay errores, no enviar el formulario
-    if (emailError || passwordError) {
+    if (identifierError || passwordError) {
       return;
     }
 
@@ -137,8 +136,8 @@ const Login = () => {
     setServerError('');
 
     try {
-      const { email, password } = formData;
-      await login({ email, password });
+      const { identifier, password } = formData;
+      await login({ identifier, password });
       
       toast.success('¡Bienvenido de nuevo!', {
         action: {
@@ -192,17 +191,17 @@ const Login = () => {
           {/* Formulario */}
           <form onSubmit={handleSubmit} className={styles.form} noValidate>
             <Input
-              label="Correo Electrónico"
-              type="email"
-              name="email"
-              value={formData.email}
-              placeholder="tu-email@ejemplo.com"
-              error={touched.email ? errors.email : ''}
+              label="Email o Nombre de jugador"
+              type="text"
+              name="identifier"
+              value={formData.identifier}
+              placeholder="tu@email.com o nombre_jugador"
+              error={touched.identifier ? errors.identifier : ''}
               required
-              icon={<MdEmail size={18} />}
+              icon={<MdPerson size={18} />}
               onChange={handleChange}
               onBlur={handleBlur}
-              autoComplete="email"
+              autoComplete="username"
               disabled={isLoading}
             />
 

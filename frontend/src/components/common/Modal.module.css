@@ -152,21 +152,81 @@
   z-index: 2;
 }
 
+/* Tablet */
 @media (max-width: 768px) {
   .modalBackdrop {
-    padding: 0;
+    padding: 1rem;
+    margin-top: 60px;
+    align-items: flex-start;
   }
 
   .modal {
-    max-height: 100vh;
-    border-radius: 0;
-    width: 100vw;
-    max-width: 100vw;
+    max-height: calc(100vh - 80px);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 100%;
   }
 
-  .modalHeader,
-  .modalBody,
+  .modal.small,
+  .modal.medium,
+  .modal.large {
+    max-width: 100%;
+  }
+
+  .modalHeader {
+    padding: 1rem 1.25rem;
+  }
+
+  .modalTitle {
+    font-size: 1.25rem;
+  }
+
+  .modalBody {
+    padding: 1.25rem;
+  }
+
   .modalFooter {
+    padding: 1rem 1.25rem;
+    flex-wrap: wrap;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .modalBackdrop {
+    padding: 0.5rem;
+    margin-top: 50px;
+  }
+
+  .modal {
+    max-height: calc(100vh - 60px);
+    border-radius: 12px;
+  }
+
+  .modalHeader {
+    padding: 0.875rem 1rem;
+  }
+
+  .modalTitle {
+    font-size: 1.1rem;
+  }
+
+  .closeButton {
+    font-size: 1.25rem;
+    padding: 0.25rem;
+  }
+
+  .modalBody {
     padding: 1rem;
+  }
+
+  .modalFooter {
+    padding: 0.875rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .modalFooter button {
+    flex: 1;
+    min-width: 0;
   }
 }

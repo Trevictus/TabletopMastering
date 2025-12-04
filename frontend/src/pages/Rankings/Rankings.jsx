@@ -1,18 +1,20 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { MdRefresh } from 'react-icons/md';
+import { FaUserCircle } from 'react-icons/fa';
 import { GiTrophy, GiPodium } from 'react-icons/gi';
 import { useAuth } from '../../context/AuthContext';
 import { useGroup } from '../../context/GroupContext';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import rankingService from '../../services/rankingService';
-import { isValidAvatar } from '../../utils/validators';
+import { isValidAvatar, capitalize } from '../../utils/validators';
 import styles from './Rankings.module.css';
 
 /**
  * Página de Rankings - Global y por grupo
  */
+
 const Rankings = () => {
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
@@ -40,6 +42,7 @@ const Rankings = () => {
         const data = response.data?.ranking || response.data || [];
         setRanking(data.map(item => ({
           id: item.user?._id || item.userId,
+          nickname: item.user?.nickname || item.nickname,
           name: item.user?.name || item.name,
           avatar: item.user?.avatar || item.avatar,
           totalPoints: item.totalPoints || 0,
@@ -51,6 +54,7 @@ const Rankings = () => {
         const data = response.data || [];
         setRanking(data.map(item => ({
           id: item.userId || item._id,
+          nickname: item.nickname,
           name: item.name,
           avatar: item.avatar,
           totalPoints: item.totalPoints || 0,
@@ -76,17 +80,23 @@ const Rankings = () => {
     return sorted;
   }, [ranking, sortBy]);
 
+  // Normalizar ID del usuario actual
+  const currentUserId = user?._id?.toString?.() || user?._id || '';
+
   // Top 20 + usuario actual si está fuera del top
   const { displayRanking, currentUserEntry } = useMemo(() => {
     const top20 = sortedRanking.slice(0, 20);
-    const userIndex = sortedRanking.findIndex(p => p.id && user?._id && String(p.id) === String(user._id));
+    const userIndex = sortedRanking.findIndex(p => {
+      const playerId = p.id?.toString?.() || p.id || '';
+      return playerId && currentUserId && playerId === currentUserId;
+    });
     const isUserOutsideTop = userIndex >= 20;
     
     return {
       displayRanking: top20,
       currentUserEntry: isUserOutsideTop ? { ...sortedRanking[userIndex], position: userIndex + 1 } : null
     };
-  }, [sortedRanking, user?._id]);
+  }, [sortedRanking, currentUserId]);
 
   // Info de vista actual
   const groupName = selectedGroupId 
@@ -166,12 +176,19 @@ const Rankings = () => {
             ) : sortedRanking.length > 0 ? (
               <>
                 {displayRanking.map((p, i) => {
-                  const isMe = p.id && user?._id && String(p.id) === String(user._id);
+                  const playerId = p.id?.toString?.() || p.id || '';
+                  const isMe = playerId && currentUserId && playerId === currentUserId;
                   const pos = i + 1;
                   return (
                     <tr key={p.id || i} className={`${isMe ? styles.me : ''} ${pos <= 3 ? styles[`top${pos}`] : ''}`}>
                       <td className={styles.pos}>
-                        {pos <= 3 ? <span className={styles[`medal${pos}`]}>{pos}</span> : `#${pos}`}
+                        {pos <= 3 ? (
+                          <span className={`${styles.medal} ${styles[`medal${pos}`]}`}>
+                            {pos === 1 ? '🥇' : pos === 2 ? '🥈' : '🥉'}
+                          </span>
+                        ) : (
+                          <span className={styles.posNumber}>{pos}</span>
+                        )}
                       </td>
                       <td>
                         <div className={styles.player}>
@@ -179,10 +196,10 @@ const Rankings = () => {
                             {isValidAvatar(p.avatar) ? (
                               <img src={p.avatar} alt="" />
                             ) : (
-                              <span>{p.name?.charAt(0).toUpperCase() || '?'}</span>
+                              <FaUserCircle className={styles.avatarFallback} />
                             )}
                           </div>
-                          <span className={styles.name}>{p.name}</span>
+                          <span className={styles.name}>{capitalize(p.nickname) || p.name}</span>
                           {isMe && <span className={styles.badge}>Tú</span>}
                         </div>
                       </td>
@@ -198,17 +215,19 @@ const Rankings = () => {
                       <td colSpan={5}><div className={styles.separatorLine}><span>···</span></div></td>
                     </tr>
                     <tr className={styles.me}>
-                      <td className={styles.pos}>#{currentUserEntry.position}</td>
+                      <td className={styles.pos}>
+                        <span className={styles.posNumber}>{currentUserEntry.position}</span>
+                      </td>
                       <td>
                         <div className={styles.player}>
                           <div className={styles.avatar}>
                             {isValidAvatar(currentUserEntry.avatar) ? (
                               <img src={currentUserEntry.avatar} alt="" />
                             ) : (
-                              <span>{currentUserEntry.name?.charAt(0).toUpperCase() || '?'}</span>
+                              <FaUserCircle className={styles.avatarFallback} />
                             )}
                           </div>
-                          <span className={styles.name}>{currentUserEntry.name}</span>
+                          <span className={styles.name}>{capitalize(currentUserEntry.nickname) || currentUserEntry.name}</span>
                           <span className={styles.badge}>Tú</span>
                         </div>
                       </td>

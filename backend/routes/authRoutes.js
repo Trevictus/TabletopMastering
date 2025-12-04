@@ -1,6 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { register, login, getMe, updateProfile } = require('../controllers/authController');
+const { register, login, getMe, updateProfile, checkNickname, checkEmail } = require('../controllers/authController');
 const { protect } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validator');
 
@@ -29,13 +29,12 @@ const registerValidation = [
 ];
 
 const loginValidation = [
-  body('email')
+  body('identifier')
     .trim()
     .notEmpty()
-    .withMessage('El email es obligatorio')
-    .isEmail()
-    .withMessage('Debe ser un email válido')
-    .normalizeEmail(),
+    .withMessage('El email o nombre de jugador es obligatorio')
+    .isLength({ min: 3 })
+    .withMessage('Debe tener al menos 3 caracteres'),
   body('password').notEmpty().withMessage('La contraseña es obligatoria'),
 ];
 
@@ -70,6 +69,8 @@ const updateProfileValidation = [
 // Rutas públicas
 router.post('/register', registerValidation, validate, register);
 router.post('/login', loginValidation, validate, login);
+router.post('/check-nickname', checkNickname);
+router.post('/check-email', checkEmail);
 
 // Rutas protegidas
 router.get('/me', protect, getMe);

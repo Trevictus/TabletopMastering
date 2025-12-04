@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GiPerspectiveDiceSixFacesRandom } from 'react-icons/gi';
-import { MdEmail, MdLock, MdPerson } from 'react-icons/md';
+import { MdEmail, MdLock, MdPerson, MdAlternateEmail } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
+import authService from '../../services/authService';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import styles from './Register.module.css';
@@ -24,6 +25,7 @@ const Register = () => {
   };
 
   const [formData, setFormData] = useState({
+    nickname: '',
     name: '',
     email: '',
     password: '',
@@ -31,6 +33,7 @@ const Register = () => {
   });
 
   const [errors, setErrors] = useState({
+    nickname: '',
     name: '',
     email: '',
     password: '',
@@ -38,6 +41,7 @@ const Register = () => {
   });
 
   const [touched, setTouched] = useState({
+    nickname: false,
     name: false,
     email: false,
     password: false,
@@ -46,6 +50,28 @@ const Register = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState('');
+  const [nicknameSuggestions, setNicknameSuggestions] = useState([]);
+  const [nicknameAvailable, setNicknameAvailable] = useState(null); // null=no verificado, true/false
+  const [emailAvailable, setEmailAvailable] = useState(null);
+  const [checkingNickname, setCheckingNickname] = useState(false);
+  const [checkingEmail, setCheckingEmail] = useState(false);
+
+  // Validación de nombre de jugador
+  const validateNickname = (nickname) => {
+    if (!nickname.trim()) {
+      return 'El nombre de jugador es obligatorio';
+    }
+    if (nickname.trim().length < 3) {
+      return 'El nombre de jugador debe tener al menos 3 caracteres';
+    }
+    if (nickname.trim().length > 20) {
+      return 'El nombre de jugador no puede exceder 20 caracteres';
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(nickname.trim())) {
+      return 'Solo letras, números y guiones bajos';
+    }
+    return '';
+  };
 
   // Validación de nombre
   const validateName = (name) => {
@@ -141,9 +167,21 @@ const Register = () => {
       setServerError('');
     }
 
+    // Resetear disponibilidad al escribir
+    if (name === 'nickname') {
+      setNicknameAvailable(null);
+      setNicknameSuggestions([]);
+    }
+    if (name === 'email') {
+      setEmailAvailable(null);
+    }
+
     // Validar en tiempo real si el campo ya fue tocado
     if (touched[name]) {
       switch (name) {
+        case 'nickname':
+          setErrors((prev) => ({ ...prev, nickname: validateNickname(value) }));
+          break;
         case 'name':
           setErrors((prev) => ({ ...prev, name: validateName(value) }));
           break;
@@ -172,7 +210,7 @@ const Register = () => {
   };
 
   // Manejar pérdida de foco (blur)
-  const handleBlur = (e) => {
+  const handleBlur = async (e) => {
     const { name, value } = e.target;
 
     setTouched((prev) => ({
@@ -182,12 +220,62 @@ const Register = () => {
 
     // Validar el campo
     switch (name) {
+      case 'nickname': {
+        const nicknameError = validateNickname(value);
+        setErrors((prev) => ({ ...prev, nickname: nicknameError }));
+        
+        // Si no hay error de formato, verificar disponibilidad
+        if (!nicknameError && value.trim()) {
+          setCheckingNickname(true);
+          setNicknameAvailable(null);
+          setNicknameSuggestions([]);
+          try {
+            const result = await authService.checkNickname(value.trim());
+            if (result.available) {
+              setNicknameAvailable(true);
+              setNicknameSuggestions([]);
+            } else {
+              setNicknameAvailable(false);
+              setErrors((prev) => ({ ...prev, nickname: 'Este nombre de jugador ya está en uso' }));
+              setNicknameSuggestions(result.suggestions || []);
+            }
+          } catch {
+            // Si falla la verificación, permitir continuar
+            setNicknameAvailable(null);
+          } finally {
+            setCheckingNickname(false);
+          }
+        }
+        break;
+      }
       case 'name':
         setErrors((prev) => ({ ...prev, name: validateName(value) }));
         break;
-      case 'email':
-        setErrors((prev) => ({ ...prev, email: validateEmail(value) }));
+      case 'email': {
+        const emailError = validateEmail(value);
+        setErrors((prev) => ({ ...prev, email: emailError }));
+        
+        // Si no hay error de formato, verificar disponibilidad
+        if (!emailError && value.trim()) {
+          setCheckingEmail(true);
+          setEmailAvailable(null);
+          try {
+            const result = await authService.checkEmail(value.trim());
+            if (result.available) {
+              setEmailAvailable(true);
+            } else {
+              setEmailAvailable(false);
+              setErrors((prev) => ({ ...prev, email: 'Este email ya está registrado' }));
+            }
+          } catch {
+            // Si falla la verificación, permitir continuar
+            setEmailAvailable(null);
+          } finally {
+            setCheckingEmail(false);
+          }
+        }
         break;
+      }
       case 'password':
         setErrors((prev) => ({ ...prev, password: validatePassword(value) }));
         break;
@@ -202,12 +290,21 @@ const Register = () => {
     }
   };
 
+  // Seleccionar una sugerencia de nickname
+  const handleSelectSuggestion = (suggestion) => {
+    setFormData((prev) => ({ ...prev, nickname: suggestion }));
+    setNicknameSuggestions([]);
+    setErrors((prev) => ({ ...prev, nickname: '' }));
+    setNicknameAvailable(true);
+  };
+
   // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Marcar todos los campos como tocados
     setTouched({
+      nickname: true,
       name: true,
       email: true,
       password: true,
@@ -215,6 +312,7 @@ const Register = () => {
     });
 
     // Validar todos los campos
+    const nicknameError = validateNickname(formData.nickname);
     const nameError = validateName(formData.name);
     const emailError = validateEmail(formData.email);
     const passwordError = validatePassword(formData.password);
@@ -224,6 +322,7 @@ const Register = () => {
     );
 
     setErrors({
+      nickname: nicknameError,
       name: nameError,
       email: emailError,
       password: passwordError,
@@ -231,17 +330,23 @@ const Register = () => {
     });
 
     // Si hay errores, no enviar el formulario
-    if (nameError || emailError || passwordError || confirmPasswordError) {
+    if (nicknameError || nameError || emailError || passwordError || confirmPasswordError) {
+      return;
+    }
+
+    // Si sabemos que el nickname o email no están disponibles, no enviar
+    if (nicknameAvailable === false || emailAvailable === false) {
       return;
     }
 
     // Enviar datos al servidor
     setIsLoading(true);
     setServerError('');
+    setNicknameSuggestions([]);
 
     try {
-      const { name, email, password } = formData;
-      const response = await register({ name, email, password });
+      const { nickname, name, email, password } = formData;
+      const response = await register({ nickname, name, email, password });
 
       // Registro exitoso - el usuario ya está logueado en el contexto
       if (response.data?.user) {
@@ -253,8 +358,13 @@ const Register = () => {
       }
     } catch (error) {
       // Manejar errores del servidor
-      if (error.response?.data?.message) {
-        setServerError(error.response.data.message);
+      const errorData = error.response?.data;
+      if (errorData?.message) {
+        setServerError(errorData.message);
+        // Si hay sugerencias de nickname, mostrarlas
+        if (errorData.suggestions && errorData.suggestions.length > 0) {
+          setNicknameSuggestions(errorData.suggestions);
+        }
       } else if (error.message) {
         setServerError(error.message);
       } else {
@@ -288,6 +398,43 @@ const Register = () => {
 
           {/* Formulario */}
           <form onSubmit={handleSubmit} className={styles.form} noValidate>
+            <div className={styles.fieldWithFeedback}>
+              <Input
+                label="Nombre de jugador"
+                type="text"
+                name="nickname"
+                value={formData.nickname}
+                placeholder="nombre_jugador"
+                error={touched.nickname ? errors.nickname : ''}
+                helpText={!touched.nickname ? 'Único. Solo letras, números y _' : (checkingNickname ? 'Verificando disponibilidad...' : (nicknameAvailable === true && !errors.nickname ? '✓ Disponible' : ''))}
+                required
+                icon={<MdAlternateEmail size={16} />}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                autoComplete="username"
+                disabled={isLoading}
+              />
+              
+              {/* Sugerencias de nickname debajo del campo */}
+              {nicknameSuggestions.length > 0 && (
+                <div className={styles.inlineSuggestions}>
+                  <span className={styles.suggestionsLabel}>Prueba con:</span>
+                  <div className={styles.suggestionsList}>
+                    {nicknameSuggestions.map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        className={styles.suggestionBtn}
+                        onClick={() => handleSelectSuggestion(suggestion)}
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <Input
               label="Nombre Completo"
               type="text"
@@ -310,6 +457,7 @@ const Register = () => {
               value={formData.email}
               placeholder="tu-email@ejemplo.com"
               error={touched.email ? errors.email : ''}
+              helpText={checkingEmail ? 'Verificando disponibilidad...' : (emailAvailable === true && !errors.email ? '✓ Disponible' : '')}
               required
               icon={<MdEmail size={16} />}
               onChange={handleChange}

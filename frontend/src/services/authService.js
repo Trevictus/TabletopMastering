@@ -117,6 +117,42 @@ const authService = {
   getToken: () => {
     return sessionStorage.getItem(STORAGE_KEYS.TOKEN);
   },
+
+  /**
+   * Verifica disponibilidad de nickname
+   * @param {string} nickname - Nickname a verificar
+   * @param {string} userId - ID del usuario actual (para excluirlo al editar perfil)
+   * @returns {Promise<Object>} { available, message, suggestions? }
+   */
+  checkNickname: async (nickname, userId = null) => {
+    try {
+      const response = await api.post('/auth/check-nickname', { nickname, userId });
+      return response.data;
+    } catch (error) {
+      return {
+        available: false,
+        message: error.response?.data?.message || 'Error al verificar',
+      };
+    }
+  },
+
+  /**
+   * Verifica disponibilidad de email
+   * @param {string} email - Email a verificar
+   * @param {string} userId - ID del usuario actual (para excluirlo al editar perfil)
+   * @returns {Promise<Object>} { available, message }
+   */
+  checkEmail: async (email, userId = null) => {
+    try {
+      const response = await api.post('/auth/check-email', { email, userId });
+      return response.data;
+    } catch (error) {
+      return {
+        available: false,
+        message: error.response?.data?.message || 'Error al verificar',
+      };
+    }
+  },
 };
 
 export default authService;

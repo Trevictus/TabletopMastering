@@ -175,6 +175,7 @@
 @media (max-width: 768px) {
   .createGroupPage {
     padding: var(--spacing-lg);
+    gap: var(--spacing-md);
   }
 
   .headerIcon {
@@ -189,11 +190,90 @@
     padding: var(--spacing-lg);
   }
 
+  .creatorInfo {
+    flex-wrap: wrap;
+    font-size: var(--font-size-xs);
+  }
+
   .actions {
     flex-direction: column;
   }
 
   .actions button {
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .createGroupPage {
+    padding: var(--spacing-md);
+    max-width: 100%;
+  }
+
+  .header {
+    gap: var(--spacing-md);
+  }
+
+  .headerContent {
+    gap: var(--spacing-md);
+  }
+
+  .headerIcon {
+    font-size: var(--font-size-2xl);
+  }
+
+  .headerContent h1 {
+    font-size: var(--font-size-xl);
+  }
+
+  .formCard {
+    padding: var(--spacing-md);
+  }
+
+  .creatorInfo {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    justify-content: center;
+    text-align: center;
+  }
+
+  .creatorNote {
+    display: block;
+    width: 100%;
+    margin-left: 0;
+    margin-top: var(--spacing-xs);
+  }
+
+  .form {
+    gap: var(--spacing-sm);
+  }
+
+  .label {
+    font-size: var(--font-size-sm);
+  }
+
+  .textarea {
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+
+  .actions {
+    padding-top: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+
+  .infoCard {
+    padding: var(--spacing-sm);
+  }
+
+  .infoContent h3 {
+    font-size: var(--font-size-md);
+  }
+
+  .infoList {
+    gap: var(--spacing-sm);
+  }
+
+  .infoList li {
+    font-size: var(--font-size-sm);
   }
 }

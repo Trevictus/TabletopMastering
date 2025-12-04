@@ -313,24 +313,25 @@ const Games = () => {
         </div>
       )}
 
-      {/* Grid de juegos - siempre visible para evitar parpadeo */}
-      <div className={`${styles.gamesGrid} ${loading && isFirstLoad ? styles.loading : ''}`}>
-        {loading && isFirstLoad ? (
-          // Skeleton cards durante la primera carga
-          [...Array(6)].map((_, i) => (
-            <div key={i} className={styles.skeletonCard}>
-              <div className={styles.skeletonImage} />
-              <div className={styles.skeletonContent}>
-                <div className={styles.skeletonTitle} />
-                <div className={styles.skeletonText} />
-                <div className={styles.skeletonText} style={{ width: '60%' }} />
+      {/* Grid de juegos - solo visible cuando hay contenido o cargando */}
+      {(loading && isFirstLoad) || games.length > 0 ? (
+        <div className={`${styles.gamesGrid} ${loading && isFirstLoad ? styles.loading : ''}`}>
+          {loading && isFirstLoad ? (
+            [...Array(6)].map((_, i) => (
+              <div key={i} className={styles.skeletonCard}>
+                <div className={styles.skeletonImage} />
+                <div className={styles.skeletonContent}>
+                  <div className={styles.skeletonTitle} />
+                  <div className={styles.skeletonText} />
+                  <div className={styles.skeletonText} style={{ width: '60%' }} />
+                </div>
               </div>
-            </div>
-          ))
-        ) : games.length > 0 ? (
-          renderedGames
-        ) : null}
-      </div>
+            ))
+          ) : (
+            renderedGames
+          )}
+        </div>
+      ) : null}
 
       {/* Paginación - solo si hay juegos y más de una página */}
       {!loading && games.length > 0 && totalPages > 1 && (

@@ -265,7 +265,7 @@
 .memberAvatarIcon {
   width: 56px;
   height: 56px;
-  color: var(--text-tertiary);
+  color: var(--accent-color);
 }
 
 .memberAvatarIconAdmin {

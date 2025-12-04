@@ -1,6 +1,6 @@
 /* Página principal de calendario */
 .calendarPage {
-  max-width: 1400px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: var(--spacing-lg);
   min-height: calc(100vh - 80px);

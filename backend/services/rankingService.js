@@ -10,6 +10,7 @@ const pointsCalculator = require('./pointsCalculator');
  * Proyección para datos de ranking
  */
 const RANKING_USER_PROJECTION = {
+  nickname: 1,
   name: 1,
   avatar: 1,
   stats: 1,
@@ -101,6 +102,7 @@ const getGroupRanking = async (groupId) => {
   return users.map((user, index) => ({
     position: index + 1,
     userId: user._id,
+    nickname: user.nickname,
     name: user.name,
     avatar: user.avatar,
     totalPoints: user.stats.totalPoints,
@@ -125,6 +127,7 @@ const getGlobalRanking = async () => {
   return users.map((user, index) => ({
     position: index + 1,
     userId: user._id,
+    nickname: user.nickname,
     name: user.name,
     avatar: user.avatar,
     totalPoints: user.stats.totalPoints,

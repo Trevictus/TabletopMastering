@@ -1,82 +1,30 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useGroup } from '../../context/GroupContext';
 import { useNavigate } from 'react-router-dom';
-import { FiEdit2, FiSave, FiX, FiCamera, FiAward, FiUsers, FiTarget, FiTrendingUp } from 'react-icons/fi';
+import { FiEdit2, FiAward, FiUsers, FiTarget, FiTrendingUp } from 'react-icons/fi';
 import { GiTrophy, GiDiceFire, GiPerspectiveDiceSixFacesRandom } from 'react-icons/gi';
 import { FaUserCircle } from 'react-icons/fa';
-import Button from '../../components/common/Button';
 import Loading from '../../components/common/Loading';
+import EditProfileModal from '../../components/common/EditProfileModal';
 import gameService from '../../services/gameService';
 import { isValidAvatar } from '../../utils/validators';
 import styles from './Profile.module.css';
-
-const compressImage = (file, maxSize = 400, quality = 0.8) => new Promise((resolve, reject) => {
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onload = (e) => {
-    const img = new Image();
-    img.src = e.target.result;
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let { width, height } = img;
-      if (width > height) {
-        if (width > maxSize) { height = Math.round((height * maxSize) / width); width = maxSize; }
-      } else {
-        if (height > maxSize) { width = Math.round((width * maxSize) / height); height = maxSize; }
-      }
-      canvas.width = width;
-      canvas.height = height;
-      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-      resolve(canvas.toDataURL('image/jpeg', quality));
-    };
-    img.onerror = reject;
-  };
-  reader.onerror = reject;
-});
 
 const Profile = () => {
   const { user, updateProfile } = useAuth();
   const { groups } = useGroup();
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [gamesCount, setGamesCount] = useState(0);
-  const [formData, setFormData] = useState({ name: '', avatar: '' });
-
-  useEffect(() => {
-    if (user) setFormData({ name: user.name || '', avatar: user.avatar || '' });
-  }, [user]);
 
   useEffect(() => {
     if (!user) return;
     gameService.getGames({ limit: 1 }).then(r => setGamesCount(r.total || 0)).catch(() => {});
   }, [user]);
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      try {
-        const compressed = await compressImage(file);
-        setFormData(prev => ({ ...prev, avatar: compressed }));
-      } catch { /* silencioso */ }
-    }
-  };
-
-  const handleSave = async () => {
-    setLoading(true);
-    try {
-      await updateProfile(formData);
-      setIsEditing(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setFormData({ name: user.name || '', avatar: user.avatar || '' });
-    setIsEditing(false);
+  const handleSaveProfile = async (data) => {
+    await updateProfile(data);
   };
 
   if (!user) return <Loading message="Cargando perfil..." />;
@@ -103,45 +51,32 @@ const Profile = () => {
         <div className={styles.headerContent}>
           <div className={styles.avatarSection}>
             <div className={styles.avatarWrapper}>
-              {isValidAvatar(formData.avatar) ? (
-                <img src={formData.avatar} alt={user.name} className={styles.avatar} />
+              {isValidAvatar(user.avatar) ? (
+                <img src={user.avatar} alt={user.name} className={styles.avatar} />
               ) : (
                 <FaUserCircle className={styles.avatarIcon} />
               )}
-              {isEditing && (
-                <button className={styles.changeAvatarBtn} onClick={() => fileInputRef.current?.click()}>
-                  <FiCamera />
-                </button>
-              )}
             </div>
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className={styles.fileInput} />
-          </div>
-
-          <div className={styles.userInfo}>
-            {isEditing ? (
-              <input type="text" name="name" value={formData.name} onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))} className={styles.nameInput} placeholder="Tu nombre" />
-            ) : (
-              <h1>{user.name}</h1>
-            )}
-            <div className={styles.memberBadge}>
+            <div className={styles.joinDate}>
               <GiPerspectiveDiceSixFacesRandom />
               <span>
                 {user.createdAt && !isNaN(new Date(user.createdAt).getTime())
-                  ? `Miembro desde ${new Date(user.createdAt).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}`
+                  ? `Desde ${new Date(user.createdAt).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })}`
                   : 'Nuevo jugador'}
               </span>
             </div>
           </div>
 
-          <div className={styles.headerActions}>
-            {isEditing ? (
-              <>
-                <Button variant="primary" size="small" onClick={handleSave} disabled={loading}><FiSave /> Guardar</Button>
-                <Button variant="outline" size="small" onClick={handleCancel}><FiX /> Cancelar</Button>
-              </>
-            ) : (
-              <Button variant="outline" size="small" onClick={() => setIsEditing(true)}><FiEdit2 /> Editar</Button>
-            )}
+          <div className={styles.userInfo}>
+            <div className={styles.userMain}>
+              <div className={styles.userNames}>
+                <h1>{user.name}</h1>
+                {user.nickname && <span className={styles.nickname}>@{user.nickname}</span>}
+              </div>
+              <button className={styles.editBtn} onClick={() => setIsModalOpen(true)} title="Editar perfil">
+                <FiEdit2 /> Editar perfil
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -198,6 +133,13 @@ const Profile = () => {
           </div>
         </section>
       </div>
+
+      <EditProfileModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        user={user}
+        onSave={handleSaveProfile}
+      />
     </div>
   );
 };
