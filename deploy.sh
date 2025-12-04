@@ -14,6 +14,8 @@ readonly ENV_FILE="${SCRIPT_DIR}/.env"
 readonly ENV_EXAMPLE="${SCRIPT_DIR}/.env.example.prod"
 readonly COMPOSE_FILE="${SCRIPT_DIR}/docker-compose-prod.yml"
 readonly CREDENTIALS_FILE="${SCRIPT_DIR}/.credentials"
+readonly SSL_CERT_PATH="/etc/letsencrypt/live/tabletopmastering.games"
+readonly DOMAIN="tabletopmastering.games"
 
 # Colores para output
 readonly RED='\033[0;31m'
@@ -22,8 +24,9 @@ readonly YELLOW='\033[1;33m'
 readonly CYAN='\033[0;36m'
 readonly NC='\033[0m' # No Color
 
-# Flag para detectar si las credenciales de MongoDB cambiaron
+# Flags
 MONGO_CREDENTIALS_CHANGED=false
+SSL_ENABLED=false
 
 # ============================================
 # FUNCIONES AUXILIARES
@@ -58,6 +61,67 @@ generate_secure_key() {
 # Verifica si un comando existe
 command_exists() {
     command -v "$1" >/dev/null 2>&1
+}
+
+# ============================================
+# VERIFICACIÓN SSL
+# ============================================
+
+check_ssl_certificates() {
+    log_step "🔒 Verificando certificados SSL..."
+    
+    # Verificar si existen los certificados
+    if [ -f "${SSL_CERT_PATH}/fullchain.pem" ] && [ -f "${SSL_CERT_PATH}/privkey.pem" ]; then
+        # Verificar que el certificado no haya expirado
+        local expiry_date
+        expiry_date=$(openssl x509 -enddate -noout -in "${SSL_CERT_PATH}/fullchain.pem" 2>/dev/null | cut -d= -f2)
+        
+        if [ -n "$expiry_date" ]; then
+            local expiry_epoch
+            expiry_epoch=$(date -d "$expiry_date" +%s 2>/dev/null || echo "0")
+            local now_epoch
+            now_epoch=$(date +%s)
+            local days_left=$(( (expiry_epoch - now_epoch) / 86400 ))
+            
+            if [ "$days_left" -gt 0 ]; then
+                SSL_ENABLED=true
+                log_success "Certificados SSL válidos (expiran en ${days_left} días)"
+                
+                if [ "$days_left" -lt 14 ]; then
+                    log_warning "⚠️  El certificado expira pronto. Considera renovarlo."
+                fi
+            else
+                log_warning "El certificado SSL ha expirado"
+                SSL_ENABLED=false
+            fi
+        else
+            log_warning "No se pudo verificar la fecha de expiración del certificado"
+            SSL_ENABLED=true  # Asumir válido si existe
+        fi
+    else
+        log_warning "No se encontraron certificados SSL"
+        log_info "Para configurar HTTPS, ejecuta: ${CYAN}sudo ./scripts/setup-ssl.sh${NC}"
+        SSL_ENABLED=false
+    fi
+    
+    # Verificar parámetros DH
+    if [ "$SSL_ENABLED" = true ] && [ ! -f "/etc/letsencrypt/ssl-dhparams.pem" ]; then
+        log_warning "Faltan parámetros Diffie-Hellman"
+        log_info "Ejecuta: ${CYAN}sudo openssl dhparam -out /etc/letsencrypt/ssl-dhparams.pem 2048${NC}"
+        SSL_ENABLED=false
+    fi
+    
+    # Seleccionar configuración de nginx según SSL
+    if [ "$SSL_ENABLED" = true ]; then
+        log_success "HTTPS habilitado - usando nginx.ssl.conf"
+    else
+        log_info "HTTP only - usando nginx.prod.conf"
+        # Actualizar docker-compose para usar config sin SSL si no hay certificados
+        if [ -f "${SCRIPT_DIR}/nginx.prod.conf" ]; then
+            # Temporalmente usar la config sin SSL
+            sed -i 's|./nginx.ssl.conf:/etc/nginx/nginx.conf:ro|./nginx.prod.conf:/etc/nginx/nginx.conf:ro|g' "$COMPOSE_FILE" 2>/dev/null || true
+        fi
+    fi
 }
 
 # ============================================
@@ -149,6 +213,22 @@ create_env_file() {
     MONGO_CREDENTIALS_CHANGED=true
     
     log_success "Archivo .env creado con claves seguras"
+}
+
+# Actualiza CLIENT_URL en .env según el estado de SSL
+update_client_url() {
+    if [ -f "$ENV_FILE" ]; then
+        local current_url
+        current_url=$(grep "^CLIENT_URL=" "$ENV_FILE" | cut -d'=' -f2)
+        
+        if [ "$SSL_ENABLED" = true ]; then
+            local https_url="https://${DOMAIN}"
+            if [ "$current_url" != "$https_url" ]; then
+                sed -i "s|^CLIENT_URL=.*|CLIENT_URL=${https_url}|g" "$ENV_FILE"
+                log_info "CLIENT_URL actualizado a HTTPS"
+            fi
+        fi
+    fi
 }
 
 # Verifica si el volumen de MongoDB necesita ser recreado
@@ -328,15 +408,22 @@ show_summary() {
     echo -e "${GREEN}╚══════════════════════════════════════════════════╝${NC}"
     
     echo -e "\n${CYAN}🌐 La aplicación está disponible en:${NC}"
-    echo -e "   http://${server_ip}"
     
-    # Mostrar CLIENT_URL si está configurado
-    if [ -f "$ENV_FILE" ]; then
-        local client_url
-        client_url=$(grep "^CLIENT_URL=" "$ENV_FILE" | cut -d'=' -f2)
-        if [ -n "$client_url" ] && [ "$client_url" != "http://${server_ip}" ]; then
-            echo -e "   ${client_url}"
+    if [ "$SSL_ENABLED" = true ]; then
+        echo -e "   ${GREEN}🔒 https://${DOMAIN}${NC} (HTTPS)"
+        echo -e "   ${CYAN}↳ HTTP redirige automáticamente a HTTPS${NC}"
+    else
+        echo -e "   http://${server_ip}"
+        # Mostrar CLIENT_URL si está configurado
+        if [ -f "$ENV_FILE" ]; then
+            local client_url
+            client_url=$(grep "^CLIENT_URL=" "$ENV_FILE" | cut -d'=' -f2)
+            if [ -n "$client_url" ] && [ "$client_url" != "http://${server_ip}" ]; then
+                echo -e "   ${client_url}"
+            fi
         fi
+        echo -e "\n${YELLOW}💡 Para habilitar HTTPS:${NC}"
+        echo -e "   ${CYAN}sudo ./scripts/setup-ssl.sh${NC}"
     fi
     
     echo -e "\n${YELLOW}📋 Comandos útiles:${NC}"
@@ -345,6 +432,13 @@ show_summary() {
     echo -e "   Detener:         ${CYAN}docker compose -f docker-compose-prod.yml down${NC}"
     echo -e "   Reiniciar:       ${CYAN}docker compose -f docker-compose-prod.yml restart${NC}"
     echo -e "   Estado:          ${CYAN}docker compose -f docker-compose-prod.yml ps${NC}"
+    
+    if [ "$SSL_ENABLED" = true ]; then
+        echo -e "\n${YELLOW}🔐 SSL/TLS:${NC}"
+        echo -e "   Ver certificados:  ${CYAN}sudo certbot certificates${NC}"
+        echo -e "   Renovar manual:    ${CYAN}sudo ./scripts/renew-ssl.sh${NC}"
+        echo -e "   Test renovación:   ${CYAN}sudo certbot renew --dry-run${NC}"
+    fi
 }
 
 # ============================================
@@ -361,7 +455,9 @@ main() {
     
     # Ejecutar pasos
     check_dependencies
+    check_ssl_certificates
     setup_env
+    update_client_url
     stop_containers
     check_mongodb_volume  # Verificar si hay que recrear el volumen de MongoDB
     build_images
