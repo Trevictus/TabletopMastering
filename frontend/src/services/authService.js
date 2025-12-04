@@ -54,11 +54,12 @@ const authService = {
    */
   getProfile: async () => {
     const response = await api.get('/auth/me');
-    // Actualizar datos en sessionStorage con la información más reciente
-    if (response.data.user) {
-      sessionStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.user));
+    // Backend devuelve { success, data: user }
+    const user = response.data.data || response.data.user;
+    if (user) {
+      sessionStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
     }
-    return response.data;
+    return { user };
   },
 
   /**

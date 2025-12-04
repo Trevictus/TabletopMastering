@@ -288,12 +288,12 @@ const checkNickname = async (req, res, next) => {
 
     const normalizedNickname = nickname.toLowerCase().trim();
     
-    // Validar formato
-    if (!/^[a-z0-9_]+$/.test(normalizedNickname)) {
+    // Validar formato (letras, números, guiones y guiones bajos)
+    if (!/^[a-z0-9_-]+$/.test(normalizedNickname)) {
       return res.status(400).json({
         success: false,
         available: false,
-        message: 'Solo letras, números y guiones bajos',
+        message: 'Solo letras, números, guiones y guiones bajos',
       });
     }
 

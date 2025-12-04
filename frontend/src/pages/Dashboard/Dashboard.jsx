@@ -9,7 +9,7 @@ import matchService from '../../services/matchService';
 import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const { groups, loadGroups } = useGroup();
   const location = useLocation();
   const navigate = useNavigate();
@@ -18,16 +18,34 @@ const Dashboard = () => {
   const [recentMatches, setRecentMatches] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Refrescar datos del usuario al montar para tener stats actualizadas
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
+
   useEffect(() => { loadGroups(); }, [loadGroups]);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await matchService.getAllUserMatches({ limit: 10 });
+        const res = await matchService.getAllUserMatches({ limit: 50 });
         const matches = res.data || [];
         const now = new Date();
-        setUpcomingMatches(matches.filter(m => m.status === 'pending' && new Date(m.scheduledDate) >= now).slice(0, 3));
-        setRecentMatches(matches.filter(m => m.status === 'completed').slice(0, 3));
+        
+        // Filtrar próximas partidas: estado 'programada' y fecha futura
+        const upcoming = matches
+          .filter(m => m.status === 'programada' && new Date(m.scheduledDate) >= now)
+          .sort((a, b) => new Date(a.scheduledDate) - new Date(b.scheduledDate))
+          .slice(0, 5);
+        
+        // Filtrar partidas recientes: estado 'finalizada', ordenadas por fecha más reciente
+        const recent = matches
+          .filter(m => m.status === 'finalizada')
+          .sort((a, b) => new Date(b.actualDate || b.scheduledDate) - new Date(a.actualDate || a.scheduledDate))
+          .slice(0, 5);
+        
+        setUpcomingMatches(upcoming);
+        setRecentMatches(recent);
       } catch {
         // Error silencioso
       } finally { setLoading(false); }
@@ -103,7 +121,13 @@ const Dashboard = () => {
                 {upcomingMatches.map(m => (
                   <li key={m._id} onClick={() => navigate('/calendar')}>
                     <strong>{m.game?.name || 'Partida'}</strong>
-                    <span>{new Date(m.scheduledDate).toLocaleDateString('es-ES')}</span>
+                    <span>{new Date(m.scheduledDate).toLocaleDateString('es-ES', { 
+                      weekday: 'short', 
+                      day: 'numeric', 
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}</span>
                   </li>
                 ))}
               </ul>
@@ -128,7 +152,10 @@ const Dashboard = () => {
                 {recentMatches.map(m => (
                   <li key={m._id} onClick={() => navigate('/history')}>
                     <strong>{m.game?.name || 'Partida'}</strong>
-                    <span>{new Date(m.playedAt || m.createdAt).toLocaleDateString('es-ES')}</span>
+                    <span>{new Date(m.actualDate || m.scheduledDate).toLocaleDateString('es-ES', {
+                      day: 'numeric',
+                      month: 'short'
+                    })}</span>
                   </li>
                 ))}
               </ul>

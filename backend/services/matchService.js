@@ -445,10 +445,11 @@ exports.confirmAttendance = async (matchId, userId) => {
 };
 
 /**
- * Cancelar asistencia a partida
+ * Cancelar asistencia a partida (abandonar partida)
+ * Si el usuario no es el creador, se elimina de la partida
+ * Si solo queda 1 jugador, la partida se elimina
  */
 exports.cancelAttendance = async (matchId, userId) => {
-  // No usamos select() para obtener todos los campos y poder devolverlos completos
   const match = await Match.findById(matchId);
     
   if (!match) {
@@ -469,13 +470,21 @@ exports.cancelAttendance = async (matchId, userId) => {
     throw new Error(`No puedes cancelar asistencia a una partida ${match.status}`);
   }
 
-  // El creador de la partida no puede cancelar su asistencia
-  if (match.createdBy.toString() === userId.toString()) {
-    throw { status: 400, message: 'El creador de la partida no puede cancelar su asistencia' };
-  }
+  const isCreator = match.createdBy.toString() === userId.toString();
 
-  // Cancelar asistencia
-  match.players[playerIndex].confirmed = false;
+  if (isCreator) {
+    // El creador solo cancela su confirmación, no puede abandonar
+    match.players[playerIndex].confirmed = false;
+  } else {
+    // Los demás jugadores abandonan la partida (se eliminan)
+    match.players.splice(playerIndex, 1);
+    
+    // Si solo queda 1 jugador (el creador), eliminar la partida
+    if (match.players.length < 2) {
+      await Match.findByIdAndDelete(matchId);
+      return { deleted: true, message: 'Partida eliminada por falta de jugadores' };
+    }
+  }
 
   await match.save();
   await match.populate(MATCH_POPULATE_DETAILED);

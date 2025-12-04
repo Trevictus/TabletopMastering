@@ -23,12 +23,13 @@
 
 /* Variantes */
 .primary {
-  color: var(--text-light);
+  color: #ffffff;
   background-color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
 .primary:hover:not(:disabled) {
+  color: #ffffff;
   background-color: var(--primary-dark);
   border-color: var(--primary-dark);
   transform: translateY(-1px);
@@ -70,6 +71,20 @@
   border-color: #6b2222;
   transform: translateY(-1px);
   box-shadow: 0 3px 6px rgba(139, 46, 46, 0.25);
+}
+
+.accent {
+  color: var(--primary-dark);
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.accent:hover:not(:disabled) {
+  color: var(--primary-dark);
+  background-color: #c9a02d;
+  border-color: #c9a02d;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(212, 175, 55, 0.35);
 }
 
 /* Estados */
