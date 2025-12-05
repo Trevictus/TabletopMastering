@@ -1,4 +1,4 @@
-# Fase 1: Análisis del sector y estructura empresarial
+# Fase 1.1a): Análisis del sector
 ## Clasificación de empresas del sector  
 El sector es "TTRPG Campaign Management Tools" (Herramientas de gestión de campañas de rol de mesa). El mercado está dominado por soluciones Software as a Service (SaaS) que intentan reemplazar el cuaderno físico del Master.
 

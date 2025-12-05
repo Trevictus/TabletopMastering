@@ -1,3 +1,4 @@
+# Fase 1.1b): Estructura empresarial
 ## Estructura organizativa de la empresa
 
 ### Definición de la estructura
