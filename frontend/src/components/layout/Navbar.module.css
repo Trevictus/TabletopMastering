@@ -196,6 +196,7 @@
 .authButtonPrimary:hover {
   background: var(--primary-dark);
   border-color: var(--primary-dark);
+  color: white;
 }
 
 /* ========================================

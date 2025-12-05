@@ -179,6 +179,24 @@ export const AuthProvider = ({ children }) => {
     setError(null);
   }, []);
 
+  /**
+   * Refresca los datos del usuario desde el backend
+   * Útil para actualizar stats después de finalizar partidas
+   */
+  const refreshUser = useCallback(async () => {
+    try {
+      const { user: updatedUser } = await authService.getProfile();
+      if (updatedUser) {
+        setUser(updatedUser);
+        authService.syncUserData(updatedUser);
+      }
+      return updatedUser;
+    } catch (err) {
+      console.error('Error refrescando usuario:', err);
+      return null;
+    }
+  }, []);
+
   // Memoizar el valor del contexto
   const value = useMemo(
     () => ({
@@ -192,8 +210,9 @@ export const AuthProvider = ({ children }) => {
       logout,
       updateProfile,
       clearError,
+      refreshUser,
     }),
-    [user, loading, error, isAuthenticated, initializing, login, register, logout, updateProfile, clearError]
+    [user, loading, error, isAuthenticated, initializing, login, register, logout, updateProfile, clearError, refreshUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

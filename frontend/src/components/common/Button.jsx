@@ -50,7 +50,7 @@ const Button = ({
 
 Button.propTypes = {
   children: PropTypes.node.isRequired,
-  variant: PropTypes.oneOf(['primary', 'secondary', 'outline', 'danger']),
+  variant: PropTypes.oneOf(['primary', 'secondary', 'outline', 'danger', 'accent']),
   size: PropTypes.oneOf(['small', 'medium', 'large']),
   disabled: PropTypes.bool,
   fullWidth: PropTypes.bool,

@@ -8,18 +8,25 @@ import matchService from '../../services/matchService';
 import styles from './History.module.css';
 
 const History = () => {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+
+  // Refrescar datos del usuario al montar
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
 
   useEffect(() => {
     if (!user) return;
     const load = async () => {
       try {
-        const response = await matchService.getMatches({ status: 'completed', limit: 100 });
-        const sorted = (response.data || []).sort((a, b) => 
-          new Date(b.playedAt || b.createdAt) - new Date(a.playedAt || a.createdAt)
+        // Cargar todas las partidas y filtrar las finalizadas
+        const response = await matchService.getAllUserMatches({ limit: 100 });
+        const finalized = (response.data || []).filter(m => m.status === 'finalizada');
+        const sorted = finalized.sort((a, b) => 
+          new Date(b.actualDate || b.scheduledDate) - new Date(a.actualDate || a.scheduledDate)
         );
         setMatches(sorted);
       } catch (err) {
@@ -32,12 +39,25 @@ const History = () => {
   }, [user]);
 
   const { stats, filtered } = useMemo(() => {
-    const wins = matches.filter(m => m.results?.find(r => r.player?._id === user?._id)?.placement === 1).length;
+    const currentUserId = user?._id?.toString();
+    
+    // Buscar si el usuario ganó (es el winner o tiene posición 1)
+    const isWinner = (match) => {
+      const winnerId = match.winner?._id?.toString() || match.winner?.toString();
+      if (winnerId === currentUserId) return true;
+      const userPlayer = match.players?.find(p => {
+        const playerId = p.user?._id?.toString() || p.user?.toString();
+        return playerId === currentUserId;
+      });
+      return userPlayer?.position === 1;
+    };
+    
+    const wins = matches.filter(isWinner).length;
     const stats = { total: matches.length, wins, losses: matches.length - wins };
     
     let filtered = matches;
-    if (filter === 'won') filtered = matches.filter(m => m.results?.find(r => r.player?._id === user?._id)?.placement === 1);
-    if (filter === 'lost') filtered = matches.filter(m => m.results?.find(r => r.player?._id === user?._id)?.placement !== 1);
+    if (filter === 'won') filtered = matches.filter(isWinner);
+    if (filter === 'lost') filtered = matches.filter(m => !isWinner(m));
     
     return { stats, filtered };
   }, [matches, filter, user]);
@@ -96,9 +116,16 @@ const StatCard = ({ label, value, color }) => (
 );
 
 const MatchCard = ({ match, userId }) => {
-  const userResult = match.results?.find(r => r.player?._id === userId);
-  const isWinner = userResult?.placement === 1;
-  const date = new Date(match.playedAt || match.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const userIdStr = userId?.toString();
+  const winnerId = match.winner?._id?.toString() || match.winner?.toString();
+  const userPlayer = match.players?.find(p => {
+    const playerId = p.user?._id?.toString() || p.user?.toString();
+    return playerId === userIdStr;
+  });
+  const isWinner = winnerId === userIdStr || userPlayer?.position === 1;
+  const date = new Date(match.actualDate || match.scheduledDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const playersWithPosition = match.players?.filter(p => p.position) || [];
+  const durationMinutes = match.duration?.value || match.duration;
 
   return (
     <Card variant="elevated" className={`${styles.match} ${isWinner ? styles.won : ''}`}>
@@ -107,25 +134,29 @@ const MatchCard = ({ match, userId }) => {
           <h3>{match.game?.name || 'Juego desconocido'}</h3>
           <div className={styles.meta}>
             <span><FiCalendar /> {date}</span>
-            <span><FiUsers /> {match.results?.length || 0}</span>
-            {match.duration && <span><FiClock /> {match.duration}min</span>}
+            <span><FiUsers /> {playersWithPosition.length || match.players?.length || 0}</span>
+            {durationMinutes && <span><FiClock /> {durationMinutes}min</span>}
           </div>
         </div>
         {isWinner && <div className={styles.winBadge}><GiTrophy /> Victoria</div>}
       </div>
 
       <div className={styles.results}>
-        {match.results?.sort((a, b) => (a.placement || 99) - (b.placement || 99)).map((r, i) => (
-          <div key={i} className={`${styles.result} ${r.player?._id === userId ? styles.me : ''}`}>
-            <span className={styles.place}>
-              {r.placement === 1 ? '🥇' : r.placement === 2 ? '🥈' : r.placement === 3 ? '🥉' : `${r.placement}º`}
-            </span>
-            <span className={styles.playerName}>
-              {r.player?.name || 'Jugador'}{r.player?._id === userId && ' (Tú)'}
-            </span>
-            {r.points !== undefined && <span className={styles.pts}>{r.points} pts</span>}
-          </div>
-        ))}
+        {playersWithPosition.sort((a, b) => (a.position || 99) - (b.position || 99)).map((p, i) => {
+          const playerId = p.user?._id?.toString() || p.user?.toString();
+          const isMe = playerId === userIdStr;
+          return (
+            <div key={i} className={`${styles.result} ${isMe ? styles.me : ''}`}>
+              <span className={styles.place}>
+                {p.position === 1 ? '🥇' : p.position === 2 ? '🥈' : p.position === 3 ? '🥉' : `${p.position}º`}
+              </span>
+              <span className={styles.playerName}>
+                {p.user?.name || 'Jugador'}{isMe && ' (Tú)'}
+              </span>
+              {p.pointsEarned > 0 && <span className={styles.pts}>+{p.pointsEarned} pts</span>}
+            </div>
+          );
+        })}
       </div>
 
       {match.group && <span className={styles.group}>Grupo: {match.group.name}</span>}

@@ -95,8 +95,8 @@ const EditProfileModal = ({ isOpen, onClose, user, onSave }) => {
         setErrors(prev => ({ ...prev, nickname: 'Mínimo 3 caracteres' }));
         return;
       }
-      if (!/^[a-zA-Z0-9_]+$/.test(value.trim())) {
-        setErrors(prev => ({ ...prev, nickname: 'Solo letras, números y _' }));
+      if (!/^[a-zA-Z0-9_-]+$/.test(value.trim())) {
+        setErrors(prev => ({ ...prev, nickname: 'Solo letras, números, guiones y _' }));
         return;
       }
       
@@ -198,20 +198,22 @@ const EditProfileModal = ({ isOpen, onClose, user, onSave }) => {
       newErrors.nickname = 'El nombre de jugador es obligatorio';
     } else if (formData.nickname.trim().length < 3) {
       newErrors.nickname = 'Mínimo 3 caracteres';
-    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.nickname.trim())) {
-      newErrors.nickname = 'Solo letras, números y _';
+    } else if (!/^[a-zA-Z0-9_-]+$/.test(formData.nickname.trim())) {
+      newErrors.nickname = 'Solo letras, números, guiones y _';
     }
 
     if (!formData.name?.trim()) {
       newErrors.name = 'El nombre es obligatorio';
     } else if (formData.name.trim().length < 2) {
       newErrors.name = 'Mínimo 2 caracteres';
+    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(formData.name.trim())) {
+      newErrors.name = 'Solo letras y espacios';
     }
 
     if (!formData.email?.trim()) {
       newErrors.email = 'El email es obligatorio';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
-      newErrors.email = 'Email inválido';
+    } else if (!/^[a-zA-Z0-9._-]+@(gmail|outlook|hotmail|yahoo|icloud|protonmail|live|msn)\.(com|es)$/i.test(formData.email.trim())) {
+      newErrors.email = 'Usa un email válido (gmail, outlook, etc.)';
     }
 
     setErrors(newErrors);

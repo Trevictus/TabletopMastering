@@ -41,7 +41,7 @@ const Rankings = () => {
         response = await rankingService.getGroupRanking(selectedGroupId);
         const data = response.data?.ranking || response.data || [];
         setRanking(data.map(item => ({
-          id: item.user?._id || item.userId,
+          id: item.user?._id || item.userId || item._id,
           nickname: item.user?.nickname || item.nickname,
           name: item.user?.name || item.name,
           avatar: item.user?.avatar || item.avatar,

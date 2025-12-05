@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       minlength: [3, 'El nickname debe tener al menos 3 caracteres'],
       maxlength: [20, 'El nickname no puede exceder 20 caracteres'],
-      match: [/^[a-zA-Z0-9_]+$/, 'El nickname solo puede contener letras, números y guiones bajos'],
+      match: [/^[a-zA-Z0-9_-]+$/, 'El nickname solo puede contener letras, números, guiones y guiones bajos'],
     },
     name: {
       type: String,
@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minlength: [2, 'El nombre debe tener al menos 2 caracteres'],
       maxlength: [50, 'El nombre no puede exceder 50 caracteres'],
+      match: [/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/, 'El nombre solo puede contener letras y espacios'],
     },
     email: {
       type: String,
@@ -26,7 +27,15 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^\S+@\S+\.\S+$/, 'Por favor ingresa un email válido'],
+      validate: {
+        validator: function(v) {
+          // Solo letras, números, puntos, guiones y guiones bajos antes del @
+          // Dominios permitidos y extensiones .com o .es
+          const emailRegex = /^[a-zA-Z0-9._-]+@(gmail|outlook|hotmail|yahoo|icloud|protonmail|live|msn)\.(com|es)$/i;
+          return emailRegex.test(v);
+        },
+        message: 'Email inválido. Usa un dominio estándar (gmail, outlook, etc.) con .com o .es'
+      },
     },
     password: {
       type: String,

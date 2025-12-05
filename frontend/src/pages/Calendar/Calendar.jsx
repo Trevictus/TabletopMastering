@@ -10,6 +10,7 @@ import RegisterResultsModal from '../../components/calendar/RegisterResultsModal
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import Loading from '../../components/common/Loading';
+import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import matchService from '../../services/matchService';
 import styles from './Calendar.module.css';
@@ -18,6 +19,7 @@ import styles from './Calendar.module.css';
  * Página de Calendario de Partidas
  */
 const Calendar = () => {
+  const { refreshUser } = useAuth();
   const toast = useToast();
   const location = useLocation();
   
@@ -152,17 +154,25 @@ const Calendar = () => {
     try {
       const response = await matchService.cancelAttendance(matchId);
       
+      // Si la partida fue eliminada por falta de jugadores
+      if (response.deleted) {
+        setMatches(prev => prev.filter(m => m._id !== matchId));
+        setShowDetailsModal(false);
+        setSelectedMatch(null);
+        toast.success('La partida fue eliminada por falta de jugadores.');
+        return;
+      }
+      
       // Actualizar la partida en la lista
       setMatches(prev => prev.map(m => m._id === matchId ? response.data : m));
       
-      // Actualizar también el match seleccionado
-      if (selectedMatch?._id === matchId) {
-        setSelectedMatch(response.data);
-      }
+      // Cerrar el modal
+      setShowDetailsModal(false);
+      setSelectedMatch(null);
       
-      toast.success('Asistencia cancelada');
+      toast.success('Asistencia actualizada');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Error al cancelar asistencia');
+      toast.error(err.response?.data?.message || 'Error al actualizar asistencia');
       throw err;
     }
   };
@@ -239,6 +249,9 @@ const Calendar = () => {
       
       // Actualizar la partida en la lista con el nuevo estado
       setMatches(prev => prev.map(m => m._id === matchId ? response.data : m));
+      
+      // Refrescar datos del usuario para actualizar stats (puntos, victorias, etc.)
+      await refreshUser();
       
       // Cerrar modal de resultados
       setShowResultsModal(false);

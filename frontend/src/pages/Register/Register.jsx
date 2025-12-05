@@ -67,8 +67,8 @@ const Register = () => {
     if (nickname.trim().length > 20) {
       return 'El nombre de jugador no puede exceder 20 caracteres';
     }
-    if (!/^[a-zA-Z0-9_]+$/.test(nickname.trim())) {
-      return 'Solo letras, números y guiones bajos';
+    if (!/^[a-zA-Z0-9_-]+$/.test(nickname.trim())) {
+      return 'Solo letras, números, guiones y _';
     }
     return '';
   };
@@ -84,17 +84,21 @@ const Register = () => {
     if (name.trim().length > 50) {
       return 'El nombre no puede exceder 50 caracteres';
     }
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(name.trim())) {
+      return 'Solo letras y espacios';
+    }
     return '';
   };
 
   // Validación de email
   const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Solo dominios estándar con .com o .es
+    const emailRegex = /^[a-zA-Z0-9._-]+@(gmail|outlook|hotmail|yahoo|icloud|protonmail|live|msn)\.(com|es)$/i;
     if (!email.trim()) {
       return 'El email es obligatorio';
     }
-    if (!emailRegex.test(email)) {
-      return 'El formato del email no es válido';
+    if (!emailRegex.test(email.trim())) {
+      return 'Usa un email válido (gmail, outlook, etc.) con .com o .es';
     }
     return '';
   };

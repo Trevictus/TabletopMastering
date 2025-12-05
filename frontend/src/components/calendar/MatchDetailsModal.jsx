@@ -79,9 +79,16 @@ const MatchDetailsModal = ({
   };
 
   const handleCancelConfirmation = async () => {
+    // Si no es el creador, confirmar antes de abandonar
+    if (!isCreator) {
+      if (!window.confirm('¿Estás seguro de que quieres abandonar esta partida?')) {
+        return;
+      }
+    }
     setLoading(true);
     try {
       await onCancelConfirmation(match._id);
+      // Si no es el creador, el modal se cerrará desde el padre cuando la partida sea actualizada/eliminada
     } finally {
       setLoading(false);
     }
@@ -114,8 +121,14 @@ const MatchDetailsModal = ({
   // Verificar si se puede registrar resultados (creador/admin y partida programada o en_curso)
   const canRegisterResults = isCreator && (match.status === 'programada' || match.status === 'en_curso');
   
-  // Verificar si hay jugadores confirmados para registrar resultados
-  const hasConfirmedPlayers = match.players?.some(p => p.confirmed);
+  // Verificar si TODOS los jugadores han confirmado asistencia
+  const allPlayersConfirmed = match.players?.length > 0 && match.players.every(p => p.confirmed);
+  
+  // Verificar si el usuario actual es jugador pero NO es el creador (puede abandonar)
+  const isPlayerNotCreator = match.players?.some(p => {
+    const playerId = p.user?._id || p.user;
+    return playerId === currentUserId;
+  }) && !isCreator;
 
   const footer = (
     <div className={styles.footerActions}>
@@ -132,8 +145,14 @@ const MatchDetailsModal = ({
         )}
       </div>
       <div className={styles.rightActions}>
-        {/* Botón Registrar Resultados - Solo visible para creador y partidas no finalizadas */}
-        {canRegisterResults && hasConfirmedPlayers && (
+        {/* Mensaje si faltan confirmaciones */}
+        {canRegisterResults && !allPlayersConfirmed && (
+          <span className={styles.warningText}>
+            Faltan confirmaciones
+          </span>
+        )}
+        {/* Botón Registrar Resultados - Solo visible si TODOS confirmaron */}
+        {canRegisterResults && allPlayersConfirmed && (
           <Button 
             variant="secondary" 
             onClick={() => onRegisterResults(match)} 
@@ -149,7 +168,7 @@ const MatchDetailsModal = ({
               onClick={handleCancelConfirmation} 
               disabled={loading}
             >
-              <MdCancel /> Cancelar Asistencia
+              <MdCancel /> {isCreator ? 'Cancelar' : 'Abandonar'}
             </Button>
           ) : (
             <Button 
@@ -157,7 +176,7 @@ const MatchDetailsModal = ({
               onClick={handleConfirm} 
               disabled={loading}
             >
-              <MdCheckCircle /> Confirmar Asistencia
+              <MdCheckCircle /> Confirmar
             </Button>
           )
         )}

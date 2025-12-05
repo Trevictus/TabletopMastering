@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useGroup } from '../../context/GroupContext';
 import { useNavigate } from 'react-router-dom';
-import { FiEdit2, FiAward, FiUsers, FiTarget, FiTrendingUp } from 'react-icons/fi';
-import { GiTrophy, GiDiceFire, GiPerspectiveDiceSixFacesRandom } from 'react-icons/gi';
+import { FiEdit2, FiAward, FiUsers, FiTarget, FiTrendingUp, FiStar, FiZap } from 'react-icons/fi';
+import { GiTrophy, GiDiceFire, GiPerspectiveDiceSixFacesRandom, GiTeamIdea, GiCardPlay, GiCrown, GiLaurelCrown, GiPodium, GiRocket, GiDiamondHard, GiBookCover } from 'react-icons/gi';
 import { FaUserCircle } from 'react-icons/fa';
+import { MdGroup } from 'react-icons/md';
 import Loading from '../../components/common/Loading';
 import EditProfileModal from '../../components/common/EditProfileModal';
 import gameService from '../../services/gameService';
@@ -12,11 +13,16 @@ import { isValidAvatar } from '../../utils/validators';
 import styles from './Profile.module.css';
 
 const Profile = () => {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, refreshUser } = useAuth();
   const { groups } = useGroup();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [gamesCount, setGamesCount] = useState(0);
+
+  // Refrescar datos del usuario al montar para tener stats actualizadas
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
 
   useEffect(() => {
     if (!user) return;
@@ -36,12 +42,34 @@ const Profile = () => {
   };
   const winRate = stats.matches > 0 ? Math.round((stats.wins / stats.matches) * 100) : 0;
   
-  const achievements = [
-    stats.matches >= 10 && { icon: '🎲', label: 'Jugador Veterano' },
-    stats.wins >= 5 && { icon: '🏆', label: 'Campeón' },
-    groups.length >= 3 && { icon: '👥', label: 'Social' },
-    gamesCount >= 5 && { icon: '📚', label: 'Coleccionista' },
-    winRate >= 50 && stats.matches >= 5 && { icon: '⭐', label: 'Estratega' },
+  // Destacados basados en datos reales del usuario
+  const highlights = [
+    // Logros por partidas jugadas
+    stats.matches >= 1 && { icon: <GiDiceFire />, label: 'Primera partida jugada', color: '#8b4513' },
+    stats.matches >= 5 && { icon: <GiPerspectiveDiceSixFacesRandom />, label: '5 partidas jugadas', color: '#8b4513' },
+    stats.matches >= 10 && { icon: <GiPodium />, label: 'Jugador Veterano (10+)', color: '#6b7280' },
+    stats.matches >= 25 && { icon: <GiCrown />, label: 'Leyenda (25+ partidas)', color: '#d4af37' },
+    
+    // Logros por victorias
+    stats.wins >= 1 && { icon: <GiTrophy />, label: 'Primera victoria', color: '#10b981' },
+    stats.wins >= 3 && { icon: <FiZap />, label: 'Racha ganadora (3+)', color: '#f59e0b' },
+    stats.wins >= 10 && { icon: <FiStar />, label: 'Campeón (10+ victorias)', color: '#f59e0b' },
+    
+    // Logros por win rate
+    winRate >= 50 && stats.matches >= 5 && { icon: <FiTrendingUp />, label: 'Estratega (50%+ win rate)', color: '#10b981' },
+    winRate >= 75 && stats.matches >= 10 && { icon: <GiDiamondHard />, label: 'Élite (75%+ win rate)', color: '#8b5cf6' },
+    
+    // Logros por puntos
+    stats.points >= 100 && { icon: <GiLaurelCrown />, label: '100 puntos acumulados', color: '#d4af37' },
+    stats.points >= 500 && { icon: <GiRocket />, label: '500 puntos acumulados', color: '#ef4444' },
+    
+    // Logros sociales
+    groups.length >= 1 && { icon: <GiTeamIdea />, label: 'Miembro de grupo', color: '#8b5cf6' },
+    groups.length >= 3 && { icon: <MdGroup />, label: 'Social (3+ grupos)', color: '#3b82f6' },
+    
+    // Logros de colección
+    gamesCount >= 1 && { icon: <GiCardPlay />, label: 'Primer juego añadido', color: '#10b981' },
+    gamesCount >= 5 && { icon: <GiBookCover />, label: 'Coleccionista (5+ juegos)', color: '#d4af37' },
   ].filter(Boolean);
 
   return (
@@ -122,10 +150,10 @@ const Profile = () => {
         <section className={styles.achievementsSection}>
           <h2><FiAward /> Destacados</h2>
           <div className={styles.achievementsList}>
-            {achievements.length > 0 ? achievements.map((a, i) => (
+            {highlights.length > 0 ? highlights.map((h, i) => (
               <div key={i} className={styles.achievement}>
-                <span className={styles.achievementIcon}>{a.icon}</span>
-                <span>{a.label}</span>
+                <span className={styles.achievementIcon} style={{ color: h.color }}>{h.icon}</span>
+                <span>{h.label}</span>
               </div>
             )) : (
               <p className={styles.noAchievements}>¡Juega partidas para desbloquear logros!</p>
