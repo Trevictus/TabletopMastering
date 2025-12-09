@@ -26,4 +26,10 @@
 | **Semana 4** | Victor | 20 | 10 | 200 € | Implementar página de calendario fue fácil, el tiempo se fue en corrección de errores de UX. |
 | | Manuel | 20 | *--* | *--* | *(Por asignar)* |
 | | Juan | 20 | *--* | *--* | *(Por asignar)* |
-| **TOTALES** | **Global** | **240** | **47** (Solo Victor) | **1000 €** | *Coste parcial acumulado* |
+| **TOTALES** | **Global** | **240** | **50** (Solo Victor) | **1000 €** | *Coste parcial acumulado* |
+
+
+
+**COSTES AÑADIDOS**  
+Hosting en DigitalOcean - 12€/mes  
+Dominio propio en names.com - 3'25/mes

@@ -34,7 +34,7 @@ Nos organizariamos por roles trabajando con el modelo **Triangulo de hierro** cu
 
 ### Organigrama estructural de la empresa  
 
-![organigramaEstructural](diagramas/organigrama.png)
+![organigrama TabletopMastering](diagramas/organigramaTabletopMastering.png)
 
 ### Justificación
 
