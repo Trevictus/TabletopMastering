@@ -154,6 +154,25 @@ const authService = {
       };
     }
   },
+
+  /**
+   * Exportar todos los datos del usuario (RGPD)
+   * @returns {Promise<Object>} Datos exportados del usuario
+   */
+  exportUserData: async () => {
+    const response = await api.get('/auth/export-data');
+    return response.data;
+  },
+
+  /**
+   * Eliminar cuenta y todos los datos (RGPD)
+   * @param {string} password - Contraseña para confirmar
+   * @returns {Promise<Object>} Resultado de la eliminación
+   */
+  deleteAccount: async (password) => {
+    const response = await api.delete('/auth/delete-account', { data: { password } });
+    return response.data;
+  },
 };
 
 export default authService;

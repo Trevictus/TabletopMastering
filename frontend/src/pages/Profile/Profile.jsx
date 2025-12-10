@@ -2,22 +2,31 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useGroup } from '../../context/GroupContext';
 import { useNavigate } from 'react-router-dom';
-import { FiEdit2, FiAward, FiUsers, FiTarget, FiTrendingUp, FiStar, FiZap } from 'react-icons/fi';
+import { FiEdit2, FiAward, FiUsers, FiTarget, FiTrendingUp, FiStar, FiZap, FiDownload, FiTrash2, FiShield, FiAlertTriangle } from 'react-icons/fi';
 import { GiTrophy, GiDiceFire, GiPerspectiveDiceSixFacesRandom, GiTeamIdea, GiCardPlay, GiCrown, GiLaurelCrown, GiPodium, GiRocket, GiDiamondHard, GiBookCover } from 'react-icons/gi';
 import { FaUserCircle } from 'react-icons/fa';
 import { MdGroup } from 'react-icons/md';
 import Loading from '../../components/common/Loading';
 import EditProfileModal from '../../components/common/EditProfileModal';
+import Button from '../../components/common/Button';
+import Input from '../../components/common/Input';
+import Modal from '../../components/common/Modal';
 import gameService from '../../services/gameService';
+import authService from '../../services/authService';
 import { isValidAvatar } from '../../utils/validators';
 import styles from './Profile.module.css';
 
 const Profile = () => {
-  const { user, updateProfile, refreshUser } = useAuth();
+  const { user, updateProfile, refreshUser, logout } = useAuth();
   const { groups } = useGroup();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [gamesCount, setGamesCount] = useState(0);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Refrescar datos del usuario al montar para tener stats actualizadas
   useEffect(() => {
@@ -31,6 +40,47 @@ const Profile = () => {
 
   const handleSaveProfile = async (data) => {
     await updateProfile(data);
+  };
+
+  // Exportar datos del usuario (RGPD)
+  const handleExportData = async () => {
+    setIsExporting(true);
+    try {
+      const response = await authService.exportUserData();
+      const dataStr = JSON.stringify(response.data, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `tabletop-mastering-datos-${user.nickname || 'usuario'}-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error al exportar datos:', error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // Eliminar cuenta (RGPD)
+  const handleDeleteAccount = async () => {
+    if (!deletePassword) {
+      setDeleteError('Introduce tu contraseña');
+      return;
+    }
+    setIsDeleting(true);
+    setDeleteError('');
+    try {
+      await authService.deleteAccount(deletePassword);
+      logout();
+      navigate('/', { replace: true });
+    } catch (error) {
+      setDeleteError(error.response?.data?.message || 'Error al eliminar cuenta');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   if (!user) return <Loading message="Cargando perfil..." />;
@@ -160,6 +210,29 @@ const Profile = () => {
             )}
           </div>
         </section>
+
+        {/* Sección de Datos y Privacidad (RGPD) */}
+        <section className={styles.privacySection}>
+          <h2><FiShield /> Datos y Privacidad</h2>
+          <p className={styles.privacyDesc}>
+            Conforme al RGPD, puedes exportar o eliminar todos tus datos personales.
+          </p>
+          <div className={styles.privacyActions}>
+            <Button
+              variant="secondary"
+              onClick={handleExportData}
+              disabled={isExporting}
+            >
+              <FiDownload /> {isExporting ? 'Exportando...' : 'Exportar mis datos'}
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => setIsDeleteModalOpen(true)}
+            >
+              <FiTrash2 /> Eliminar mi cuenta
+            </Button>
+          </div>
+        </section>
       </div>
 
       <EditProfileModal
@@ -168,6 +241,54 @@ const Profile = () => {
         user={user}
         onSave={handleSaveProfile}
       />
+
+      {/* Modal de confirmación de eliminación */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletePassword('');
+          setDeleteError('');
+        }}
+        title="Eliminar cuenta"
+      >
+        <div className={styles.deleteModal}>
+          <div className={styles.deleteWarning}>
+            <FiAlertTriangle className={styles.warningIcon} />
+            <p>
+              <strong>Esta acción es irreversible.</strong> Se eliminarán todos tus datos, 
+              incluyendo tu perfil, estadísticas y participación en partidas.
+            </p>
+          </div>
+          <p>Introduce tu contraseña para confirmar:</p>
+          <Input
+            type="password"
+            value={deletePassword}
+            onChange={(e) => setDeletePassword(e.target.value)}
+            placeholder="Tu contraseña"
+            error={deleteError}
+          />
+          <div className={styles.deleteActions}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+                setDeletePassword('');
+                setDeleteError('');
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleDeleteAccount}
+              disabled={isDeleting || !deletePassword}
+            >
+              {isDeleting ? 'Eliminando...' : 'Eliminar definitivamente'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

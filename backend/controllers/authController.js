@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const Group = require('../models/Group');
+const Match = require('../models/Match');
 const generateToken = require('../utils/generateToken');
 
 /**
@@ -379,6 +381,139 @@ const checkEmail = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Exportar todos los datos del usuario (RGPD)
+ * @route   GET /api/auth/export-data
+ * @access  Private
+ */
+const exportUserData = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+
+    // Obtener datos del usuario
+    const user = await User.findById(userId).select('-password');
+
+    // Obtener grupos del usuario
+    const groups = await Group.find({ 'members.user': userId })
+      .select('name description createdAt')
+      .lean();
+
+    // Obtener partidas del usuario
+    const matches = await Match.find({ 'players.user': userId })
+      .populate('game', 'name')
+      .populate('group', 'name')
+      .select('scheduledDate actualDate status players')
+      .lean();
+
+    // Formatear partidas para incluir solo datos del usuario
+    const userMatches = matches.map(match => {
+      const playerData = match.players.find(p => p.user.toString() === userId.toString());
+      return {
+        game: match.game?.name || 'Desconocido',
+        group: match.group?.name || 'Desconocido',
+        scheduledDate: match.scheduledDate,
+        actualDate: match.actualDate,
+        status: match.status,
+        score: playerData?.score || 0,
+        position: playerData?.position || null,
+      };
+    });
+
+    const exportData = {
+      exportDate: new Date().toISOString(),
+      user: {
+        nickname: user.nickname,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        description: user.description,
+        quote: user.quote,
+        createdAt: user.createdAt,
+      },
+      groups: groups.map(g => ({
+        name: g.name,
+        description: g.description,
+        joinedAt: g.createdAt,
+      })),
+      matches: userMatches,
+      statistics: {
+        totalGroups: groups.length,
+        totalMatches: matches.length,
+        completedMatches: matches.filter(m => m.status === 'finalizada').length,
+      },
+    };
+
+    res.status(200).json({
+      success: true,
+      message: 'Datos exportados correctamente',
+      data: exportData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Eliminar cuenta y todos los datos del usuario (RGPD)
+ * @route   DELETE /api/auth/delete-account
+ * @access  Private
+ */
+const deleteAccount = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const { password } = req.body;
+
+    // Verificar contraseña
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado',
+      });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Contraseña incorrecta',
+      });
+    }
+
+    // Verificar si el usuario es admin de algún grupo
+    const adminGroups = await Group.find({ admin: userId });
+    if (adminGroups.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Eres administrador de ${adminGroups.length} grupo(s). Transfiere la administración antes de eliminar tu cuenta.`,
+        groups: adminGroups.map(g => ({ id: g._id, name: g.name })),
+      });
+    }
+
+    // Eliminar usuario de grupos
+    await Group.updateMany(
+      { 'members.user': userId },
+      { $pull: { members: { user: userId } } }
+    );
+
+    // Eliminar participación en partidas (marcar como eliminado)
+    await Match.updateMany(
+      { 'players.user': userId },
+      { $pull: { players: { user: userId } } }
+    );
+
+    // Eliminar usuario
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Cuenta eliminada correctamente. Todos tus datos han sido borrados.',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -386,4 +521,6 @@ module.exports = {
   updateProfile,
   checkNickname,
   checkEmail,
+  exportUserData,
+  deleteAccount,
 };

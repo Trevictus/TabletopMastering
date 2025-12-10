@@ -12,3 +12,6 @@ export { default as Calendar } from './Calendar/Calendar';
 export { default as History } from './History/History';
 export { default as NotFound } from './NotFound/NotFound';
 
+// Legal Pages
+export { PrivacyPolicy, TermsOfService, CookiePolicy, Accessibility, Licenses } from './Legal';
+

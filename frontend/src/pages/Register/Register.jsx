@@ -29,7 +29,8 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    acceptTerms: false
   });
 
   const [errors, setErrors] = useState({
@@ -37,7 +38,8 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    acceptTerms: ''
   });
 
   const [touched, setTouched] = useState({
@@ -45,7 +47,8 @@ const Register = () => {
     name: false,
     email: false,
     password: false,
-    confirmPassword: false
+    confirmPassword: false,
+    acceptTerms: false
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -312,7 +315,8 @@ const Register = () => {
       name: true,
       email: true,
       password: true,
-      confirmPassword: true
+      confirmPassword: true,
+      acceptTerms: true
     });
 
     // Validar todos los campos
@@ -324,17 +328,19 @@ const Register = () => {
       formData.confirmPassword,
       formData.password
     );
+    const acceptTermsError = !formData.acceptTerms ? 'Debes aceptar los términos' : '';
 
     setErrors({
       nickname: nicknameError,
       name: nameError,
       email: emailError,
       password: passwordError,
-      confirmPassword: confirmPasswordError
+      confirmPassword: confirmPasswordError,
+      acceptTerms: acceptTermsError
     });
 
     // Si hay errores, no enviar el formulario
-    if (nicknameError || nameError || emailError || passwordError || confirmPasswordError) {
+    if (nicknameError || nameError || emailError || passwordError || confirmPasswordError || acceptTermsError) {
       return;
     }
 
@@ -523,12 +529,41 @@ const Register = () => {
               disabled={isLoading}
             />
 
+            {/* Checkbox de términos */}
+            <div className={styles.termsCheckbox}>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  name="acceptTerms"
+                  checked={formData.acceptTerms}
+                  onChange={(e) => {
+                    setFormData(prev => ({ ...prev, acceptTerms: e.target.checked }));
+                    if (touched.acceptTerms) {
+                      setErrors(prev => ({ ...prev, acceptTerms: e.target.checked ? '' : 'Debes aceptar los términos' }));
+                    }
+                  }}
+                  onBlur={() => setTouched(prev => ({ ...prev, acceptTerms: true }))}
+                  className={styles.checkbox}
+                  disabled={isLoading}
+                />
+                <span className={styles.checkboxText}>
+                  Acepto los{' '}
+                  <Link to="/terms" target="_blank" className={styles.termsLink}>Términos de Uso</Link>,{' '}
+                  <Link to="/privacy" target="_blank" className={styles.termsLink}>Política de Privacidad</Link>{' '}y{' '}
+                  <Link to="/cookies" target="_blank" className={styles.termsLink}>Política de Cookies</Link>
+                </span>
+              </label>
+              {touched.acceptTerms && errors.acceptTerms && (
+                <span className={styles.termsError}>{errors.acceptTerms}</span>
+              )}
+            </div>
+
             <Button
               type="submit"
               variant="primary"
               size="large"
               fullWidth
-              disabled={isLoading}
+              disabled={isLoading || !formData.acceptTerms}
               className={styles.submitButton}
             >
               {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
@@ -547,14 +582,6 @@ const Register = () => {
               <Link to="/login" className={styles.link}>
                 Inicia sesión aquí
               </Link>
-            </p>
-          </div>
-
-          {/* Información adicional */}
-          <div className={styles.footer}>
-            <p className={styles.footerText}>
-              Al crear una cuenta, aceptas nuestros términos de servicio
-              y política de privacidad.
             </p>
           </div>
         </div>

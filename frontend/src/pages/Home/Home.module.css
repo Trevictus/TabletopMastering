@@ -1,8 +1,15 @@
 /* Home Landing */
+.landingWrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 60px); /* Resta altura del navbar */
+}
+
 .page {
   max-width: 1000px;
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-lg);
+  flex: 1;
 }
 
 /* Hero */
@@ -86,7 +93,7 @@
 
 /* How it works - Steps */
 .howItWorks {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(135deg, #6b4423 0%, #4a3019 100%);
   border-radius: var(--border-radius-xl);
   padding: var(--spacing-2xl);
   text-align: center;

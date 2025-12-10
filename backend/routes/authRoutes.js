@@ -1,6 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { register, login, getMe, updateProfile, checkNickname, checkEmail } = require('../controllers/authController');
+const { register, login, getMe, updateProfile, checkNickname, checkEmail, exportUserData, deleteAccount } = require('../controllers/authController');
 const { protect } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validator');
 
@@ -75,5 +75,7 @@ router.post('/check-email', checkEmail);
 // Rutas protegidas
 router.get('/me', protect, getMe);
 router.put('/profile', protect, updateProfileValidation, validate, updateProfile);
+router.get('/export-data', protect, exportUserData);
+router.delete('/delete-account', protect, deleteAccount);
 
 module.exports = router;

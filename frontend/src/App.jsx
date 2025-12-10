@@ -6,7 +6,7 @@ import { ToastContainer } from './components/common/Toast';
 import ProtectedRoute from './components/routes/ProtectedRoute';
 import PublicRoute from './components/routes/PublicRoute';
 import Navbar from './components/layout/Navbar';
-import { Home, Login, Register, Dashboard, Profile, Games, Rankings, Groups, CreateGroup, GroupDetail, Calendar, History, NotFound } from './pages';
+import { Home, Login, Register, Dashboard, Profile, Games, Rankings, Groups, CreateGroup, GroupDetail, Calendar, History, NotFound, PrivacyPolicy, TermsOfService, CookiePolicy, Accessibility, Licenses } from './pages';
 import './styles/variables.css';
 import './styles/components.css';
 import './styles/layout.css';
@@ -43,6 +43,13 @@ function AppContent() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Home />} />
             <Route path="/register" element={<Home />} />
+            
+            {/* Rutas legales (públicas) */}
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/cookies" element={<CookiePolicy />} />
+            <Route path="/accessibility" element={<Accessibility />} />
+            <Route path="/licenses" element={<Licenses />} />
 
             {/* Rutas protegidas - generadas desde configuración */}
             {/* eslint-disable-next-line no-unused-vars */}
