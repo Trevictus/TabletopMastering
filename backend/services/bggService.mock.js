@@ -4,89 +4,102 @@
  * 
  * @description Proporciona datos de prueba estáticos para desarrollo local cuando
  * la variable de entorno USE_BGG_MOCK=true está activa
- * @version 2.0.0
+ * @version 3.0.0
  * @author TableTopMastering Team
  */
 
-// URLs de imágenes para mock (usando placeholders públicos confiables)
-const BGG_IMAGE_BASE = 'https://placehold.co';
-
 /**
- * Configuración de imágenes por juego
- * Cada juego tiene su imagen y thumbnail usando placeholders con colores distintivos
+ * Configuración de imágenes OFICIALES de cada juego de mesa
+ * URLs estables desde CDNs públicos (BoardGameAtlas S3, Wikimedia, etc.)
  */
 const GAME_IMAGES = Object.freeze({
-  // Catan - Color naranja característico
+  // Catan - Portada oficial del juego
   13: {
-    image: `${BGG_IMAGE_BASE}/400x300/E57C23/FFFFFF?text=Catan`,
-    thumbnail: `${BGG_IMAGE_BASE}/200x150/E57C23/FFFFFF?text=Catan`,
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629324722072.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629324722072.jpg',
   },
-  // Gloomhaven - Color oscuro de fantasía
+  // Gloomhaven - Portada oficial
   174430: {
-    image: `${BGG_IMAGE_BASE}/400x300/2C3E50/FFFFFF?text=Gloomhaven`,
-    thumbnail: `${BGG_IMAGE_BASE}/200x150/2C3E50/FFFFFF?text=Gloomhaven`,
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254920151-51ulRXlJ7LL.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254920151-51ulRXlJ7LL.jpg',
   },
-  // Terraforming Mars - Color rojo marciano
+  // Terraforming Mars - Portada oficial
   167791: {
-    image: `${BGG_IMAGE_BASE}/400x300/C0392B/FFFFFF?text=Terraforming+Mars`,
-    thumbnail: `${BGG_IMAGE_BASE}/200x150/C0392B/FFFFFF?text=Terraforming+Mars`,
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629324032557.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629324032557.jpg',
   },
-  // Wingspan - Color azul cielo
+  // Wingspan - Portada oficial
   266192: {
-    image: `${BGG_IMAGE_BASE}/400x300/5DADE2/FFFFFF?text=Wingspan`,
-    thumbnail: `${BGG_IMAGE_BASE}/200x150/5DADE2/FFFFFF?text=Wingspan`,
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629325193747.png',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629325193747.png',
   },
-  // Scythe - Color verde militar
+  // Scythe - Portada oficial
   169786: {
-    image: `${BGG_IMAGE_BASE}/400x300/1E8449/FFFFFF?text=Scythe`,
-    thumbnail: `${BGG_IMAGE_BASE}/200x150/1E8449/FFFFFF?text=Scythe`,
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629323474169.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629323474169.jpg',
   },
-  // 7 Wonders Duel - Color dorado
+  // 7 Wonders Duel - Portada oficial
   173346: {
-    image: `${BGG_IMAGE_BASE}/400x300/D4AC0D/FFFFFF?text=7+Wonders+Duel`,
-    thumbnail: `${BGG_IMAGE_BASE}/200x150/D4AC0D/FFFFFF?text=7+Wonders+Duel`,
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629323024736.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629323024736.jpg',
   },
-  // Pandemic Legacy Season 1 - Color rojo alerta
+  // Pandemic Legacy Season 1 - Portada oficial
   161936: {
-    image: `${BGG_IMAGE_BASE}/400x300/E74C3C/FFFFFF?text=Pandemic+Legacy`,
-    thumbnail: `${BGG_IMAGE_BASE}/200x150/E74C3C/FFFFFF?text=Pandemic+Legacy`,
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559257833516-612BUfjuA7fL.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559257833516-612BUfjuA7fL.jpg',
   },
-  // Twilight Struggle - Color azul/rojo guerra fría
+  // Twilight Struggle - Portada oficial
   12333: {
-    image: `${BGG_IMAGE_BASE}/400x300/34495E/FFFFFF?text=Twilight+Struggle`,
-    thumbnail: `${BGG_IMAGE_BASE}/200x150/34495E/FFFFFF?text=Twilight+Struggle`,
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254846153-51N7yvy2umL.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254846153-51N7yvy2umL.jpg',
   },
-  // Gaia Project - Color púrpura espacial
+  // Gaia Project - Portada oficial
   220308: {
-    image: `${BGG_IMAGE_BASE}/400x300/8E44AD/FFFFFF?text=Gaia+Project`,
-    thumbnail: `${BGG_IMAGE_BASE}/200x150/8E44AD/FFFFFF?text=Gaia+Project`,
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1545169957644-51Lq7hMVVRL.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1545169957644-51Lq7hMVVRL.jpg',
   },
-  // The Castles of Burgundy - Color verde medieval
+  // The Castles of Burgundy - Portada oficial
   84876: {
-    image: `${BGG_IMAGE_BASE}/400x300/27AE60/FFFFFF?text=Castles+of+Burgundy`,
-    thumbnail: `${BGG_IMAGE_BASE}/200x150/27AE60/FFFFFF?text=Castles+of+Burgundy`,
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254202422-51mP2aJfyxL.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254202422-51mP2aJfyxL.jpg',
   },
-  // Clank! - Color dorado de tesoro
+  // Clank! - Portada oficial
   233078: {
-    image: `${BGG_IMAGE_BASE}/400x300/F39C12/FFFFFF?text=Clank!`,
-    thumbnail: `${BGG_IMAGE_BASE}/200x150/F39C12/FFFFFF?text=Clank!`,
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254975681-61-Gvn-MBQL.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254975681-61-Gvn-MBQL.jpg',
   },
-  // Default - Placeholder genérico gris
+  // Azul - Portada oficial
+  230802: {
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254200327-61EFZADvURL.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254200327-61EFZADvURL.jpg',
+  },
+  // Root - Portada oficial
+  237182: {
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629324307084.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629324307084.jpg',
+  },
+  // Spirit Island - Portada oficial
+  162886: {
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254941010-61PJxjjnbfL.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254941010-61PJxjjnbfL.jpg',
+  },
+  // Everdell - Portada oficial
+  199792: {
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254898769-61oy9MIPjLL.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254898769-61oy9MIPjLL.jpg',
+  },
+  // Default - Imagen genérica de juego de mesa
   default: {
-    image: `${BGG_IMAGE_BASE}/400x300/7F8C8D/FFFFFF?text=Board+Game`,
-    thumbnail: `${BGG_IMAGE_BASE}/200x150/7F8C8D/FFFFFF?text=Board+Game`,
+    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629324722072.jpg',
+    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629324722072.jpg',
   },
 });
 
 /**
  * Servicio Mock de BoardGameGeek
- * Proporciona una simulación completa de la API de BGG para desarrollo y testing
  */
 class MockBGGService {
-  /** @type {Map<number|string, Object>} Mapa de juegos mock */
   #mockGames;
-  
-  /** @type {Array<Object>} Lista de juegos populares */
   #hotList;
 
   constructor() {
@@ -94,28 +107,26 @@ class MockBGGService {
     this.#initializeHotList();
   }
 
-  /**
-   * Inicializa el mapa de juegos mock con datos actualizados
-   * @private
-   */
   #initializeMockGames() {
     this.#mockGames = new Map([
       [13, {
         bggId: 13,
         name: 'Catan',
-        description: 'In Catan, players try to be the dominant force on the island of Catan by building settlements, cities, and roads. On each turn dice are rolled to determine what resources the island produces.',
+        description: 'In Catan, players try to be the dominant force on the island of Catan by building settlements, cities, and roads.',
         ...GAME_IMAGES[13],
         yearPublished: 1995,
-        minPlayers: 2,
+        minPlayers: 3,
         maxPlayers: 4,
         playingTime: 120,
         minPlayTime: 60,
         maxPlayTime: 120,
+        minAge: 10,
         categories: ['Negotiation', 'Economic', 'Dice'],
         mechanics: ['Dice Rolling', 'Hand Management', 'Hexagon Grid', 'Network and Route Building', 'Trading'],
         designer: ['Klaus Teuber'],
-        publisher: ['Kosmos', 'Mayfair Games'],
-        rating: { average: 7.2, usersRated: 95000, bayesAverage: 7.1 },
+        publisher: ['KOSMOS', 'Catan Studio'],
+        rating: { average: 7.2, usersRated: 115000, bayesAverage: 7.1 },
+        weight: 2.3,
         source: 'bgg',
         bggLastSync: new Date(),
       }],
@@ -129,31 +140,35 @@ class MockBGGService {
         maxPlayers: 4,
         playingTime: 120,
         minPlayTime: 60,
-        maxPlayTime: 120,
+        maxPlayTime: 150,
+        minAge: 14,
         categories: ['Adventure', 'Exploration', 'Fantasy', 'Fighting', 'Miniatures'],
-        mechanics: ['Campaign / Battle Card Driven', 'Cooperative Game', 'Grid Movement', 'Hand Management', 'Modular Board', 'Role Playing', 'Simultaneous Action Selection', 'Storytelling', 'Variable Player Powers'],
+        mechanics: ['Campaign / Battle Card Driven', 'Cooperative Game', 'Grid Movement', 'Hand Management'],
         designer: ['Isaac Childres'],
         publisher: ['Cephalofair Games'],
-        rating: { average: 8.7, usersRated: 75000, bayesAverage: 8.4 },
+        rating: { average: 8.6, usersRated: 85000, bayesAverage: 8.4 },
+        weight: 3.9,
         source: 'bgg',
         bggLastSync: new Date(),
       }],
       [167791, {
         bggId: 167791,
         name: 'Terraforming Mars',
-        description: 'In the 2400s, mankind begins to terraform the planet Mars. Giant corporations, sponsored by the World Government on Earth, initiate huge projects to raise the temperature, oxygen level, and ocean coverage.',
+        description: 'In the 2400s, mankind begins to terraform the planet Mars with giant corporations.',
         ...GAME_IMAGES[167791],
         yearPublished: 2016,
         minPlayers: 1,
         maxPlayers: 5,
         playingTime: 120,
         minPlayTime: 90,
-        maxPlayTime: 120,
-        categories: ['Economic', 'Environmental', 'Industry / Manufacturing', 'Science Fiction', 'Territory Building'],
-        mechanics: ['Card Drafting', 'Hand Management', 'Set Collection', 'Tile Placement', 'Variable Player Powers'],
+        maxPlayTime: 150,
+        minAge: 12,
+        categories: ['Economic', 'Science Fiction', 'Territory Building'],
+        mechanics: ['Card Drafting', 'Hand Management', 'Tile Placement', 'Variable Player Powers'],
         designer: ['Jacob Fryxelius'],
-        publisher: ['FryxGames'],
-        rating: { average: 8.4, usersRated: 89000, bayesAverage: 8.2 },
+        publisher: ['FryxGames', 'Stronghold Games'],
+        rating: { average: 8.4, usersRated: 95000, bayesAverage: 8.2 },
+        weight: 3.2,
         source: 'bgg',
         bggLastSync: new Date(),
       }],
@@ -168,68 +183,244 @@ class MockBGGService {
         playingTime: 70,
         minPlayTime: 40,
         maxPlayTime: 70,
+        minAge: 10,
         categories: ['Animals', 'Card Game', 'Educational'],
-        mechanics: ['Card Drafting', 'Dice Rolling', 'End Game Bonuses', 'Hand Management', 'Set Collection'],
+        mechanics: ['Card Drafting', 'Dice Rolling', 'Engine Building', 'Hand Management'],
         designer: ['Elizabeth Hargrave'],
         publisher: ['Stonemaier Games'],
-        rating: { average: 8.0, usersRated: 98000, bayesAverage: 7.9 },
+        rating: { average: 8.1, usersRated: 110000, bayesAverage: 7.9 },
+        weight: 2.4,
         source: 'bgg',
         bggLastSync: new Date(),
       }],
       [169786, {
         bggId: 169786,
         name: 'Scythe',
-        description: 'It is a time of unrest in 1920s Europa. The ashes from the first great war still darken the snow. Lead your faction to victory.',
+        description: 'It is a time of unrest in 1920s Europa. Lead your faction to victory with mechs and workers.',
         ...GAME_IMAGES[169786],
         yearPublished: 2016,
         minPlayers: 1,
         maxPlayers: 5,
         playingTime: 115,
         minPlayTime: 90,
-        maxPlayTime: 115,
+        maxPlayTime: 140,
+        minAge: 14,
         categories: ['Economic', 'Fighting', 'Science Fiction', 'Territory Building'],
-        mechanics: ['Area Control', 'Grid Movement', 'Simultaneous Action Selection', 'Variable Player Powers'],
+        mechanics: ['Area Control', 'Grid Movement', 'Engine Building', 'Variable Player Powers'],
         designer: ['Jamey Stegmaier'],
         publisher: ['Stonemaier Games'],
-        rating: { average: 8.1, usersRated: 91000, bayesAverage: 7.9 },
+        rating: { average: 8.2, usersRated: 98000, bayesAverage: 8.0 },
+        weight: 3.4,
         source: 'bgg',
         bggLastSync: new Date(),
       }],
       [173346, {
         bggId: 173346,
         name: '7 Wonders Duel',
-        description: 'Create the greatest civilization the Ancient World has ever known in this standalone 2-player version of 7 Wonders.',
+        description: 'Create the greatest civilization the Ancient World has ever known in this 2-player version of 7 Wonders.',
         ...GAME_IMAGES[173346],
         yearPublished: 2015,
         minPlayers: 2,
         maxPlayers: 2,
         playingTime: 30,
         minPlayTime: 30,
-        maxPlayTime: 30,
+        maxPlayTime: 45,
+        minAge: 10,
         categories: ['Ancient', 'Card Game', 'City Building', 'Civilization'],
-        mechanics: ['Card Drafting', 'Set Collection', 'Tug of War', 'Victory Points as a Resource'],
+        mechanics: ['Card Drafting', 'Set Collection', 'Tug of War'],
         designer: ['Antoine Bauza', 'Bruno Cathala'],
-        publisher: ['Repos Production'],
-        rating: { average: 8.1, usersRated: 74000, bayesAverage: 7.9 },
+        publisher: ['Repos Production', 'Asmodee'],
+        rating: { average: 8.1, usersRated: 82000, bayesAverage: 7.9 },
+        weight: 2.2,
         source: 'bgg',
         bggLastSync: new Date(),
       }],
       [161936, {
         bggId: 161936,
         name: 'Pandemic Legacy: Season 1',
-        description: 'Pandemic Legacy is a cooperative campaign game where your actions and choices carry over between games.',
+        description: 'Pandemic Legacy is a co-operative campaign game with an overarching story-arc played through 12-24 sessions.',
         ...GAME_IMAGES[161936],
         yearPublished: 2015,
         minPlayers: 2,
         maxPlayers: 4,
         playingTime: 60,
         minPlayTime: 60,
-        maxPlayTime: 60,
-        categories: ['Medical'],
-        mechanics: ['Action Point Allowance System', 'Campaign / Battle Card Driven', 'Cooperative Game', 'Hand Management', 'Point to Point Movement', 'Set Collection', 'Trading', 'Variable Player Powers'],
+        maxPlayTime: 75,
+        minAge: 13,
+        categories: ['Environmental', 'Medical'],
+        mechanics: ['Action Points', 'Campaign / Battle Card Driven', 'Cooperative Game', 'Hand Management'],
         designer: ['Rob Daviau', 'Matt Leacock'],
-        publisher: ['Z-Man Games'],
-        rating: { average: 8.6, usersRated: 96000, bayesAverage: 8.3 },
+        publisher: ['Z-Man Games', 'Asmodee'],
+        rating: { average: 8.5, usersRated: 72000, bayesAverage: 8.3 },
+        weight: 2.8,
+        source: 'bgg',
+        bggLastSync: new Date(),
+      }],
+      [12333, {
+        bggId: 12333,
+        name: 'Twilight Struggle',
+        description: 'Twilight Struggle simulates the Cold War era from 1945-1989 between the Soviet Union and the United States.',
+        ...GAME_IMAGES[12333],
+        yearPublished: 2005,
+        minPlayers: 2,
+        maxPlayers: 2,
+        playingTime: 180,
+        minPlayTime: 120,
+        maxPlayTime: 180,
+        minAge: 13,
+        categories: ['Political', 'Wargame', 'Modern Warfare'],
+        mechanics: ['Area Control', 'Campaign / Battle Card Driven', 'Hand Management'],
+        designer: ['Ananda Gupta', 'Jason Matthews'],
+        publisher: ['GMT Games'],
+        rating: { average: 8.2, usersRated: 52000, bayesAverage: 8.0 },
+        weight: 3.6,
+        source: 'bgg',
+        bggLastSync: new Date(),
+      }],
+      [220308, {
+        bggId: 220308,
+        name: 'Gaia Project',
+        description: 'Gaia Project is Terra Mystica in space. Control one of 14 unique factions as they spread across the galaxy.',
+        ...GAME_IMAGES[220308],
+        yearPublished: 2017,
+        minPlayers: 1,
+        maxPlayers: 4,
+        playingTime: 150,
+        minPlayTime: 60,
+        maxPlayTime: 150,
+        minAge: 14,
+        categories: ['Economic', 'Science Fiction', 'Space Exploration'],
+        mechanics: ['Income', 'Modular Board', 'Network Building', 'Variable Player Powers'],
+        designer: ['Jens Drögemüller', 'Helge Ostertag'],
+        publisher: ['Z-Man Games', 'Feuerland Spiele'],
+        rating: { average: 8.5, usersRated: 42000, bayesAverage: 8.2 },
+        weight: 4.3,
+        source: 'bgg',
+        bggLastSync: new Date(),
+      }],
+      [84876, {
+        bggId: 84876,
+        name: 'The Castles of Burgundy',
+        description: 'Set in the Burgundy region of High Medieval France, players build settlements and powerful castles.',
+        ...GAME_IMAGES[84876],
+        yearPublished: 2011,
+        minPlayers: 2,
+        maxPlayers: 4,
+        playingTime: 90,
+        minPlayTime: 30,
+        maxPlayTime: 90,
+        minAge: 12,
+        categories: ['Dice', 'Medieval', 'Territory Building'],
+        mechanics: ['Dice Rolling', 'Hexagon Grid', 'Set Collection', 'Tile Placement'],
+        designer: ['Stefan Feld'],
+        publisher: ['alea', 'Ravensburger'],
+        rating: { average: 8.1, usersRated: 65000, bayesAverage: 7.9 },
+        weight: 3.0,
+        source: 'bgg',
+        bggLastSync: new Date(),
+      }],
+      [233078, {
+        bggId: 233078,
+        name: 'Clank!: A Deck-Building Adventure',
+        description: 'Burgle your way to adventure! Sneak into an angry dragon\'s mountain lair to steal precious artifacts.',
+        ...GAME_IMAGES[233078],
+        yearPublished: 2016,
+        minPlayers: 2,
+        maxPlayers: 4,
+        playingTime: 60,
+        minPlayTime: 30,
+        maxPlayTime: 60,
+        minAge: 12,
+        categories: ['Adventure', 'Fantasy', 'Fighting'],
+        mechanics: ['Deck Building', 'Point to Point Movement', 'Push Your Luck'],
+        designer: ['Paul Dennen'],
+        publisher: ['Renegade Game Studios', 'Dire Wolf'],
+        rating: { average: 7.8, usersRated: 48000, bayesAverage: 7.6 },
+        weight: 2.2,
+        source: 'bgg',
+        bggLastSync: new Date(),
+      }],
+      [230802, {
+        bggId: 230802,
+        name: 'Azul',
+        description: 'Draft colored tiles to decorate the walls of the Royal Palace of Evora.',
+        ...GAME_IMAGES[230802],
+        yearPublished: 2017,
+        minPlayers: 2,
+        maxPlayers: 4,
+        playingTime: 45,
+        minPlayTime: 30,
+        maxPlayTime: 45,
+        minAge: 8,
+        categories: ['Abstract Strategy', 'Puzzle', 'Renaissance'],
+        mechanics: ['Open Drafting', 'Pattern Building', 'Set Collection', 'Tile Placement'],
+        designer: ['Michael Kiesling'],
+        publisher: ['Plan B Games', 'Next Move Games'],
+        rating: { average: 7.8, usersRated: 95000, bayesAverage: 7.7 },
+        weight: 1.8,
+        source: 'bgg',
+        bggLastSync: new Date(),
+      }],
+      [237182, {
+        bggId: 237182,
+        name: 'Root',
+        description: 'Root is a game of adventure and war where 2 to 4 players battle for control of a vast wilderness.',
+        ...GAME_IMAGES[237182],
+        yearPublished: 2018,
+        minPlayers: 2,
+        maxPlayers: 4,
+        playingTime: 90,
+        minPlayTime: 60,
+        maxPlayTime: 90,
+        minAge: 10,
+        categories: ['Animals', 'Fantasy', 'Wargame'],
+        mechanics: ['Area Control', 'Dice Rolling', 'Hand Management', 'Variable Player Powers'],
+        designer: ['Cole Wehrle'],
+        publisher: ['Leder Games'],
+        rating: { average: 8.1, usersRated: 52000, bayesAverage: 7.9 },
+        weight: 3.7,
+        source: 'bgg',
+        bggLastSync: new Date(),
+      }],
+      [162886, {
+        bggId: 162886,
+        name: 'Spirit Island',
+        description: 'In Spirit Island, players are different spirits of the land defending their island from colonizing Invaders.',
+        ...GAME_IMAGES[162886],
+        yearPublished: 2017,
+        minPlayers: 1,
+        maxPlayers: 4,
+        playingTime: 120,
+        minPlayTime: 90,
+        maxPlayTime: 120,
+        minAge: 13,
+        categories: ['Fantasy', 'Fighting', 'Mythology', 'Territory Building'],
+        mechanics: ['Area Control', 'Cooperative Game', 'Hand Management', 'Variable Player Powers'],
+        designer: ['R. Eric Reuss'],
+        publisher: ['Greater Than Games'],
+        rating: { average: 8.3, usersRated: 52000, bayesAverage: 8.1 },
+        weight: 4.0,
+        source: 'bgg',
+        bggLastSync: new Date(),
+      }],
+      [199792, {
+        bggId: 199792,
+        name: 'Everdell',
+        description: 'Within the charming valley of Everdell, a civilization of forest critters is thriving and expanding.',
+        ...GAME_IMAGES[199792],
+        yearPublished: 2018,
+        minPlayers: 1,
+        maxPlayers: 4,
+        playingTime: 80,
+        minPlayTime: 40,
+        maxPlayTime: 80,
+        minAge: 13,
+        categories: ['Animals', 'Card Game', 'City Building', 'Fantasy'],
+        mechanics: ['Card Drafting', 'Hand Management', 'Set Collection', 'Worker Placement'],
+        designer: ['James A. Wilson'],
+        publisher: ['Starling Games'],
+        rating: { average: 7.9, usersRated: 55000, bayesAverage: 7.7 },
+        weight: 2.8,
         source: 'bgg',
         bggLastSync: new Date(),
       }],
@@ -244,69 +435,55 @@ class MockBGGService {
         playingTime: 60,
         minPlayTime: 30,
         maxPlayTime: 90,
-        categories: ['Strategy'],
-        mechanics: ['Hand Management'],
+        minAge: 10,
+        categories: ['Strategy', 'Family'],
+        mechanics: ['Hand Management', 'Set Collection'],
         designer: ['Mock Designer'],
         publisher: ['Mock Publisher'],
         rating: { average: 7.0, usersRated: 1000, bayesAverage: 6.8 },
+        weight: 2.5,
         source: 'bgg',
         bggLastSync: new Date(),
       }],
     ]);
   }
 
-  /**
-   * Inicializa la lista de juegos populares (Hot List) con imágenes actualizadas
-   * @private
-   */
   #initializeHotList() {
     this.#hotList = Object.freeze([
-      { bggId: 13, rank: 1, name: 'Catan', yearPublished: 1995, thumbnail: GAME_IMAGES[13].thumbnail },
-      { bggId: 174430, rank: 2, name: 'Gloomhaven', yearPublished: 2017, thumbnail: GAME_IMAGES[174430].thumbnail },
-      { bggId: 12333, rank: 3, name: 'Twilight Struggle', yearPublished: 2005, thumbnail: GAME_IMAGES[12333].thumbnail },
-      { bggId: 167791, rank: 4, name: 'Terraforming Mars', yearPublished: 2016, thumbnail: GAME_IMAGES[167791].thumbnail },
+      { bggId: 174430, rank: 1, name: 'Gloomhaven', yearPublished: 2017, thumbnail: GAME_IMAGES[174430].thumbnail },
+      { bggId: 161936, rank: 2, name: 'Pandemic Legacy: Season 1', yearPublished: 2015, thumbnail: GAME_IMAGES[161936].thumbnail },
+      { bggId: 167791, rank: 3, name: 'Terraforming Mars', yearPublished: 2016, thumbnail: GAME_IMAGES[167791].thumbnail },
+      { bggId: 169786, rank: 4, name: 'Scythe', yearPublished: 2016, thumbnail: GAME_IMAGES[169786].thumbnail },
       { bggId: 220308, rank: 5, name: 'Gaia Project', yearPublished: 2017, thumbnail: GAME_IMAGES[220308].thumbnail },
-      { bggId: 84876, rank: 6, name: 'The Castles of Burgundy', yearPublished: 2011, thumbnail: GAME_IMAGES[84876].thumbnail },
-      { bggId: 169786, rank: 7, name: 'Scythe', yearPublished: 2016, thumbnail: GAME_IMAGES[169786].thumbnail },
-      { bggId: 173346, rank: 8, name: '7 Wonders Duel', yearPublished: 2015, thumbnail: GAME_IMAGES[173346].thumbnail },
-      { bggId: 233078, rank: 9, name: 'Clank!: A Deck-Building Adventure', yearPublished: 2016, thumbnail: GAME_IMAGES[233078].thumbnail },
-      { bggId: 161936, rank: 10, name: 'Pandemic Legacy: Season 1', yearPublished: 2015, thumbnail: GAME_IMAGES[161936].thumbnail },
+      { bggId: 12333, rank: 6, name: 'Twilight Struggle', yearPublished: 2005, thumbnail: GAME_IMAGES[12333].thumbnail },
+      { bggId: 162886, rank: 7, name: 'Spirit Island', yearPublished: 2017, thumbnail: GAME_IMAGES[162886].thumbnail },
+      { bggId: 266192, rank: 8, name: 'Wingspan', yearPublished: 2019, thumbnail: GAME_IMAGES[266192].thumbnail },
+      { bggId: 173346, rank: 9, name: '7 Wonders Duel', yearPublished: 2015, thumbnail: GAME_IMAGES[173346].thumbnail },
+      { bggId: 84876, rank: 10, name: 'The Castles of Burgundy', yearPublished: 2011, thumbnail: GAME_IMAGES[84876].thumbnail },
+      { bggId: 237182, rank: 11, name: 'Root', yearPublished: 2018, thumbnail: GAME_IMAGES[237182].thumbnail },
+      { bggId: 230802, rank: 12, name: 'Azul', yearPublished: 2017, thumbnail: GAME_IMAGES[230802].thumbnail },
+      { bggId: 199792, rank: 13, name: 'Everdell', yearPublished: 2018, thumbnail: GAME_IMAGES[199792].thumbnail },
+      { bggId: 233078, rank: 14, name: 'Clank!', yearPublished: 2016, thumbnail: GAME_IMAGES[233078].thumbnail },
+      { bggId: 13, rank: 15, name: 'Catan', yearPublished: 1995, thumbnail: GAME_IMAGES[13].thumbnail },
     ]);
   }
 
-  /**
-   * Obtiene un juego del mapa interno
-   * @param {number|string} bggId - ID del juego
-   * @returns {Object|undefined} Datos del juego o undefined
-   * @private
-   */
   #getGame(bggId) {
     return this.#mockGames.get(Number(bggId)) ?? this.#mockGames.get(bggId);
   }
 
-  /**
-   * Buscar juegos en BGG por nombre (simulado)
-   * @param {string} query - Término de búsqueda
-   * @param {boolean} exact - Búsqueda exacta
-   * @returns {Promise<Array>} - Lista de juegos encontrados
-   */
   async searchGames(query, exact = false) {
     console.log(`[MOCK BGG] Searching for: "${query}", exact: ${exact}`);
-    
-    // Simular delay de red
-    await this.#sleep(100);
+    await this.#sleep(150);
 
     const searchTerm = query.toLowerCase();
     const results = [];
 
-    // Buscar en juegos predefinidos usando iteración del Map
     for (const [id, game] of this.#mockGames) {
       if (id === 'default') continue;
       
       const gameName = game.name.toLowerCase();
-      const isMatch = exact 
-        ? gameName === searchTerm 
-        : gameName.includes(searchTerm);
+      const isMatch = exact ? gameName === searchTerm : gameName.includes(searchTerm);
       
       if (isMatch) {
         results.push({
@@ -319,72 +496,40 @@ class MockBGGService {
       }
     }
 
-    // Si no se encuentra nada, retornar resultados genéricos para búsqueda no exacta
     if (results.length === 0 && !exact) {
       const defaultGame = this.#mockGames.get('default');
       results.push({
-        bggId: 999,
-        name: `${query} - Mock Result`,
+        bggId: 999999,
+        name: `${query} (Mock Result)`,
         yearPublished: 2024,
         image: defaultGame.image,
         thumbnail: defaultGame.thumbnail,
       });
     }
 
+    console.log(`[MOCK BGG] Found ${results.length} result(s)`);
     return results;
   }
 
-  /**
-   * Obtener detalles completos de un juego por su ID de BGG (simulado)
-   * @param {number} bggId - ID del juego en BGG
-   * @returns {Promise<Object>} - Información completa del juego
-   */
   async getGameDetails(bggId) {
     console.log(`[MOCK BGG] Getting details for bggId: ${bggId}`);
-    
-    // Simular delay de red
     await this.#sleep(100);
 
-    // Verificar si el juego existe en nuestra base de datos mock
     const game = this.#getGame(bggId);
-    
-    if (game) {
-      return { ...game };
-    }
+    if (game) return { ...game };
 
-    // Si no existe, verificar si es un ID muy alto (probablemente inexistente)
-    if (bggId > 500000) {
-      throw new Error('Juego no encontrado en BGG');
-    }
+    if (bggId > 500000) throw new Error('Juego no encontrado en BGG');
 
-    // Para IDs desconocidos, retornar un juego genérico
     const defaultGame = this.#mockGames.get('default');
-    return {
-      ...defaultGame,
-      bggId: Number(bggId),
-      name: `Mock Game ${bggId}`,
-    };
+    return { ...defaultGame, bggId: Number(bggId), name: `Mock Game ${bggId}` };
   }
 
-  /**
-   * Obtener juegos populares (Hot List) (simulado)
-   * @param {number} limit - Número de juegos a obtener
-   * @returns {Promise<Array>} - Lista de IDs de juegos populares
-   */
   async getHotGames(limit = 10) {
     console.log(`[MOCK BGG] Getting hot games, limit: ${limit}`);
-    
-    // Simular delay de red
     await this.#sleep(100);
-
     return this.#hotList.slice(0, Math.min(limit, this.#hotList.length));
   }
 
-  /**
-   * Validar si un ID de BGG existe (simulado)
-   * @param {number} bggId - ID a validar
-   * @returns {Promise<boolean>} - true si existe
-   */
   async validateBGGId(bggId) {
     try {
       await this.getGameDetails(bggId);
@@ -394,44 +539,24 @@ class MockBGGService {
     }
   }
 
-  /**
-   * Obtener estadísticas de la caché (mock)
-   * @returns {Promise<Object>}
-   */
   async getCacheStats() {
     const BGGCache = require('../models/BGGCache');
     return BGGCache.getCacheStats();
   }
 
-  /**
-   * Invalidar caché de un juego (mock)
-   * @param {number} bggId
-   * @returns {Promise<void>}
-   */
   async invalidateCache(bggId) {
     const BGGCache = require('../models/BGGCache');
     return BGGCache.invalidateCache(bggId);
   }
 
-  /**
-   * Limpiar toda la caché (mock)
-   * @returns {Promise<void>}
-   */
   async clearCache() {
     const BGGCache = require('../models/BGGCache');
     return BGGCache.clearCache();
   }
 
-  /**
-   * Simular delay de red
-   * @param {number} ms - Milisegundos a esperar
-   * @returns {Promise<void>}
-   * @private
-   */
   #sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
 
-// Exportar instancia singleton
 module.exports = new MockBGGService();
