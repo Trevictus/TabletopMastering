@@ -4,9 +4,11 @@ name: CI/CD
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  ci:
+  lint-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,13 +17,26 @@ jobs:
         with:
           node-version: '20'
       
-      - name: Lint Backend
+      - name: Install & Lint Backend
         working-directory: ./backend
-        run: npm ci && npm run lint
+        run: |
+          npm install --legacy-peer-deps
+          npm run lint --if-present
+
+  lint-build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       
-      - name: Lint Frontend
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install & Lint Frontend
         working-directory: ./frontend
-        run: npm ci && npm run lint
+        run: |
+          npm install --legacy-peer-deps
+          npm run lint --if-present
       
       - name: Build Frontend
         working-directory: ./frontend

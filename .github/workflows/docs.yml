@@ -18,12 +18,35 @@ jobs:
       - name: Generate Backend Docs (JSDoc)
         run: |
           npm install -g jsdoc
-          jsdoc backend -r -d docs/backend-api
+          jsdoc backend -r -d docs/backend-api --configure /dev/stdin <<EOF
+          {
+            "source": {
+              "include": ["backend"],
+              "includePattern": ".+\\.js$",
+              "excludePattern": "node_modules"
+            },
+            "opts": {
+              "recurse": true,
+              "destination": "docs/backend-api"
+            }
+          }
+          EOF
       
-      - name: Generate Frontend Docs (TypeDoc)
+      - name: Generate Frontend Docs (JSDoc)
         run: |
-          npm install -g typedoc
-          typedoc frontend/src --out docs/frontend-api --entryPointStrategy expand
+          jsdoc frontend/src -r -d docs/frontend-api --configure /dev/stdin <<EOF
+          {
+            "source": {
+              "include": ["frontend/src"],
+              "includePattern": ".+\\.(js|jsx)$",
+              "excludePattern": "node_modules"
+            },
+            "opts": {
+              "recurse": true,
+              "destination": "docs/frontend-api"
+            }
+          }
+          EOF
       
       - name: Upload docs
         uses: actions/upload-artifact@v4
