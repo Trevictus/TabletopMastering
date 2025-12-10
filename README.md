@@ -2,7 +2,7 @@
 
 https://tabletopmastering.games/
 
-> Sistema de gestión de partidas de juegos de mesa
+> Plataforma web para la gestión integral de partidas y grupos de juegos de mesa
 
 [![Node](https://img.shields.io/badge/Node.js-20%2B-success)](https://nodejs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.0-brightgreen)](https://www.mongodb.com/)
@@ -11,27 +11,41 @@ https://tabletopmastering.games/
 
 ## 📖 Descripción
 
-Aplicación web para gestionar partidas de juegos de mesa: organiza sesiones, registra resultados, lleva estadísticas y consulta historial.
+Tabletop Mastering es una aplicación web que permite organizar sesiones, registrar resultados, gestionar grupos y consultar estadísticas de juegos de mesa.  
+Pensada para clubes, asociaciones y grupos de amigos que quieren llevar el control de sus partidas de forma sencilla y colaborativa.
 
-**Características:**
-- 🔐 Autenticación JWT
-- 👥 Gestión de grupos con roles
-- 🎮 Catálogo de juegos + integración BoardGameGeek
-- 📊 Historial y estadísticas
-- 🏆 Rankings (en desarrollo)
+**Funcionalidades principales:**
+- Autenticación segura con JWT
+- Gestión de grupos y roles
+- Catálogo de juegos con integración BoardGameGeek
+- Registro de partidas y resultados
+- Historial y estadísticas personalizadas
+- Rankings globales y por grupo
+- Panel de administración y configuración
+- Accesibilidad y cumplimiento legal (RGPD, LSSI-CE, WCAG 2.1)
 
-## 🚀 Inicio Rápido
+## 🚀 Acceso y despliegue
 
-### Docker (Recomendado)
+La aplicación está disponible en producción en:
+
+**https://tabletopmastering.games/**
+
+No es necesario instalar ni configurar nada para usar la web.
+
+### ¿Quieres desplegar tu propia instancia o contribuir?
+
+Puedes usar Docker o el entorno de desarrollo local siguiendo estos pasos:
+
+#### Docker (opcional para despliegue propio)
 ```bash
 git clone https://github.com/Trevictus/TabletopMastering.git
 cd TabletopMastering
 cp .env.example .env
 docker compose up -d
 ```
-Abre `http://localhost`
+Accede a `http://localhost` en tu navegador.
 
-### Variables de Entorno (.env)
+#### Variables de entorno (.env)
 ```env
 MONGO_USERNAME=admin
 MONGO_PASSWORD=changeme
@@ -40,7 +54,7 @@ JWT_SECRET=tu_clave_secreta
 JWT_EXPIRE=7d
 ```
 
-### Desarrollo Local
+#### Desarrollo local
 ```bash
 # Backend
 cd backend
@@ -56,39 +70,44 @@ npm run dev
 
 ## 📚 Documentación
 
-- **[Backend](BACKEND_DOC.md)** - API, modelos, endpoints
-- **[Frontend](FRONTEND_DOC.md)** - Componentes, rutas, servicios
-- **[Guía Usuario](GUIA_USUARIO.md)** - Cómo usar la aplicación
+- [Legislación y Cumplimiento](docs/legislacion.md)
+- [Recursos y APIs](docs/recursos.md)
+- [Presupuesto y ROI](docs/presupuesto.md)
 
 ## 🛠️ Stack Tecnológico
 
-**Backend:** Node.js + Express + MongoDB + JWT  
-**Frontend:** React 19 + Vite 7 + React Router v7  
-**DevOps:** Docker + Docker Compose
+- **Backend:** Node.js + Express + MongoDB + JWT
+- **Frontend:** React 19 + Vite 7 + React Router v7
+- **DevOps:** Docker + Docker Compose
 
-## 📊 Estado del Proyecto
+## ✅ Estado del Proyecto
 
-```
-✅ Autenticación:  100%
-✅ Grupos:         100%
-✅ Juegos:         100%
-✅ Frontend Base:   80%
-🚧 Partidas:        30%
-🚧 Estadísticas:    20%
-```
+| Módulo         | Estado   |
+|----------------|----------|
+| Autenticación  | 100%     |
+| Grupos         | 100%     |
+| Juegos         | 100%     |
+| Partidas       | 100%     |
+| Estadísticas   | 100%     |
+| Frontend Base  | 100%     |
+| Accesibilidad  | 100%     |
+| Legal          | 100%     |
+
+Proyecto finalizado y validado en todos los sprints.  
+Documentación, presupuesto y gestión de recursos actualizados.
 
 ## 👨‍💻 Autores
 
-- [@Aranaaa00](https://github.com/Aaranaa00)
-- [@Trevictus](https://github.com/Trevictus)
-- [@Juanfu224](https://github.com/Juanfu224)
+- [@Aranaaa00](https://github.com/Aaranaa00) — Desarrollo backend y frontend
+- [@Trevictus](https://github.com/Trevictus) — Diseño, UX/UI y frontend
+- [@Juanfu224](https://github.com/Juanfu224) — Scrum Master, DevOps y gestión
 
 ## 📄 Licencia
 
-MIT License - Ver [LICENSE](LICENSE)
+MIT License — Ver [LICENSE](LICENSE)
 
 ---
 
-**⭐ Si te gusta el proyecto, dale una estrella ⭐**
+**⭐ Si te ha sido útil, comparte Tabletop Mastering con tu grupo y déjanos tu feedback.**
 
-*Proyecto educativo DAW - Hecho con ❤️ para la comunidad de juegos de mesa*
+*Proyecto educativo DAW — Hecho con pasión y trabajo en equipo para la comunidad de juegos de mesa.*
