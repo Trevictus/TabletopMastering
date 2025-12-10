@@ -9,14 +9,29 @@ https://tabletopmastering.games/
 [![React](https://img.shields.io/badge/React-19.2-61dafb)](https://react.dev/)
 [![Licencia](https://img.shields.io/badge/Licencia-MIT-yellow)](LICENSE)
 
-## 📖 Descripción
+## Descripción
 
 Tabletop Mastering es una aplicación web que permite organizar sesiones, registrar resultados, gestionar grupos y consultar estadísticas de juegos de mesa.  
 Pensada para clubes, asociaciones y grupos de amigos que quieren llevar el control de sus partidas de forma sencilla y colaborativa.
 
+## Justificación y Audiencia Objetivo
+
+La idea de Tabletop Mastering surge de la necesidad real de los grupos de juegos de mesa de contar con una herramienta centralizada, moderna y colaborativa para gestionar sus partidas, resultados y estadísticas. Muchas soluciones actuales son complejas, de pago o no se adaptan a la realidad de clubes y asociaciones que buscan sencillez, transparencia y control sobre sus datos.
+
+**Audiencia objetivo:**
+- Clubes y asociaciones de juegos de mesa que organizan eventos y ligas internas.
+- Grupos de amigos que desean llevar un registro histórico de sus partidas y resultados.
+- Jugadores que buscan comparar su rendimiento y progresión a lo largo del tiempo.
+
+**Beneficios para el usuario:**
+- Facilita la organización y comunicación dentro del grupo.
+- Permite registrar y consultar resultados de manera rápida y visual.
+- Ofrece estadísticas y rankings personalizados, motivando la participación.
+- Garantiza la privacidad y el control de los datos, sin depender de plataformas externas comerciales.
+
+Esta propuesta responde a la demanda de una solución accesible, gratuita y adaptada a la comunidad hispanohablante, con enfoque en la experiencia de usuario y el cumplimiento legal.
+
 **Funcionalidades principales:**
-- Autenticación segura con JWT
-- Gestión de grupos y roles
 - Catálogo de juegos con integración BoardGameGeek
 - Registro de partidas y resultados
 - Historial y estadísticas personalizadas
@@ -24,7 +39,7 @@ Pensada para clubes, asociaciones y grupos de amigos que quieren llevar el contr
 - Panel de administración y configuración
 - Accesibilidad y cumplimiento legal (RGPD, LSSI-CE, WCAG 2.1)
 
-## 🚀 Acceso y despliegue
+## Acceso y despliegue
 
 La aplicación está disponible en producción en:
 
@@ -68,19 +83,21 @@ npm install
 npm run dev
 ```
 
-## 📚 Documentación
+## Documentación
 
 - [Legislación y Cumplimiento](docs/legislacion.md)
 - [Recursos y APIs](docs/recursos.md)
 - [Presupuesto y ROI](docs/presupuesto.md)
 
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 
 - **Backend:** Node.js + Express + MongoDB + JWT
-- **Frontend:** React 19 + Vite 7 + React Router v7
+- **Frontend:** React 19 + Vite 7 + React Router v7 + Zustand
+- **Gestión de estado:** Zustand (stores para auth, grupos y notificaciones)
+- **Llamadas API:** Axios con interceptores y manejo de errores
 - **DevOps:** Docker + Docker Compose
 
-## ✅ Estado del Proyecto
+## Estado del Proyecto
 
 | Módulo         | Estado   |
 |----------------|----------|
@@ -96,13 +113,13 @@ npm run dev
 Proyecto finalizado y validado en todos los sprints.  
 Documentación, presupuesto y gestión de recursos actualizados.
 
-## 👨‍💻 Autores
+## Autores
 
 - [@Aaranaa00](https://github.com/Aaranaa00) — Desarrollo backend y frontend
 - [@Trevictus](https://github.com/Trevictus) — Diseño, UX/UI y frontend
 - [@Juanfu224](https://github.com/Juanfu224) — Scrum Master, DevOps y gestión
 
-## 📄 Licencia
+## Licencia
 
 MIT License — Ver [LICENSE](LICENSE)
 

@@ -23,12 +23,16 @@
 
 ## Frontend
 
-- **Tecnologías principales:** React, Vite
-- **Dependencias clave:** axios, prop-types, react, react-dom, react-icons, react-router-dom
+- **Tecnologías principales:** React, Vite, Zustand
+- **Dependencias clave:** axios, prop-types, react, react-dom, react-icons, react-router-dom, zustand
 - **Configuración de desarrollo:** Vite (`vite.config.js`)
 - **Puerto por defecto:** 5173
-- **Servicios implementados:**
-  - `api.js`: Cliente Axios para comunicación con backend
+- **Gestión de estado global (Zustand):**
+  - `stores/authStore.js`: Estado de autenticación (usuario, login, logout, refreshUser)
+  - `stores/groupStore.js`: Estado de grupos (grupos, grupo seleccionado, CRUD)
+  - `stores/toastStore.js`: Sistema de notificaciones toast (success, error, warning, info)
+- **Servicios implementados (Axios):**
+  - `api.js`: Cliente Axios para comunicación con backend (interceptores, tokens, manejo de errores)
   - `authService.js`: Registro, login y gestión de sesión
   - `gameService.js`: Búsqueda y gestión de juegos (BoardGameGeek)
   - `groupService.js`: Gestión de grupos y miembros

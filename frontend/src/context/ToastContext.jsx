@@ -1,180 +1,34 @@
 /**
- * @fileoverview Contexto de Notificaciones Toast
- * @description Sistema de notificaciones toast global (success, error, warning, info)
+ * @fileoverview Contexto de Notificaciones Toast (Wrapper sobre Zustand)
+ * @description Provee compatibilidad con componentes existentes que usan useToast
  * @module context/ToastContext
  */
 
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext } from 'react';
 import PropTypes from 'prop-types';
-
-/**
- * Context para sistema de notificaciones Toast
- * 
- * Proporciona funciones para mostrar notificaciones de:
- * - Éxito
- * - Error
- * - Advertencia
- * - Información
- */
+import useToastStore, { ToastTypes } from '../stores/toastStore';
 
 const ToastContext = createContext(null);
 
+// Re-exportar tipos para compatibilidad
+export { ToastTypes };
+
 /**
  * Hook para acceder al contexto de toasts
- * @throws {Error} Si se usa fuera del ToastProvider
+ * Actúa como wrapper sobre el store de Zustand para compatibilidad
  */
 export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useToast debe ser usado dentro de un ToastProvider');
-  }
-  return context;
-};
-
-/**
- * Tipos de toast disponibles
- */
-export const ToastTypes = {
-  SUCCESS: 'success',
-  ERROR: 'error',
-  WARNING: 'warning',
-  INFO: 'info',
-};
-
-/**
- * Duración por defecto según el tipo
- */
-const DEFAULT_DURATIONS = {
-  [ToastTypes.SUCCESS]: 3000,
-  [ToastTypes.ERROR]: 5000,
-  [ToastTypes.WARNING]: 4000,
-  [ToastTypes.INFO]: 3000,
-};
-
-/**
- * Proveedor del contexto de toasts
- */
-export const ToastProvider = ({ children }) => {
-  const [toasts, setToasts] = useState([]);
-
-  /**
-   * Remueve un toast por ID
-   */
-  const removeToast = useCallback((id) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
-  }, []);
-
-  /**
-   * Añade un nuevo toast
-   * @param {Object} toast - Configuración del toast
-   */
-  const addToast = useCallback((toast) => {
-    const id = Date.now() + Math.random();
-    const duration = toast.duration || DEFAULT_DURATIONS[toast.type];
-
-    const newToast = {
-      id,
-      type: toast.type || ToastTypes.INFO,
-      title: toast.title,
-      message: toast.message,
-      duration,
-      action: toast.action,
-    };
-
-    setToasts((prev) => [...prev, newToast]);
-
-    // Auto-remover después de la duración
-    if (duration > 0) {
-      setTimeout(() => {
-        removeToast(id);
-      }, duration);
-    }
-
-    return id;
-  }, [removeToast]);
-
-  /**
-   * Remueve todos los toasts
-   */
-  const clearAll = useCallback(() => {
-    setToasts([]);
-  }, []);
-
-  /**
-   * Muestra un toast de éxito
-   */
-  const success = useCallback((message, options = {}) => {
-    return addToast({
-      type: ToastTypes.SUCCESS,
-      title: options.title || 'Éxito',
-      message,
-      ...options,
-    });
-  }, [addToast]);
-
-  /**
-   * Muestra un toast de error
-   */
-  const error = useCallback((message, options = {}) => {
-    return addToast({
-      type: ToastTypes.ERROR,
-      title: options.title || 'Error',
-      message,
-      ...options,
-    });
-  }, [addToast]);
-
-  /**
-   * Muestra un toast de advertencia
-   */
-  const warning = useCallback((message, options = {}) => {
-    return addToast({
-      type: ToastTypes.WARNING,
-      title: options.title || 'Advertencia',
-      message,
-      ...options,
-    });
-  }, [addToast]);
-
-  /**
-   * Muestra un toast de información
-   */
-  const info = useCallback((message, options = {}) => {
-    return addToast({
-      type: ToastTypes.INFO,
-      title: options.title || 'Información',
-      message,
-      ...options,
-    });
-  }, [addToast]);
-
-  /**
-   * Muestra un toast de promesa
-   * Útil para operaciones asíncronas
-   */
-  const promise = useCallback(async (
-    promiseFn,
-    {
-      loading = 'Cargando...',
-      success: successMsg = 'Operación exitosa',
-      error: errorMsg = 'Ocurrió un error',
-    } = {}
-  ) => {
-    const loadingId = info(loading, { duration: 0 });
-
-    try {
-      const result = await promiseFn;
-      removeToast(loadingId);
-      success(typeof successMsg === 'function' ? successMsg(result) : successMsg);
-      return result;
-    } catch (err) {
-      removeToast(loadingId);
-      error(typeof errorMsg === 'function' ? errorMsg(err) : errorMsg);
-      throw err;
-    }
-  }, [info, success, error, removeToast]);
-
-  const value = {
+  // Usar directamente el store de Zustand
+  const toasts = useToastStore((state) => state.toasts);
+  const success = useToastStore((state) => state.success);
+  const error = useToastStore((state) => state.error);
+  const warning = useToastStore((state) => state.warning);
+  const info = useToastStore((state) => state.info);
+  const promise = useToastStore((state) => state.promise);
+  const removeToast = useToastStore((state) => state.removeToast);
+  const clearAll = useToastStore((state) => state.clearAll);
+  
+  return {
     toasts,
     success,
     error,
@@ -184,9 +38,16 @@ export const ToastProvider = ({ children }) => {
     remove: removeToast,
     clearAll,
   };
+};
 
+/**
+ * Proveedor del contexto de toasts
+ * Mantiene compatibilidad con el sistema anterior
+ */
+export const ToastProvider = ({ children }) => {
+  // El valor del contexto es solo un marcador para verificar el provider
   return (
-    <ToastContext.Provider value={value}>
+    <ToastContext.Provider value={true}>
       {children}
     </ToastContext.Provider>
   );

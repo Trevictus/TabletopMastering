@@ -1,118 +1,52 @@
 /**
- * @fileoverview Contexto de Grupos
- * @description Provee estado y métodos de gestión de grupos global
+ * @fileoverview Contexto de Grupos (Wrapper sobre Zustand)
+ * @description Provee compatibilidad con componentes existentes que usan useGroup
  * @module context/GroupContext
  */
 
 import PropTypes from 'prop-types';
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import groupService from '../services/groupService';
-import { STORAGE_KEYS } from '../constants/auth';
+import { createContext } from 'react';
+import useGroupStore from '../stores/groupStore';
 
 const GroupContext = createContext(null);
 
 /**
  * Hook personalizado para acceder al contexto de grupos
- * @returns {Object} Contexto de grupos con selectedGroup, grupos y métodos
- * @throws {Error} Si se usa fuera del GroupProvider
+ * Actúa como wrapper sobre el store de Zustand para compatibilidad
+ * @returns {Object} Contexto de grupos
  */
 export const useGroup = () => {
-  const context = useContext(GroupContext);
-  if (!context) {
-    throw new Error('useGroup debe ser usado dentro de un GroupProvider');
-  }
-  return context;
+  // Usar directamente el store de Zustand
+  const selectedGroup = useGroupStore((state) => state.selectedGroup);
+  const groups = useGroupStore((state) => state.groups);
+  const loading = useGroupStore((state) => state.loading);
+  const error = useGroupStore((state) => state.error);
+  const selectGroup = useGroupStore((state) => state.selectGroup);
+  const loadGroups = useGroupStore((state) => state.loadGroups);
+  const clearError = useGroupStore((state) => state.clearError);
+  
+  return {
+    selectedGroup,
+    groups,
+    loading,
+    error,
+    selectGroup,
+    loadGroups,
+    clearError,
+  };
 };
 
 /**
- * Proveedor del contexto de grupos global
- * Maneja el grupo seleccionado actualmente y la lista de grupos del usuario
+ * Proveedor del contexto de grupos
+ * Mantiene compatibilidad con el sistema anterior
  */
 export const GroupProvider = ({ children }) => {
-  const [selectedGroup, setSelectedGroup] = useState(null);
-  const [groups, setGroups] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  /**
-   * Carga los grupos del usuario autenticado
-   */
-  const loadGroups = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await groupService.getMyGroups();
-      setGroups(response.data || []);
-      
-      // Si hay un grupo guardado en sessionStorage, intentar seleccionarlo
-      const savedGroupId = sessionStorage.getItem(STORAGE_KEYS.SELECTED_GROUP);
-      if (savedGroupId && response.data?.length > 0) {
-        const savedGroup = response.data.find(g => g._id === savedGroupId);
-        if (savedGroup) {
-          setSelectedGroup(savedGroup);
-        }
-      }
-      // No seleccionar automáticamente el primer grupo
-      // El usuario debe elegir explícitamente
-    } catch (err) {
-      // Solo mostrar error si no es una petición cancelada
-      if (err.name !== 'CanceledError') {
-        setError(err.response?.data?.message || 'Error al cargar grupos');
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, []); // Sin dependencias - es estable
-
-  /**
-   * Selecciona un grupo como activo
-   * @param {Object} group - Grupo a seleccionar
-   */
-  const selectGroup = useCallback((group) => {
-    setSelectedGroup(group);
-    // Guardar en sessionStorage para persistencia en esta pestaña
-    if (group) {
-      sessionStorage.setItem(STORAGE_KEYS.SELECTED_GROUP, group._id);
-    } else {
-      sessionStorage.removeItem(STORAGE_KEYS.SELECTED_GROUP);
-    }
-  }, []);
-
-  /**
-   * Restaura el grupo seleccionado desde sessionStorage
-   */
-  useEffect(() => {
-    const savedGroupId = sessionStorage.getItem(STORAGE_KEYS.SELECTED_GROUP);
-    if (savedGroupId && groups.length > 0 && !selectedGroup) {
-      const group = groups.find(g => g._id === savedGroupId);
-      if (group) {
-        setSelectedGroup(group);
-      }
-    }
-  }, [groups, selectedGroup]);
-
-  /**
-   * Limpia el error
-   */
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
-  // Memoizar el valor del contexto
-  const value = useMemo(
-    () => ({
-      selectedGroup,
-      groups,
-      loading,
-      error,
-      selectGroup,
-      loadGroups,
-      clearError,
-    }),
-    [selectedGroup, groups, loading, error, selectGroup, loadGroups, clearError]
+  // El valor del contexto es solo un marcador para verificar el provider
+  return (
+    <GroupContext.Provider value={true}>
+      {children}
+    </GroupContext.Provider>
   );
-
-  return <GroupContext.Provider value={value}>{children}</GroupContext.Provider>;
 };
 
 GroupProvider.propTypes = {
