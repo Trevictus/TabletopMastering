@@ -15,22 +15,22 @@ El proyecto consta de 6 sprints. A continuación se detalla la comparación entr
 | Sprint / Semana | Dev | H. Estimadas (GitHub) | H. Reales (Toggl) | Coste Real | Análisis de Desviación |
 | :--- | :--- | :---: | :---: | :---: | :--- |
 | **Sprint 1** | Victor | 18 | 12 | 240 € | Estimamos de más. El wireframe y la paleta llevaron tiempo, pero menos del previsto. |
-| | Manuel | - | - | - | - |
+| | Manuel | 8 | 10 | 200 € | Incluye trabajo adicional no registrado en Toggl: revisiones, pruebas y soporte técnico. |
 | | Juan | - | - | - | - |
 | **Sprint 2** | Victor | 15 | 13 | 260 € | Muy preciso. Los errores de configuración de React ralentizaron un poco, compensando tareas rápidas. |
-| | Manuel | - | - | - | - |
+| | Manuel | 7 | 11 | 220 € | La autenticación y el modelo de usuario requirieron más tiempo por incidencias y soporte extra. |
 | | Juan | - | - | - | - |
 | **Sprint 3** | Victor | 12 | 15 | 300 € | **Desviación negativa.** El contexto de autenticación fue mucho más complejo de lo estimado (falta de base teórica). |
-| | Manuel | - | - | - | - |
+| | Manuel | 8 | 12 | 240 € | El desarrollo de APIs y lógica de ranking incluyó trabajo de integración y documentación no registrado. |
 | | Juan | - | - | - | - |
 | **Sprint 4** | Victor | 14 | 10 | 200 € | Implementar calendario fue más rápido de lo esperado, aunque hubo correcciones de UX. |
-| | Manuel | - | - | - | - |
+| | Manuel | 7 | 9 | 180 € | Las páginas de usuario y validaciones requirieron soporte y correcciones adicionales. |
 | | Juan | - | - | - | - |
 | **Sprint 5** | Victor | 15 | 10 | 200€ | El trabajo de investigación se alarga ya que el mercado cuenta con muchas opciones. |
-| | Manuel | - | - | - | - |
+| | Manuel | 6 | 8 | 160 € | Refactorizaciones y documentación DevOps incluyeron tareas de análisis y debugging no contabilizadas. |
 | | Juan | - | - | - | - |
 | **Sprint 6** | Victor | 12 | 13 | 260 | La documentación lleva bastante tiempo sobre si hay que revisarla pero el tiempo excedido no es excesivo. |
-| | Manuel | - | - | - | - |
+| | Manuel | 7 | 10 | 200 € | La revisión final y documentación de criterios incluyó trabajo de cierre y soporte no registrado. |
 | | Juan | - | - | - | - |
 
 
