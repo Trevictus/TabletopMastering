@@ -33,10 +33,10 @@ const GAME_IMAGES = Object.freeze({
     image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629325193747.png',
     thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629325193747.png',
   },
-  // Scythe - Portada oficial
+  // Scythe - Imagen de gameplay de Wikipedia
   169786: {
-    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629323474169.jpg',
-    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629323474169.jpg',
+    image: 'https://upload.wikimedia.org/wikipedia/en/9/96/Scythe-gameplay.jpg',
+    thumbnail: 'https://upload.wikimedia.org/wikipedia/en/9/96/Scythe-gameplay.jpg',
   },
   // 7 Wonders Duel - Portada oficial
   173346: {
@@ -48,45 +48,45 @@ const GAME_IMAGES = Object.freeze({
     image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559257833516-612BUfjuA7fL.jpg',
     thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559257833516-612BUfjuA7fL.jpg',
   },
-  // Twilight Struggle - Portada oficial
+  // Twilight Struggle - Imagen de gameplay de Wikipedia
   12333: {
-    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254846153-51N7yvy2umL.jpg',
-    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254846153-51N7yvy2umL.jpg',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Twilight_struggle_example.jpg',
+    thumbnail: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Twilight_struggle_example.jpg',
   },
-  // Gaia Project - Portada oficial
+  // Gaia Project - Placeholder con nombre del juego
   220308: {
-    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1545169957644-51Lq7hMVVRL.jpg',
-    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1545169957644-51Lq7hMVVRL.jpg',
+    image: 'https://dummyimage.com/400x400/1a237e/ffffff.png&text=Gaia+Project',
+    thumbnail: 'https://dummyimage.com/200x200/1a237e/ffffff.png&text=Gaia+Project',
   },
   // The Castles of Burgundy - Portada oficial
   84876: {
     image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254202422-51mP2aJfyxL.jpg',
     thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254202422-51mP2aJfyxL.jpg',
   },
-  // Clank! - Portada oficial
+  // Clank! - Placeholder con nombre del juego
   233078: {
-    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254975681-61-Gvn-MBQL.jpg',
-    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254975681-61-Gvn-MBQL.jpg',
+    image: 'https://dummyimage.com/400x400/4a148c/ffffff.png&text=Clank!',
+    thumbnail: 'https://dummyimage.com/200x200/4a148c/ffffff.png&text=Clank!',
   },
   // Azul - Portada oficial
   230802: {
     image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254200327-61EFZADvURL.jpg',
     thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254200327-61EFZADvURL.jpg',
   },
-  // Root - Portada oficial
+  // Root - Diagrama de tablero de Wikipedia
   237182: {
-    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629324307084.jpg',
-    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629324307084.jpg',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/0/0a/Root_board_game_graph.svg',
+    thumbnail: 'https://upload.wikimedia.org/wikipedia/commons/0/0a/Root_board_game_graph.svg',
   },
   // Spirit Island - Portada oficial
   162886: {
     image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254941010-61PJxjjnbfL.jpg',
     thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254941010-61PJxjjnbfL.jpg',
   },
-  // Everdell - Portada oficial
+  // Everdell - Placeholder con nombre del juego
   199792: {
-    image: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254898769-61oy9MIPjLL.jpg',
-    thumbnail: 'https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1559254898769-61oy9MIPjLL.jpg',
+    image: 'https://dummyimage.com/400x400/1b5e20/ffffff.png&text=Everdell',
+    thumbnail: 'https://dummyimage.com/200x200/1b5e20/ffffff.png&text=Everdell',
   },
   // Default - Imagen genérica de juego de mesa
   default: {
