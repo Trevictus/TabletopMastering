@@ -8,73 +8,73 @@
  * @author TableTopMastering Team
  */
 
-// URLs de imágenes oficiales de BoardGameGeek (CDN estable y fiable)
-const BGG_IMAGE_BASE = 'https://cf.geekdo-images.com';
+// URLs de imágenes para mock (usando placeholders públicos confiables)
+const BGG_IMAGE_BASE = 'https://placehold.co';
 
 /**
  * Configuración de imágenes por juego
- * Cada juego tiene su imagen y thumbnail oficial de BGG
+ * Cada juego tiene su imagen y thumbnail usando placeholders con colores distintivos
  */
 const GAME_IMAGES = Object.freeze({
-  // Catan - Caja clásica naranja con la isla hexagonal
+  // Catan - Color naranja característico
   13: {
-    image: `${BGG_IMAGE_BASE}/images/pic2419375.jpg`,
-    thumbnail: `${BGG_IMAGE_BASE}/thumb/img/8a9HeqFydO7Uun_le9bXWPnidcA=/fit-in/200x150/filters:strip_icc()/pic2419375.jpg`,
+    image: `${BGG_IMAGE_BASE}/400x300/E57C23/FFFFFF?text=Catan`,
+    thumbnail: `${BGG_IMAGE_BASE}/200x150/E57C23/FFFFFF?text=Catan`,
   },
-  // Gloomhaven - Arte épico de fantasía oscura
+  // Gloomhaven - Color oscuro de fantasía
   174430: {
-    image: `${BGG_IMAGE_BASE}/images/pic2437871.jpg`,
-    thumbnail: `${BGG_IMAGE_BASE}/thumb/img/e7GyV4PaNtwmalU-EQAGecwW-lg=/fit-in/200x150/filters:strip_icc()/pic2437871.jpg`,
+    image: `${BGG_IMAGE_BASE}/400x300/2C3E50/FFFFFF?text=Gloomhaven`,
+    thumbnail: `${BGG_IMAGE_BASE}/200x150/2C3E50/FFFFFF?text=Gloomhaven`,
   },
-  // Terraforming Mars - Planeta rojo con corporaciones
+  // Terraforming Mars - Color rojo marciano
   167791: {
-    image: `${BGG_IMAGE_BASE}/images/pic3536616.jpg`,
-    thumbnail: `${BGG_IMAGE_BASE}/thumb/img/QK96lPCkhOhdXNlHqGMIL5OGdec=/fit-in/200x150/filters:strip_icc()/pic3536616.jpg`,
+    image: `${BGG_IMAGE_BASE}/400x300/C0392B/FFFFFF?text=Terraforming+Mars`,
+    thumbnail: `${BGG_IMAGE_BASE}/200x150/C0392B/FFFFFF?text=Terraforming+Mars`,
   },
-  // Wingspan - Ilustración artística de aves
+  // Wingspan - Color azul cielo
   266192: {
-    image: `${BGG_IMAGE_BASE}/images/pic4458123.jpg`,
-    thumbnail: `${BGG_IMAGE_BASE}/thumb/img/-SBY5JNPxqPbF18u0Y-xDzqneiY=/fit-in/200x150/filters:strip_icc()/pic4458123.jpg`,
+    image: `${BGG_IMAGE_BASE}/400x300/5DADE2/FFFFFF?text=Wingspan`,
+    thumbnail: `${BGG_IMAGE_BASE}/200x150/5DADE2/FFFFFF?text=Wingspan`,
   },
-  // Scythe - Mechs dieselpunk en Europa alternativa
+  // Scythe - Color verde militar
   169786: {
-    image: `${BGG_IMAGE_BASE}/images/pic3163924.jpg`,
-    thumbnail: `${BGG_IMAGE_BASE}/thumb/img/ZpT5sYwbKwDpe7DNiKSOnKVijuk=/fit-in/200x150/filters:strip_icc()/pic3163924.jpg`,
+    image: `${BGG_IMAGE_BASE}/400x300/1E8449/FFFFFF?text=Scythe`,
+    thumbnail: `${BGG_IMAGE_BASE}/200x150/1E8449/FFFFFF?text=Scythe`,
   },
-  // 7 Wonders Duel - Cartas y maravillas antiguas
+  // 7 Wonders Duel - Color dorado
   173346: {
-    image: `${BGG_IMAGE_BASE}/images/pic3043377.jpg`,
-    thumbnail: `${BGG_IMAGE_BASE}/thumb/img/LRIIr-_VEMfpHlVkHlbVqmlldzI=/fit-in/200x150/filters:strip_icc()/pic3043377.jpg`,
+    image: `${BGG_IMAGE_BASE}/400x300/D4AC0D/FFFFFF?text=7+Wonders+Duel`,
+    thumbnail: `${BGG_IMAGE_BASE}/200x150/D4AC0D/FFFFFF?text=7+Wonders+Duel`,
   },
-  // Pandemic Legacy Season 1 - Mapa del mundo con virus
+  // Pandemic Legacy Season 1 - Color rojo alerta
   161936: {
-    image: `${BGG_IMAGE_BASE}/images/pic2452831.png`,
-    thumbnail: `${BGG_IMAGE_BASE}/thumb/img/E6umhCSkeG4EcYjRaFtzWpMLmmE=/fit-in/200x150/filters:strip_icc()/pic2452831.png`,
+    image: `${BGG_IMAGE_BASE}/400x300/E74C3C/FFFFFF?text=Pandemic+Legacy`,
+    thumbnail: `${BGG_IMAGE_BASE}/200x150/E74C3C/FFFFFF?text=Pandemic+Legacy`,
   },
-  // Twilight Struggle - Guerra Fría con mapa global
+  // Twilight Struggle - Color azul/rojo guerra fría
   12333: {
-    image: `${BGG_IMAGE_BASE}/images/pic3530661.jpg`,
-    thumbnail: `${BGG_IMAGE_BASE}/thumb/img/iNHKuGa_4ePTCWGTz0gNZuZGRkY=/fit-in/200x150/filters:strip_icc()/pic3530661.jpg`,
+    image: `${BGG_IMAGE_BASE}/400x300/34495E/FFFFFF?text=Twilight+Struggle`,
+    thumbnail: `${BGG_IMAGE_BASE}/200x150/34495E/FFFFFF?text=Twilight+Struggle`,
   },
-  // Gaia Project - Planetas y facciones espaciales
+  // Gaia Project - Color púrpura espacial
   220308: {
-    image: `${BGG_IMAGE_BASE}/images/pic3763556.jpg`,
-    thumbnail: `${BGG_IMAGE_BASE}/thumb/img/VJd1HXHvdooPVjDMsXeobg8Vx0w=/fit-in/200x150/filters:strip_icc()/pic3763556.jpg`,
+    image: `${BGG_IMAGE_BASE}/400x300/8E44AD/FFFFFF?text=Gaia+Project`,
+    thumbnail: `${BGG_IMAGE_BASE}/200x150/8E44AD/FFFFFF?text=Gaia+Project`,
   },
-  // The Castles of Burgundy - Tablero de azulejos medievales
+  // The Castles of Burgundy - Color verde medieval
   84876: {
-    image: `${BGG_IMAGE_BASE}/images/pic1176894.jpg`,
-    thumbnail: `${BGG_IMAGE_BASE}/thumb/img/C7m9cRB7JkMHqbDrDH7DzXv4PFA=/fit-in/200x150/filters:strip_icc()/pic1176894.jpg`,
+    image: `${BGG_IMAGE_BASE}/400x300/27AE60/FFFFFF?text=Castles+of+Burgundy`,
+    thumbnail: `${BGG_IMAGE_BASE}/200x150/27AE60/FFFFFF?text=Castles+of+Burgundy`,
   },
-  // Clank! - Aventura en mazmorras con dragón
+  // Clank! - Color dorado de tesoro
   233078: {
-    image: `${BGG_IMAGE_BASE}/images/pic3180509.jpg`,
-    thumbnail: `${BGG_IMAGE_BASE}/thumb/img/EYuq1JJ4y2kvQugOw1_kRdDifLQ=/fit-in/200x150/filters:strip_icc()/pic3180509.jpg`,
+    image: `${BGG_IMAGE_BASE}/400x300/F39C12/FFFFFF?text=Clank!`,
+    thumbnail: `${BGG_IMAGE_BASE}/200x150/F39C12/FFFFFF?text=Clank!`,
   },
-  // Default - Placeholder genérico
+  // Default - Placeholder genérico gris
   default: {
-    image: `${BGG_IMAGE_BASE}/images/pic1657689.jpg`,
-    thumbnail: `${BGG_IMAGE_BASE}/thumb/img/Bl1-4YYBRC0cSJOqNbgcvx-8lQY=/fit-in/200x150/filters:strip_icc()/pic1657689.jpg`,
+    image: `${BGG_IMAGE_BASE}/400x300/7F8C8D/FFFFFF?text=Board+Game`,
+    thumbnail: `${BGG_IMAGE_BASE}/200x150/7F8C8D/FFFFFF?text=Board+Game`,
   },
 });
 

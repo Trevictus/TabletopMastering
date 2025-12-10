@@ -355,11 +355,14 @@ const AddGameModal = ({ isOpen, onClose, onGameAdded, groupId }) => {
           </Button>
 
           <div className={styles.preview}>
-            {gamePreview.image && (
+            {(gamePreview.image || gamePreview.thumbnail) && (
               <img
-                src={gamePreview.image}
+                src={gamePreview.image || gamePreview.thumbnail}
                 alt={gamePreview.name}
                 className={styles.previewImage}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
               />
             )}
 
