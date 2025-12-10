@@ -98,7 +98,7 @@ Documentación, presupuesto y gestión de recursos actualizados.
 
 ## 👨‍💻 Autores
 
-- [@Aranaaa00](https://github.com/Aaranaa00) — Desarrollo backend y frontend
+- [@Aaranaa00](https://github.com/Aaranaa00) — Desarrollo backend y frontend
 - [@Trevictus](https://github.com/Trevictus) — Diseño, UX/UI y frontend
 - [@Juanfu224](https://github.com/Juanfu224) — Scrum Master, DevOps y gestión
 
