@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Controlador de Partidas
+ * @description Maneja CRUD de partidas, resultados y calendario
+ * @module controllers/matchController
+ * @requires ../services/matchService
+ */
+
 const matchService = require('../services/matchService');
 
 /**

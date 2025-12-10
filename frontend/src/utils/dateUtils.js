@@ -1,4 +1,10 @@
 /**
+ * @fileoverview Utilidades de Fechas
+ * @description Funciones para formateo y manipulación de fechas
+ * @module utils/dateUtils
+ */
+
+/**
  * Formatea una fecha en formato legible
  * @param {string|Date} date - Fecha a formatear
  * @returns {string} Fecha formateada

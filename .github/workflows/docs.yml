@@ -1,0 +1,33 @@
+# Genera documentación automática en cada push
+name: Generate Documentation
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Generate Backend Docs (JSDoc)
+        run: |
+          npm install -g jsdoc
+          jsdoc backend -r -d docs/backend-api
+      
+      - name: Generate Frontend Docs (TypeDoc)
+        run: |
+          npm install -g typedoc
+          typedoc frontend/src --out docs/frontend-api --entryPointStrategy expand
+      
+      - name: Upload docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation
+          path: docs/
+          retention-days: 7

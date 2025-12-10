@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Servicio de Partidas
+ * @description Operaciones CRUD de partidas y calendario
+ * @module services/matchService
+ */
+
 import api from './api';
 
 const matchService = {

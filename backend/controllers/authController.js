@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Controlador de Autenticación
+ * @description Maneja registro, login, logout y perfil de usuarios
+ * @module controllers/authController
+ * @requires ../models/User
+ * @requires ../models/Group
+ * @requires ../models/Match
+ * @requires ../utils/generateToken
+ */
+
 const User = require('../models/User');
 const Group = require('../models/Group');
 const Match = require('../models/Match');

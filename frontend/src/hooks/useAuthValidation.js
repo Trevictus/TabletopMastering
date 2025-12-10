@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Hook de Validación de Autenticación
+ * @description Utilidades para verificar roles y permisos de usuario
+ * @module hooks/useAuthValidation
+ */
+
 import { useAuth } from '../context/AuthContext';
 
 /**

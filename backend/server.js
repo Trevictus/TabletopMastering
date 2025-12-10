@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Servidor principal de Tabletop Mastering API
+ * @description Configura Express, middlewares, rutas y conexión a MongoDB
+ * @module server
+ * @requires express
+ * @requires cors
+ * @requires morgan
+ * @requires ./config/database
+ */
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');

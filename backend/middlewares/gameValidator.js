@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Validadores de Juegos
+ * @description Define reglas de validación para operaciones con juegos
+ * @module middlewares/gameValidator
+ * @requires express-validator
+ */
+
 const { body, query, param } = require('express-validator');
 
 /**

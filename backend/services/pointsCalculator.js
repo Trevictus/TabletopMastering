@@ -1,4 +1,10 @@
 /**
+ * @fileoverview Calculador de Puntos
+ * @description Lógica pura para cálculo de puntos según posiciones en partidas
+ * @module services/pointsCalculator
+ */
+
+/**
  * Servicio para calcular puntos en partidas
  * Define la lógica de puntos sin efectos secundarios
  */

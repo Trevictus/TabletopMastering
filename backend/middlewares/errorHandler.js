@@ -1,5 +1,15 @@
 /**
+ * @fileoverview Middleware de Manejo de Errores
+ * @description Manejo centralizado de errores de la aplicación
+ * @module middlewares/errorHandler
+ */
+
+/**
  * Middleware para manejar errores globales
+ * @param {Error} err - Error capturado
+ * @param {Object} req - Request de Express
+ * @param {Object} res - Response de Express
+ * @param {Function} next - Siguiente middleware
  */
 const errorHandler = (err, req, res, next) => {
   console.error('❌ Error:', err);

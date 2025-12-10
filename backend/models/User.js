@@ -1,6 +1,25 @@
+/**
+ * @fileoverview Modelo de Usuario
+ * @description Define el esquema de usuario con autenticación, estadísticas y grupos
+ * @module models/User
+ * @requires mongoose
+ * @requires bcryptjs
+ */
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+/**
+ * Esquema de Usuario
+ * @typedef {Object} User
+ * @property {string} nickname - Nombre de jugador único
+ * @property {string} name - Nombre completo
+ * @property {string} email - Email único
+ * @property {string} password - Contraseña hasheada
+ * @property {string} avatar - URL del avatar
+ * @property {Object} stats - Estadísticas del jugador
+ * @property {ObjectId[]} groups - Grupos a los que pertenece
+ */
 const userSchema = new mongoose.Schema(
   {
     nickname: {

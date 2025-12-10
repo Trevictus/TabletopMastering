@@ -1,3 +1,15 @@
+/**
+ * @fileoverview Servicio de Partidas
+ * @description Lógica de negocio para CRUD de partidas y gestión de resultados
+ * @module services/matchService
+ * @requires ../models/Match
+ * @requires ../models/Group
+ * @requires ../models/Game
+ * @requires ../models/User
+ * @requires ./pointsCalculator
+ * @requires ./rankingService
+ */
+
 const Match = require('../models/Match');
 const Group = require('../models/Group');
 const Game = require('../models/Game');

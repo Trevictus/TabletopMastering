@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Servicio de Juegos BGG
+ * @description Integración con BoardGameGeek API para búsqueda e importación de juegos
+ * @module services/bggGameService
+ * @requires ../models/Game
+ * @requires ../models/Group
+ * @requires ./bggService
+ */
+
 const Game = require('../models/Game');
 const Group = require('../models/Group');
 const bggService = require('./bggService');

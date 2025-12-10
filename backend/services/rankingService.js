@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Servicio de Rankings
+ * @description Lógica de rankings, estadísticas y puntuaciones de usuarios
+ * @module services/rankingService
+ * @requires ../models/User
+ * @requires ./pointsCalculator
+ */
+
 const User = require('../models/User');
 const pointsCalculator = require('./pointsCalculator');
 

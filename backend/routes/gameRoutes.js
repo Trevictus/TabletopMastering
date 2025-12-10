@@ -1,3 +1,14 @@
+/**
+ * @fileoverview Rutas de Juegos
+ * @description Define endpoints para CRUD de juegos, BGG, caché y estadísticas
+ * @module routes/gameRoutes
+ * @requires express
+ * @requires ../middlewares/auth
+ * @requires ../middlewares/gameValidator
+ * @requires ../controllers/gameController
+ * @requires ../controllers/cacheController
+ */
+
 const express = require('express');
 const { protect } = require('../middlewares/auth');
 const { validate } = require('../middlewares/validator');

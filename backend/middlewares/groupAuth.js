@@ -1,7 +1,17 @@
+/**
+ * @fileoverview Middleware de Autorización de Grupos
+ * @description Verifica membresía y roles de usuario en grupos
+ * @module middlewares/groupAuth
+ * @requires ../models/Group
+ */
+
 const Group = require('../models/Group');
 
 /**
  * Middleware para verificar que el usuario sea miembro del grupo
+ * @param {Object} req - Request de Express
+ * @param {Object} res - Response de Express
+ * @param {Function} next - Siguiente middleware
  */
 const isGroupMember = async (req, res, next) => {
   try {

@@ -1,4 +1,10 @@
 /**
+ * @fileoverview Constantes de Autenticación
+ * @description Claves de almacenamiento, mensajes de error y configuración de auth
+ * @module constants/auth
+ */
+
+/**
  * Constantes y configuraciones para el sistema de autenticación
  */
 

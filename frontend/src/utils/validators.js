@@ -1,4 +1,10 @@
 /**
+ * @fileoverview Validadores
+ * @description Funciones de validación para formularios (email, password, etc.)
+ * @module utils/validators
+ */
+
+/**
  * Valida un email
  * @param {string} email - Email a validar
  * @returns {boolean} True si es válido

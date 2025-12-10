@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Middleware de Upload
+ * @description Configura multer para subida de imágenes de juegos
+ * @module middlewares/upload
+ * @requires multer
+ * @requires path
+ * @requires fs
+ */
+
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');

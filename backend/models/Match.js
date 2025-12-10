@@ -1,5 +1,22 @@
+/**
+ * @fileoverview Modelo de Partida
+ * @description Define el esquema de partidas con jugadores, resultados y estadísticas
+ * @module models/Match
+ * @requires mongoose
+ */
+
 const mongoose = require('mongoose');
 
+/**
+ * Esquema de Partida
+ * @typedef {Object} Match
+ * @property {ObjectId} game - Juego de la partida
+ * @property {ObjectId} group - Grupo donde se juega
+ * @property {Date} scheduledDate - Fecha programada
+ * @property {string} status - Estado (programada/en_curso/finalizada/cancelada)
+ * @property {Array} players - Jugadores participantes
+ * @property {ObjectId} winner - Ganador de la partida
+ */
 const matchSchema = new mongoose.Schema(
   {
     game: {

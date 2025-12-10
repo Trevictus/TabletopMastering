@@ -1,3 +1,14 @@
+/**
+ * @fileoverview Rutas de Grupos
+ * @description Define endpoints para CRUD de grupos, miembros e invitaciones
+ * @module routes/groupRoutes
+ * @requires express
+ * @requires express-validator
+ * @requires ../controllers/groupController
+ * @requires ../middlewares/auth
+ * @requires ../middlewares/groupAuth
+ */
+
 const express = require('express');
 const { body, param } = require('express-validator');
 const {

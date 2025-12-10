@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Controlador de Grupos
+ * @description Maneja CRUD de grupos, miembros, invitaciones y permisos
+ * @module controllers/groupController
+ * @requires ../models/Group
+ * @requires ../models/User
+ * @requires ../models/Match
+ * @requires ../utils/groupHelpers
+ */
+
 const Group = require('../models/Group');
 const User = require('../models/User');
 const Match = require('../models/Match');

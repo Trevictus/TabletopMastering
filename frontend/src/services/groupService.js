@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Servicio de Grupos
+ * @description Operaciones CRUD de grupos, miembros e invitaciones
+ * @module services/groupService
+ */
+
 import api from './api';
 
 const groupService = {

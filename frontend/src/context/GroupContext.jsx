@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Contexto de Grupos
+ * @description Provee estado y métodos de gestión de grupos global
+ * @module context/GroupContext
+ */
+
 import PropTypes from 'prop-types';
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import groupService from '../services/groupService';

@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Servicio de Juegos
+ * @description Lógica de negocio para CRUD de juegos y sincronización con BGG
+ * @module services/gameService
+ * @requires ../models/Game
+ * @requires ../models/Group
+ */
+
 const Game = require('../models/Game');
 const Group = require('../models/Group');
 

@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Servicio de Autenticación
+ * @description Operaciones de registro, login, logout y gestión de sesión
+ * @module services/authService
+ */
+
 import api from './api';
 import { STORAGE_KEYS } from '../constants/auth';
 

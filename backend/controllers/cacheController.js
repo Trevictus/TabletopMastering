@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Controlador de Caché
+ * @description Maneja operaciones de caché de BGG (estadísticas, invalidación, limpieza)
+ * @module controllers/cacheController
+ * @requires ../services/bggService
+ */
+
 const bggService = require('../services/bggService');
 
 /**

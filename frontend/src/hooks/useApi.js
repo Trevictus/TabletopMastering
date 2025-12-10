@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Hook de API
+ * @description Hook personalizado para peticiones HTTP con estado, cache y errores
+ * @module hooks/useApi
+ */
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { formatError, logError } from '../services/apiErrorHandler';
 import { useToast } from '../context/ToastContext';

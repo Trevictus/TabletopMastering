@@ -1,6 +1,22 @@
+/**
+ * @fileoverview Modelo de Grupo
+ * @description Define el esquema de grupos con miembros, roles e invitaciones
+ * @module models/Group
+ * @requires mongoose
+ * @requires crypto
+ */
+
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 
+/**
+ * Esquema de Grupo
+ * @typedef {Object} Group
+ * @property {string} name - Nombre del grupo
+ * @property {string} inviteCode - Código de invitación único
+ * @property {ObjectId} admin - Administrador del grupo
+ * @property {Array} members - Lista de miembros con roles
+ */
 const groupSchema = new mongoose.Schema(
   {
     name: {

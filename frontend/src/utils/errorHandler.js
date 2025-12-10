@@ -1,4 +1,10 @@
 /**
+ * @fileoverview Manejador de Errores
+ * @description Funciones para manejo centralizado de errores de API
+ * @module utils/errorHandler
+ */
+
+/**
  * Maneja errores de las peticiones API
  * @param {Error} error - Error de axios
  * @returns {string} Mensaje de error formateado

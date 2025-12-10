@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Utilidades de Grupos
+ * @description Funciones auxiliares para gestión de grupos y miembros
+ * @module utils/groupHelpers
+ * @requires ../models/Group
+ * @requires ../models/User
+ */
+
 const Group = require('../models/Group');
 const User = require('../models/User');
 

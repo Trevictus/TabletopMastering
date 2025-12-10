@@ -1,8 +1,18 @@
+/**
+ * @fileoverview Modelo de Caché BGG
+ * @description Cache de datos de BoardGameGeek para reducir llamadas a API externa
+ * @module models/BGGCache
+ * @requires mongoose
+ */
+
 const mongoose = require('mongoose');
 
 /**
- * Esquema para cachear datos de BoardGameGeek
- * Reduce llamadas a la API externa y mejora el rendimiento
+ * Esquema de Caché BGG
+ * @typedef {Object} BGGCache
+ * @property {number} bggId - ID único del juego en BGG
+ * @property {Object} data - Datos cacheados del juego
+ * @property {Date} lastSync - Última sincronización
  */
 const bggCacheSchema = new mongoose.Schema(
   {

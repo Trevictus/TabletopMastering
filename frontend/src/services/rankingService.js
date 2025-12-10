@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Servicio de Rankings
+ * @description Obtiene rankings globales y por grupo
+ * @module services/rankingService
+ */
+
 import api from './api';
 
 const rankingService = {

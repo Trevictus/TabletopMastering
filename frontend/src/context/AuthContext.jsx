@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Contexto de Autenticación
+ * @description Provee estado y métodos de autenticación global
+ * @module context/AuthContext
+ */
+
 import PropTypes from 'prop-types';
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import authService from '../services/authService';

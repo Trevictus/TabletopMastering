@@ -1,5 +1,22 @@
+/**
+ * @fileoverview Modelo de Juego
+ * @description Define el esquema de juegos de mesa (personalizados o de BGG)
+ * @module models/Game
+ * @requires mongoose
+ */
+
 const mongoose = require('mongoose');
 
+/**
+ * Esquema de Juego
+ * @typedef {Object} Game
+ * @property {string} name - Nombre del juego
+ * @property {string} description - Descripción
+ * @property {number} minPlayers - Mínimo de jugadores
+ * @property {number} maxPlayers - Máximo de jugadores
+ * @property {string} source - Origen (bgg/custom)
+ * @property {number} bggId - ID en BoardGameGeek
+ */
 const gameSchema = new mongoose.Schema(
   {
     name: {

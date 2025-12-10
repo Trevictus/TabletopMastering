@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Controlador de Juegos
+ * @description Maneja CRUD de juegos, búsqueda en BGG y sincronización
+ * @module controllers/gameController
+ * @requires ../services/gameService
+ * @requires ../services/bggGameService
+ */
+
 const gameService = require('../services/gameService');
 const bggGameService = require('../services/bggGameService');
 

@@ -1,5 +1,19 @@
+/**
+ * @fileoverview Configuración de conexión a MongoDB
+ * @description Establece y gestiona la conexión con la base de datos MongoDB
+ * @module config/database
+ * @requires mongoose
+ */
+
 const mongoose = require('mongoose');
 
+/**
+ * Conecta a la base de datos MongoDB
+ * @async
+ * @function connectDB
+ * @returns {Promise<void>}
+ * @throws {Error} Si no puede conectar a MongoDB
+ */
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI, {

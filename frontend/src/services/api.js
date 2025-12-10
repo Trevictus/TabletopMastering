@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Cliente API HTTP
+ * @description Configuración de Axios con interceptors, autenticación y manejo de errores
+ * @module services/api
+ */
+
 import axios from 'axios';
 import { STORAGE_KEYS, AUTH_ROUTES } from '../constants/auth';
 

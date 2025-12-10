@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Servicio de Juegos
+ * @description Operaciones CRUD de juegos e integración con BGG
+ * @module services/gameService
+ */
+
 import api from './api';
 
 const gameService = {

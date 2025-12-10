@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Rutas de Autenticación
+ * @description Define endpoints para registro, login, perfil y gestión de cuenta
+ * @module routes/authRoutes
+ * @requires express
+ * @requires express-validator
+ * @requires ../controllers/authController
+ * @requires ../middlewares/auth
+ */
+
 const express = require('express');
 const { body } = require('express-validator');
 const { register, login, getMe, updateProfile, checkNickname, checkEmail, exportUserData, deleteAccount } = require('../controllers/authController');

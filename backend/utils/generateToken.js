@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Generador de Tokens JWT
+ * @description Crea tokens de autenticación firmados
+ * @module utils/generateToken
+ * @requires jsonwebtoken
+ */
+
 const jwt = require('jsonwebtoken');
 
 /**

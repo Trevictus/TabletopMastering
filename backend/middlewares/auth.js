@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Middleware de Autenticación
+ * @description Protección de rutas mediante verificación JWT
+ * @module middlewares/auth
+ * @requires jsonwebtoken
+ * @requires ../models/User
+ */
+
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 

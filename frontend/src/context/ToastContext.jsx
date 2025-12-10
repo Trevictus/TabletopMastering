@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Contexto de Notificaciones Toast
+ * @description Sistema de notificaciones toast global (success, error, warning, info)
+ * @module context/ToastContext
+ */
+
 import { createContext, useContext, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 

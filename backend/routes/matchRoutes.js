@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Rutas de Partidas
+ * @description Define endpoints para CRUD de partidas, resultados y rankings
+ * @module routes/matchRoutes
+ * @requires express
+ * @requires ../middlewares/auth
+ * @requires ../controllers/matchController
+ */
+
 const express = require('express');
 const { protect } = require('../middlewares/auth');
 const {

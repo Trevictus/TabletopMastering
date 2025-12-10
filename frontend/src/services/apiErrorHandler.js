@@ -1,4 +1,10 @@
 /**
+ * @fileoverview Manejador de Errores de API
+ * @description Utilidades para categorización y formateo de errores HTTP
+ * @module services/apiErrorHandler
+ */
+
+/**
  * Utilidades para manejo centralizado de errores de API
  * 
  * Proporciona funciones helper para:
