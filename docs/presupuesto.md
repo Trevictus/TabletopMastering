@@ -1,35 +1,44 @@
 # Fase 2.2f): Presupuesto económico 
-### Cálculo del coste del proyecto
-#### --- Coste/hora por pefil ---
 
-| Perfil           | Desarrollador  | Coste/Hora |
-|------------------|----------------|------------|
-| Junior Fullstack | @Aranaaa00     | 20 €       |
-| Junior Fullstack | @Trevictus     | 20 €       |
-| Junior Fullstack | @Juanfu224     | 20 €       |
+## Coste por perfil
+Se ha establecido un coste por hora basado en el perfil Junior Fullstack, dentro del rango de mercado (15-25€/h).
 
-### Estimación vs realidad
-**Sprints** seis sprints de una semana cada uno, en el cuál cada integrante trabajará un total de 20 horas a la semana, con diferentes tiempos asignados para cada tarea.  
+| Perfil | Desarrollador | Coste/Hora |
+| :--- | :--- | :---: |
+| Junior Fullstack | @Aranaaa00 | 20 € |
+| Junior Fullstack | @Trevictus | 20 € |
+| Junior Fullstack | @Juanfu224 | 20 € |
 
+## Seguimiento y Desviaciones (Sprint a Sprint)
+El proyecto consta de 6 sprints. A continuación se detalla la comparación entre la estimación realizada en GitHub Projects (Planning Poker) y las horas reales registradas en Toggl Track.
 
-| Semana | Desarrollador | H. Estimadas | H. Reales | Coste Real (20€/h) | Problemas Encontrados / Análisis de Desviación |
+| Sprint / Semana | Dev | H. Estimadas (GitHub) | H. Reales (Toggl) | Coste Real | Análisis de Desviación |
 | :--- | :--- | :---: | :---: | :---: | :--- |
-| **Semana 1** | Victor | 20 | 12 | 240 € | El wireframe y la paleta de color son los que más tiempo se han llevado. |
-| | Manuel | 20 | *--* | *--* | *(Por asignar)* |
-| | Juan | 20 | *--* | *--* | *(Por asignar)* |
-| **Semana 2** | Victor | 20 | 13 | 260 € | Mala práctica con Toggl y conceptos nuevos (configurar proyecto React) conllevaron errores que ralentizaron. |
-| | Manuel | 20 | *--* | *--* | *(Por asignar)* |
-| | Juan | 20 | *--* | *--* | *(Por asignar)* |
-| **Semana 3** | Victor | 20 | 15 | 300 € | Crear el contexto de autenticación fue costoso (10h para una issue) por falta de conceptos básicos y complejos. |
-| | Manuel | 20 | *--* | *--* | *(Por asignar)* |
-| | Juan | 20 | *--* | *--* | *(Por asignar)* |
-| **Semana 4** | Victor | 20 | 10 | 200 € | Implementar página de calendario fue fácil, el tiempo se fue en corrección de errores de UX. |
-| | Manuel | 20 | *--* | *--* | *(Por asignar)* |
-| | Juan | 20 | *--* | *--* | *(Por asignar)* |
-| **TOTALES** | **Global** | **240** | **50** (Solo Victor) | **1000 €** | *Coste parcial acumulado* |
+| **Sprint 1** | Victor | 18 | 12 | 240 € | Estimamos de más. El wireframe y la paleta llevaron tiempo, pero menos del previsto. |
+| | Manuel | - | - | - | - |
+| | Juan | - | - | - | - |
+| **Sprint 2** | Victor | 15 | 13 | 260 € | Muy preciso. Los errores de configuración de React ralentizaron un poco, compensando tareas rápidas. |
+| | Manuel | - | - | - | - |
+| | Juan | - | - | - | - |
+| **Sprint 3** | Victor | 12 | 15 | 300 € | **Desviación negativa.** El contexto de autenticación fue mucho más complejo de lo estimado (falta de base teórica). |
+| | Manuel | - | - | - | - |
+| | Juan | - | - | - | - |
+| **Sprint 4** | Victor | 14 | 10 | 200 € | Implementar calendario fue más rápido de lo esperado, aunque hubo correcciones de UX. |
+| | Manuel | - | - | - | - |
+| | Juan | - | - | - | - |
+| **Sprint 5** | Victor | 15 | 10 | 200€ | El trabajo de investigación se alarga ya que el mercado cuenta con muchas opciones. |
+| | Manuel | - | - | - | - |
+| | Juan | - | - | - | - |
+| **Sprint 6** | Victor | 12 | 13 | 260 | La documentación lleva bastante tiempo sobre si hay que revisarla pero el tiempo excedido no es excesivo. |
+| | Manuel | - | - | - | - |
+| | Juan | - | - | - | - |
 
 
+## Presupuesto Total del Proyecto
 
-**COSTES AÑADIDOS**  
-Hosting en DigitalOcean - 12€/mes  
-Dominio propio en names.com - 3'25/mes
+| Concepto | Detalle | Coste Total |
+| :--- | :--- | :---: |
+| **Recursos Humanos** | Victor (50h) + Manuel (Xh) + Juan (Xh) a 20€/h | **1.000 €** (+ resto) |
+| **Infraestructura** | Hosting DigitalOcean (12€/mes x 2 meses estimado) | 24 € |
+| **Dominios** | names.com (Pago anual prorrateado o mensual) | 3,25 € |
+| **TOTAL** | | **1.027,25 €** |
