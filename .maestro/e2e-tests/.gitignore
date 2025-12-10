@@ -1,0 +1,9 @@
+# Credenciales de test
+.env
+
+# Resultados de tests
+test-results/
+playwright-report/
+
+# Dependencias
+node_modules/
