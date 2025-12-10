@@ -123,12 +123,6 @@ const MatchDetailsModal = ({
   
   // Verificar si TODOS los jugadores han confirmado asistencia
   const allPlayersConfirmed = match.players?.length > 0 && match.players.every(p => p.confirmed);
-  
-  // Verificar si el usuario actual es jugador pero NO es el creador (puede abandonar)
-  const isPlayerNotCreator = match.players?.some(p => {
-    const playerId = p.user?._id || p.user;
-    return playerId === currentUserId;
-  }) && !isCreator;
 
   const footer = (
     <div className={styles.footerActions}>
