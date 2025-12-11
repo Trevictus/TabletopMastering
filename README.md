@@ -84,10 +84,14 @@ npm run dev
 ```
 
 ## Documentación
-
-- [Legislación y Cumplimiento](docs/legislacion.md)
-- [Recursos y APIs](docs/recursos.md)
+- [Guía de Usuario](docs/guia-usuario.md)
+- [Documentación de la API](docs/api.md)
+- [Análisis de Competencias](docs/analisis-competencias.md)
+- [Estructura Organizativa](docs/estructura-organizativa.md)
+- [Financiación](docs/financiacion.md)
 - [Presupuesto y ROI](docs/presupuesto.md)
+- [Recursos y APIs](docs/recursos.md)
+- [Legislación y Cumplimiento](docs/legislacion.md)
 
 ## Stack Tecnológico
 
