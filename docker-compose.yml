@@ -47,6 +47,7 @@ services:
       CLIENT_URL: ${CLIENT_URL:-http://localhost}
       JWT_SECRET: ${JWT_SECRET:-tu-super-secret-key-change-in-production}
       JWT_EXPIRE: ${JWT_EXPIRE:-7d}
+      SENTRY_DSN: ${SENTRY_DSN}
     volumes:
       # Bind mount para desarrollo con hot-reload
       - ./backend:/app:cached
@@ -75,6 +76,7 @@ services:
         condition: service_healthy
     environment:
       VITE_API_URL: ${VITE_API_URL:-http://localhost/api}
+      VITE_SENTRY_DSN: ${VITE_SENTRY_DSN}
     volumes:
       # Bind mount para desarrollo con hot-reload
       - ./frontend:/app:cached
@@ -114,12 +116,82 @@ services:
         limits:
           memory: 128M
 
+  # ---- Observabilidad (opcional, usar con --profile observability) ----
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: tabletop-prometheus
+    profiles: ["observability"]
+    restart: unless-stopped
+    command: ['--config.file=/etc/prometheus/prometheus.yml', '--storage.tsdb.path=/prometheus', '--storage.tsdb.retention.time=7d']
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - backend-network
+    ports:
+      - "9090:9090"
+
+  loki:
+    image: grafana/loki:latest
+    container_name: tabletop-loki
+    profiles: ["observability"]
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki-config.yml
+    volumes:
+      - ./observability/loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - loki_data:/loki
+    networks:
+      - backend-network
+    ports:
+      - "3100:3100"
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: tabletop-promtail
+    profiles: ["observability"]
+    restart: unless-stopped
+    command: -config.file=/etc/promtail/promtail-config.yml
+    volumes:
+      - ./observability/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - backend-network
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: tabletop-grafana
+    profiles: ["observability"]
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    networks:
+      - backend-network
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+      - loki
+
 # ---- Volúmenes persistentes ----
 volumes:
   mongodb_data:
     name: tabletop-mongodb-data
   game_uploads:
     name: tabletop-game-uploads
+  prometheus_data:
+    name: tabletop-prometheus-data
+  loki_data:
+    name: tabletop-loki-data
+  grafana_data:
+    name: tabletop-grafana-data
 
 # ---- Redes ----
 networks:
