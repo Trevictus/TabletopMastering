@@ -1,0 +1,87 @@
+# Security Scanning with Trivy
+name: Security Scan
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+  # Permite ejecución manual desde GitHub Actions
+  workflow_dispatch:
+
+jobs:
+  trivy-scan:
+    name: Trivy Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Escaneo de vulnerabilidades en el sistema de archivos (código y dependencias)
+      - name: Run Trivy vulnerability scanner (filesystem)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+          skip-dirs: 'node_modules,docs'
+
+      # Escaneo de la imagen Docker del backend
+      - name: Build Backend Docker image
+        run: docker build -t tabletopmastering-backend:${{ github.sha }} ./backend
+
+      - name: Run Trivy scanner on Backend image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'tabletopmastering-backend:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+      # Escaneo de la imagen Docker del frontend
+      - name: Build Frontend Docker image
+        run: docker build -t tabletopmastering-frontend:${{ github.sha }} ./frontend
+
+      - name: Run Trivy scanner on Frontend image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'tabletopmastering-frontend:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+  # Job separado para escaneo de dependencias con SARIF (integración con GitHub Security)
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner (SARIF)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
