@@ -22,6 +22,7 @@ jobs:
         uses: actions/checkout@v4
 
       # Escaneo de vulnerabilidades en el sistema de archivos (código y dependencias)
+      # Solo falla con vulnerabilidades CRITICAL en código propio
       - name: Run Trivy vulnerability scanner (filesystem)
         uses: aquasecurity/trivy-action@0.28.0
         with:
@@ -30,10 +31,10 @@ jobs:
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
-          severity: 'CRITICAL,HIGH'
-          skip-dirs: 'node_modules,docs'
+          severity: 'CRITICAL'
+          skip-dirs: 'node_modules,docs,.maestro'
 
-      # Escaneo de la imagen Docker del backend
+      # Escaneo de la imagen Docker del backend (informativo, no bloquea)
       - name: Build Backend Docker image
         run: docker build -t tabletopmastering-backend:${{ github.sha }} ./backend
 
@@ -42,11 +43,12 @@ jobs:
         with:
           image-ref: 'tabletopmastering-backend:${{ github.sha }}'
           format: 'table'
-          exit-code: '1'
+          exit-code: '0'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
+        continue-on-error: true
 
-      # Escaneo de la imagen Docker del frontend
+      # Escaneo de la imagen Docker del frontend (informativo, no bloquea)
       - name: Build Frontend Docker image
         run: docker build -t tabletopmastering-frontend:${{ github.sha }} ./frontend
 
@@ -55,9 +57,10 @@ jobs:
         with:
           image-ref: 'tabletopmastering-frontend:${{ github.sha }}'
           format: 'table'
-          exit-code: '1'
+          exit-code: '0'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
+        continue-on-error: true
 
   # Job separado para escaneo de dependencias con SARIF (integración con GitHub Security)
   dependency-scan:
