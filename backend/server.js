@@ -4,6 +4,8 @@
  * @module server
  * @requires express
  * @requires cors
+ * @requires helmet
+ * @requires express-rate-limit
  * @requires morgan
  * @requires ./config/database
  * @requires Sentry
@@ -13,6 +15,8 @@ require('dotenv').config();
 const Sentry = require('@sentry/node');
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 const path = require('path');
 const connectDB = require('./config/database');
@@ -40,6 +44,58 @@ Sentry.init({
 
 // Conectar a la base de datos
 connectDB();
+
+// ============================================
+// SEGURIDAD BÁSICA
+// ============================================
+
+// Helmet.js - Cabeceras HTTP de seguridad
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Necesario para cargar imágenes externas
+}));
+
+// Rate Limiting - Limitar peticiones por IP
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // Máximo 100 peticiones por ventana por IP
+  message: {
+    success: false,
+    message: 'Demasiadas peticiones desde esta IP, por favor intenta de nuevo en 15 minutos',
+  },
+  standardHeaders: true, // Devuelve info de rate limit en headers `RateLimit-*`
+  legacyHeaders: false, // Deshabilita headers `X-RateLimit-*`
+});
+
+// Aplicar rate limiting a todas las rutas de API
+app.use('/api', limiter);
+
+// Rate limiting más estricto para autenticación (prevención de fuerza bruta)
+const authLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hora
+  max: 10, // Máximo 10 intentos de login por hora por IP
+  message: {
+    success: false,
+    message: 'Demasiados intentos de autenticación, por favor intenta de nuevo en 1 hora',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Aplicar rate limiting estricto a rutas de autenticación
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
+
+// ============================================
+// OTROS MIDDLEWARES
+// ============================================
 
 // Middlewares globales
 app.use(cors({
