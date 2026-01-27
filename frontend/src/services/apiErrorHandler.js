@@ -4,6 +4,10 @@
  * @module services/apiErrorHandler
  */
 
+import Logger from '../utils/logger';
+
+const logger = new Logger('APIErrorHandler');
+
 /**
  * Utilidades para manejo centralizado de errores de API
  * 
@@ -200,20 +204,14 @@ export const isRetryableError = (error) => {
  * @param {string} context - Contexto donde ocurrió el error
  */
 export const logError = (error, context = 'API') => {
-  if (!import.meta.env.DEV) return;
-
   const formatted = formatError(error);
   
-  console.group(`❌ [${context}] Error: ${formatted.type}`);
-  console.log('Mensaje:', formatted.message);
-  console.log('Status:', formatted.status);
-  if (Object.keys(formatted.validationErrors).length > 0) {
-    console.log('Errores de validación:', formatted.validationErrors);
-  }
-  if (formatted.originalError) {
-    console.log('Error original:', formatted.originalError);
-  }
-  console.groupEnd();
+  logger.error(`[${context}] ${formatted.type}`, {
+    message: formatted.message,
+    status: formatted.status,
+    validationErrors: Object.keys(formatted.validationErrors).length > 0 ? formatted.validationErrors : null,
+    originalError: formatted.originalError,
+  });
 };
 
 export default {

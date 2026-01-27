@@ -4,6 +4,10 @@
  * @module utils/errorHandler
  */
 
+import Logger from './logger';
+
+const logger = new Logger('ErrorHandler');
+
 /**
  * Maneja errores de las peticiones API
  * @param {Error} error - Error de axios
@@ -28,7 +32,7 @@ export const handleApiError = (error) => {
  */
 export const showSuccess = (message) => {
   // Implementar con librería de toasts o notificaciones
-  console.log('✅ Éxito:', message);
+  logger.success(message);
 };
 
 /**
@@ -37,5 +41,5 @@ export const showSuccess = (message) => {
  */
 export const showError = (message) => {
   // Implementar con librería de toasts o notificaciones
-  console.error('❌ Error:', message);
+  logger.error(message);
 };
