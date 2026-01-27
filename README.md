@@ -2,74 +2,74 @@
 
 https://tabletopmastering.games/
 
-> Plataforma web para la gestión integral de partidas y grupos de juegos de mesa
+> Web platform for comprehensive management of tabletop gaming sessions and groups
 
 [![Node](https://img.shields.io/badge/Node.js-20%2B-success)](https://nodejs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.0-brightgreen)](https://www.mongodb.com/)
 [![React](https://img.shields.io/badge/React-19.2-61dafb)](https://react.dev/)
-[![Licencia](https://img.shields.io/badge/Licencia-MIT-yellow)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
-## Descripción
+## Description
 
-Tabletop Mastering es una aplicación web que permite organizar sesiones, registrar resultados, gestionar grupos y consultar estadísticas de juegos de mesa.  
-Pensada para clubes, asociaciones y grupos de amigos que quieren llevar el control de sus partidas de forma sencilla y colaborativa.
+Tabletop Mastering is a web application that allows you to organize sessions, record results, manage groups, and consult statistics for tabletop games.  
+Designed for clubs, associations, and groups of friends who want to keep track of their games in a simple and collaborative way.
 
-## Justificación y Audiencia Objetivo
+## Justification and Target Audience
 
-La idea de Tabletop Mastering surge de la necesidad real de los grupos de juegos de mesa de contar con una herramienta centralizada, moderna y colaborativa para gestionar sus partidas, resultados y estadísticas. Muchas soluciones actuales son complejas, de pago o no se adaptan a la realidad de clubes y asociaciones que buscan sencillez, transparencia y control sobre sus datos.
+The idea for Tabletop Mastering stems from the real need of tabletop gaming groups to have a centralized, modern, and collaborative tool to manage their games, results, and statistics. Many current solutions are complex, paid, or don't adapt to the reality of clubs and associations seeking simplicity, transparency, and control over their data.
 
-**Audiencia objetivo:**
-- Clubes y asociaciones de juegos de mesa que organizan eventos y ligas internas.
-- Grupos de amigos que desean llevar un registro histórico de sus partidas y resultados.
-- Jugadores que buscan comparar su rendimiento y progresión a lo largo del tiempo.
+**Target audience:**
+- Tabletop gaming clubs and associations that organize events and internal leagues.
+- Groups of friends who want to keep a historical record of their games and results.
+- Players who want to compare their performance and progression over time.
 
-**Beneficios para el usuario:**
-- Facilita la organización y comunicación dentro del grupo.
-- Permite registrar y consultar resultados de manera rápida y visual.
-- Ofrece estadísticas y rankings personalizados, motivando la participación.
-- Garantiza la privacidad y el control de los datos, sin depender de plataformas externas comerciales.
+**User benefits:**
+- Facilitates organization and communication within the group.
+- Allows recording and querying results quickly and visually.
+- Offers customized statistics and rankings, motivating participation.
+- Guarantees data privacy and control, without depending on commercial external platforms.
 
-Esta propuesta responde a la demanda de una solución accesible, gratuita y adaptada a la comunidad hispanohablante, con enfoque en la experiencia de usuario y el cumplimiento legal.
+This proposal responds to the demand for an accessible, free solution adapted to the English-speaking community, with a focus on user experience and legal compliance.
 
-**Funcionalidades principales:**
-- Catálogo de juegos con integración BoardGameGeek
-- Registro de partidas y resultados
-- Historial y estadísticas personalizadas
-- Rankings globales y por grupo
-- Panel de administración y configuración
-- Accesibilidad y cumplimiento legal (RGPD, LSSI-CE, WCAG 2.1)
+**Main features:**
+- Game catalog with BoardGameGeek integration
+- Game session and result registration
+- History and personalized statistics
+- Global and group-specific rankings
+- Administration and configuration panel
+- Accessibility and legal compliance (GDPR, privacy regulations, WCAG 2.1)
 
-## Acceso y despliegue
+## Access and Deployment
 
-La aplicación está disponible en producción en:
+The application is available in production at:
 
 **https://tabletopmastering.games/**
 
-No es necesario instalar ni configurar nada para usar la web.
+No installation or configuration is necessary to use the web.
 
-### ¿Quieres desplegar tu propia instancia o contribuir?
+### Do you want to deploy your own instance or contribute?
 
-Puedes usar Docker o el entorno de desarrollo local siguiendo estos pasos:
+You can use Docker or the local development environment by following these steps:
 
-#### Docker (opcional para despliegue propio)
+#### Docker (optional for custom deployment)
 ```bash
 git clone https://github.com/Trevictus/TabletopMastering.git
 cd TabletopMastering
 cp .env.example .env
 docker compose up -d
 ```
-Accede a `http://localhost` en tu navegador.
+Access `http://localhost` in your browser.
 
-#### Variables de entorno (.env)
+#### Environment variables (.env)
 ```env
 MONGO_USERNAME=admin
 MONGO_PASSWORD=changeme
 MONGO_DBNAME=tabletop_mastering
-JWT_SECRET=tu_clave_secreta
+JWT_SECRET=your_secret_key
 JWT_EXPIRE=7d
 ```
 
-#### Desarrollo local
+#### Local Development
 ```bash
 # Backend
 cd backend
@@ -83,52 +83,52 @@ npm install
 npm run dev
 ```
 
-## Documentación
-- [Guía de Usuario](docs/guia-usuario.md)
-- [Documentación de la API](docs/api.md)
-- [Análisis de Competencias](docs/analisis-competencias.md)
-- [Estructura Organizativa](docs/estructura-organizativa.md)
-- [Financiación](docs/financiacion.md)
-- [Presupuesto y ROI](docs/presupuesto.md)
-- [Recursos y APIs](docs/recursos.md)
-- [Legislación y Cumplimiento](docs/legislacion.md)
+## Documentation
+- [User Guide](docs/guia-usuario.md)
+- [API Documentation](docs/api.md)
+- [Competitive Analysis](docs/analisis-competencias.md)
+- [Organizational Structure](docs/estructura-organizativa.md)
+- [Financing](docs/financiacion.md)
+- [Budget and ROI](docs/presupuesto.md)
+- [Resources and APIs](docs/recursos.md)
+- [Legislation and Compliance](docs/legislacion.md)
 
-## Stack Tecnológico
+## Technology Stack
 
 - **Backend:** Node.js + Express + MongoDB + JWT
 - **Frontend:** React 19 + Vite 7 + React Router v7 + Zustand
-- **Gestión de estado:** Zustand (stores para auth, grupos y notificaciones)
-- **Llamadas API:** Axios con interceptores y manejo de errores
+- **State Management:** Zustand (stores for auth, groups, and notifications)
+- **API Calls:** Axios with interceptors and error handling
 - **DevOps:** Docker + Docker Compose
 
-## Estado del Proyecto
+## Project Status
 
-| Módulo         | Estado   |
+| Module         | Status   |
 |----------------|----------|
-| Autenticación  | 100%     |
-| Grupos         | 100%     |
-| Juegos         | 100%     |
-| Partidas       | 100%     |
-| Estadísticas   | 100%     |
-| Frontend Base  | 100%     |
-| Accesibilidad  | 100%     |
+| Authentication | 100%     |
+| Groups         | 100%     |
+| Games          | 100%     |
+| Matches        | 100%     |
+| Statistics     | 100%     |
+| Base Frontend  | 100%     |
+| Accessibility  | 100%     |
 | Legal          | 100%     |
 
-Proyecto finalizado y validado en todos los sprints.  
-Documentación, presupuesto y gestión de recursos actualizados.
+Project completed and validated in all sprints.  
+Documentation, budget, and resource management updated.
 
-## Autores
+## Authors
 
-- [@Aaranaa00](https://github.com/Aaranaa00) — Desarrollo backend y frontend
-- [@Trevictus](https://github.com/Trevictus) — Diseño, UX/UI y frontend
-- [@Juanfu224](https://github.com/Juanfu224) — Scrum Master, DevOps y gestión
+- [@Aaranaa00](https://github.com/Aaranaa00) — Backend and frontend development
+- [@Trevictus](https://github.com/Trevictus) — Design, UX/UI, and frontend
+- [@Juanfu224](https://github.com/Juanfu224) — Scrum Master, DevOps, and management
 
-## Licencia
+## License
 
-MIT License — Ver [LICENSE](LICENSE)
+MIT License — See [LICENSE](LICENSE)
 
 ---
 
-**⭐ Si te ha sido útil, comparte Tabletop Mastering con tu grupo y déjanos tu feedback.**
+**⭐ If this has been useful to you, share Tabletop Mastering with your group and leave us your feedback.**
 
-*Proyecto educativo DAW — Hecho con pasión y trabajo en equipo para la comunidad de juegos de mesa.*
+*Educational DAW project — Made with passion and teamwork for the tabletop gaming community.*
